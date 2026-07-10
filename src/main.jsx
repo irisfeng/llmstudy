@@ -9,10 +9,11 @@ import '@fontsource/ibm-plex-mono/500.css'
 import '@fontsource/ibm-plex-mono/600.css'
 import App from './App.jsx'
 import { AuthProvider } from './auth.jsx'
+import { I18nProvider } from './i18n.jsx'
 import './styles.css'
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider><App /></AuthProvider>
+    <I18nProvider><AuthProvider><App /></AuthProvider></I18nProvider>
   </React.StrictMode>,
 )

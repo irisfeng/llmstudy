@@ -4,6 +4,7 @@ import {
   LockKey, SignIn, SignOut, SpinnerGap, UserCircle, X,
 } from '@phosphor-icons/react'
 import { getSupabase, isCloudConfigured } from './lib/supabase.js'
+import { useI18n } from './i18n.jsx'
 
 const AuthContext = createContext(null)
 
@@ -233,6 +234,14 @@ const statusCopy = {
   offline: ['本机已保存', '网络恢复后可继续同步'],
 }
 
+const statusCopyEn = {
+  unavailable: ['Saved locally', 'Cloud sync is not configured'],
+  local: ['Saved locally', 'Sign in to sync across devices'],
+  syncing: ['Syncing', 'One moment…'],
+  synced: ['Cloud synced', 'Progress is consistent across devices'],
+  offline: ['Saved locally', 'Sync will resume when the network returns'],
+}
+
 const authErrorCopy = {
   invalid_credentials: '邮箱或密码不正确。',
   email_address_invalid: '请输入能够正常接收邮件的邮箱地址。',
@@ -241,16 +250,27 @@ const authErrorCopy = {
   user_already_exists: '这个邮箱已经注册，请直接登录。',
   weak_password: '密码强度不足，请至少使用 8 位并混合字母与数字。',
 }
+const authErrorCopyEn = {
+  invalid_credentials: 'Incorrect email or password.',
+  email_address_invalid: 'Enter an email address that can receive messages.',
+  email_address_not_authorized: 'The current email service cannot send to this address.',
+  over_email_send_rate_limit: 'Too many verification emails. Please try again later.',
+  user_already_exists: 'This email is already registered. Sign in instead.',
+  weak_password: 'Use at least 8 characters with a mix of letters and numbers.',
+}
 
 export function AccountButton({ onClick, user, syncStatus = 'local', compact = false }) {
+  const { locale, pick } = useI18n()
+  const statuses = locale === 'zh' ? statusCopy : statusCopyEn
   const Icon = user ? (syncStatus === 'synced' ? CloudCheck : syncStatus === 'offline' ? CloudSlash : Cloud) : UserCircle
-  return <button className={`account-trigger ${user ? 'signed-in' : ''} ${compact ? 'compact' : ''}`} onClick={onClick} aria-label={user ? '打开学习账户' : '登录并同步进度'} title={user ? statusCopy[syncStatus]?.[0] : '登录并同步'}>
+  return <button className={`account-trigger ${user ? 'signed-in' : ''} ${compact ? 'compact' : ''}`} onClick={onClick} aria-label={user ? pick('打开学习账户','Open learning account') : pick('登录并同步进度','Sign in and sync progress')} title={user ? statuses[syncStatus]?.[0] : pick('登录并同步','Sign in and sync')}>
     <Icon weight={user ? 'fill' : 'regular'} />
-    {!compact && <span>{user ? statusCopy[syncStatus]?.[0] : '登录'}</span>}
+    {!compact && <span>{user ? statuses[syncStatus]?.[0] : pick('登录','Sign in')}</span>}
   </button>
 }
 
 export function AccountModal({ onClose, progress, completedCount, totalLessons, syncStatus, lastSynced }) {
+  const { locale, pick } = useI18n()
   const { user, configured, loading, recovery, clearRecovery } = useAuth()
   const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
@@ -291,14 +311,15 @@ export function AccountModal({ onClose, progress, completedCount, totalLessons, 
     }
     setBusy(false)
     if (result.error) {
-      setError(authErrorCopy[result.error.code] || (result.error.message === 'Invalid login credentials' ? '邮箱或密码不正确。' : result.error.message))
+      const errorCopy = locale === 'zh' ? authErrorCopy : authErrorCopyEn
+      setError(errorCopy[result.error.code] || (result.error.message === 'Invalid login credentials' ? pick('邮箱或密码不正确。','Incorrect email or password.') : result.error.message))
       return
     }
-    if (mode === 'signup') setMessage('确认邮件已发送。打开邮件中的链接后，进度会自动同步。')
-    if (mode === 'reset') setMessage('密码重置邮件已发送，请检查收件箱。')
+    if (mode === 'signup') setMessage(pick('确认邮件已发送。打开邮件中的链接后，进度会自动同步。','Confirmation email sent. Open its link and your progress will sync automatically.'))
+    if (mode === 'reset') setMessage(pick('密码重置邮件已发送，请检查收件箱。','Password reset email sent. Check your inbox.'))
     if (mode === 'update') {
       clearRecovery()
-      setMessage('密码已更新。')
+      setMessage(pick('密码已更新。','Password updated.'))
     }
   }
 
@@ -310,31 +331,32 @@ export function AccountModal({ onClose, progress, completedCount, totalLessons, 
     onClose()
   }
 
-  const [statusTitle, statusDetail] = statusCopy[syncStatus] || statusCopy.local
+  const statuses = locale === 'zh' ? statusCopy : statusCopyEn
+  const [statusTitle, statusDetail] = statuses[syncStatus] || statuses.local
   const displayEmail = user?.email || ''
 
   return <div className="account-backdrop" onMouseDown={onClose}>
-    <section className="account-modal" role="dialog" aria-modal="true" aria-label={user ? '学习账户' : '登录'} onMouseDown={event => event.stopPropagation()}>
-      <header><div><span className="section-no">LEARNING ID</span><h2>{mode === 'update' ? '设置新密码' : user ? '你的学习档案' : mode === 'signup' ? '创建学习档案' : mode === 'reset' ? '找回密码' : '登录并继续'}</h2></div><button className="icon-button" onClick={onClose} aria-label="关闭"><X /></button></header>
-      {loading ? <div className="account-loading"><SpinnerGap className="spin" />正在读取账户…</div> : user && !recovery ? <>
-        <div className="account-identity"><span>{displayEmail.slice(0, 1).toUpperCase()}</span><div><b>{displayEmail}</b><small><Check /> 已登录 · 本机进度不会丢失</small></div></div>
-        <div className="account-progress"><div className="account-ring" style={{ '--p': `${progress}%` }}><span>{progress}%</span></div><div><span className="section-no">COURSE PROGRESS</span><strong>{completedCount} / {totalLessons} 节已完成</strong><p>每次完成课程或修改笔记，都会先保存在本机，再同步到云端。</p></div></div>
-        <div className={`sync-card ${syncStatus}`}><div>{syncStatus === 'synced' ? <CloudCheck weight="fill" /> : syncStatus === 'offline' ? <CloudSlash /> : <Cloud />}</div><span><b>{statusTitle}</b><small>{lastSynced ? `上次同步 ${lastSynced.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })}` : statusDetail}</small></span></div>
-        <button className="account-signout" onClick={signOut} disabled={busy}><SignOut />退出登录</button>
-      </> : !configured ? <div className="account-unavailable"><CloudSlash /><h3>云同步正在准备中</h3><p>课程、笔记和完成状态仍会安全保存在这台设备。云端启用后可直接登录导入。</p></div> : <>
-        <p className="account-intro">{mode === 'update' ? '请输入新的账户密码。更新后，你的学习进度与笔记不会改变。' : '游客也能完整学习。登录仅用于把 69 节课的进度、笔记与偏好同步到你的其他设备。'}</p>
+    <section className="account-modal" role="dialog" aria-modal="true" aria-label={user ? pick('学习账户','Learning account') : pick('登录','Sign in')} onMouseDown={event => event.stopPropagation()}>
+      <header><div><span className="section-no">LEARNING ID</span><h2>{mode === 'update' ? pick('设置新密码','Set a new password') : user ? pick('你的学习档案','Your learning profile') : mode === 'signup' ? pick('创建学习档案','Create a learning profile') : mode === 'reset' ? pick('找回密码','Reset password') : pick('登录并继续','Sign in and continue')}</h2></div><button className="icon-button" onClick={onClose} aria-label={pick('关闭','Close')}><X /></button></header>
+      {loading ? <div className="account-loading"><SpinnerGap className="spin" />{pick('正在读取账户…','Loading account…')}</div> : user && !recovery ? <>
+        <div className="account-identity"><span>{displayEmail.slice(0, 1).toUpperCase()}</span><div><b>{displayEmail}</b><small><Check /> {pick('已登录 · 本机进度不会丢失','Signed in · local progress stays safe')}</small></div></div>
+        <div className="account-progress"><div className="account-ring" style={{ '--p': `${progress}%` }}><span>{progress}%</span></div><div><span className="section-no">COURSE PROGRESS</span><strong>{completedCount} / {totalLessons} {pick('节已完成','lessons complete')}</strong><p>{pick('每次完成课程或修改笔记，都会先保存在本机，再同步到云端。','Completions and notes save locally first, then sync to the cloud.')}</p></div></div>
+        <div className={`sync-card ${syncStatus}`}><div>{syncStatus === 'synced' ? <CloudCheck weight="fill" /> : syncStatus === 'offline' ? <CloudSlash /> : <Cloud />}</div><span><b>{statusTitle}</b><small>{lastSynced ? `${pick('上次同步','Last synced')} ${lastSynced.toLocaleTimeString(locale === 'zh' ? 'zh-CN' : 'en', { hour: '2-digit', minute: '2-digit' })}` : statusDetail}</small></span></div>
+        <button className="account-signout" onClick={signOut} disabled={busy}><SignOut />{pick('退出登录','Sign out')}</button>
+      </> : !configured ? <div className="account-unavailable"><CloudSlash /><h3>{pick('云同步正在准备中','Cloud sync is being prepared')}</h3><p>{pick('课程、笔记和完成状态仍会安全保存在这台设备。云端启用后可直接登录导入。','Lessons, notes, and completions remain safely stored on this device.')}</p></div> : <>
+        <p className="account-intro">{mode === 'update' ? pick('请输入新的账户密码。更新后，你的学习进度与笔记不会改变。','Enter a new password. Your progress and notes will not change.') : pick('游客也能完整学习。登录仅用于把 69 节课的进度、笔记与偏好同步到你的其他设备。','Guests can access the full course. Sign-in only syncs all 69 lessons, notes, and preferences across devices.')}</p>
         <form className="auth-form" onSubmit={submit}>
-          {mode !== 'update' && <label><span>邮箱</span><div><EnvelopeSimple /><input type="email" inputMode="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></div></label>}
-          {mode !== 'reset' && <label><span>密码</span><div><LockKey /><input type={showPassword ? 'text' : 'password'} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength="8" required value={password} onChange={e => setPassword(e.target.value)} placeholder="至少 8 位" /><button type="button" onClick={() => setShowPassword(x => !x)} aria-label={showPassword ? '隐藏密码' : '显示密码'}>{showPassword ? <EyeSlash /> : <Eye />}</button></div></label>}
+          {mode !== 'update' && <label><span>{pick('邮箱','Email')}</span><div><EnvelopeSimple /><input type="email" inputMode="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" /></div></label>}
+          {mode !== 'reset' && <label><span>{pick('密码','Password')}</span><div><LockKey /><input type={showPassword ? 'text' : 'password'} autoComplete={mode === 'signup' ? 'new-password' : 'current-password'} minLength="8" required value={password} onChange={e => setPassword(e.target.value)} placeholder={pick('至少 8 位','At least 8 characters')} /><button type="button" onClick={() => setShowPassword(x => !x)} aria-label={showPassword ? pick('隐藏密码','Hide password') : pick('显示密码','Show password')}>{showPassword ? <EyeSlash /> : <Eye />}</button></div></label>}
           {error && <p className="auth-message error">{error}</p>}
           {message && <p className="auth-message success"><Check />{message}</p>}
-          <button className="auth-submit" disabled={busy}>{busy ? <SpinnerGap className="spin" /> : mode === 'signup' ? <UserCircle /> : mode === 'reset' ? <EnvelopeSimple /> : mode === 'update' ? <LockKey /> : <SignIn />}{mode === 'signup' ? '创建并导入本机进度' : mode === 'reset' ? '发送重置邮件' : mode === 'update' ? '保存新密码' : '登录并同步'}<ArrowRight /></button>
+          <button className="auth-submit" disabled={busy}>{busy ? <SpinnerGap className="spin" /> : mode === 'signup' ? <UserCircle /> : mode === 'reset' ? <EnvelopeSimple /> : mode === 'update' ? <LockKey /> : <SignIn />}{mode === 'signup' ? pick('创建并导入本机进度','Create account and import local progress') : mode === 'reset' ? pick('发送重置邮件','Send reset email') : mode === 'update' ? pick('保存新密码','Save new password') : pick('登录并同步','Sign in and sync')}<ArrowRight /></button>
         </form>
         <div className="auth-switch">
-          {mode === 'signin' && <><button onClick={() => { setMode('signup'); setError(''); setMessage('') }}>第一次来？创建账户</button><button onClick={() => { setMode('reset'); setError(''); setMessage('') }}>忘记密码</button></>}
-          {mode === 'update' ? <button onClick={() => { clearRecovery(); onClose() }}>暂不修改</button> : mode !== 'signin' && <button onClick={() => { setMode('signin'); setError(''); setMessage('') }}>返回登录</button>}
+          {mode === 'signin' && <><button onClick={() => { setMode('signup'); setError(''); setMessage('') }}>{pick('第一次来？创建账户','New here? Create an account')}</button><button onClick={() => { setMode('reset'); setError(''); setMessage('') }}>{pick('忘记密码','Forgot password')}</button></>}
+          {mode === 'update' ? <button onClick={() => { clearRecovery(); onClose() }}>{pick('暂不修改','Not now')}</button> : mode !== 'signin' && <button onClick={() => { setMode('signin'); setError(''); setMessage('') }}>{pick('返回登录','Back to sign in')}</button>}
         </div>
-        <small className="privacy-note"><LockKey /> 仅保存学习进度与笔记；密码由 Supabase Auth 加密管理，本站无法读取。</small>
+        <small className="privacy-note"><LockKey /> {pick('仅保存学习进度与笔记；密码由 Supabase Auth 加密管理，本站无法读取。','Only progress and notes are stored. Supabase Auth securely manages passwords; this site cannot read them.')}</small>
       </>}
     </section>
   </div>

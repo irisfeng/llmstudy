@@ -493,10 +493,15 @@ pre { margin:0; font:400 11px/1.55 'IBM Plex Mono', 'Noto Sans SC', monospace; t
 .theme-toggle svg { width:16px; height:16px; }
 .theme-toggle.compact { width:38px; min-width:38px; padding:0; }
 .lesson-outline > .theme-toggle { width:calc(100% - 28px); margin:0 14px 24px; justify-content:flex-start; padding-left:12px; }
+.language-toggle { height:36px; display:inline-flex; align-items:center; padding:3px; border:1px solid var(--line); border-radius:7px; background:var(--panel); }
+.language-toggle button { min-width:30px; height:28px; padding:0 7px; border:0; border-radius:4px; background:transparent; color:var(--muted); cursor:pointer; font:600 9px 'IBM Plex Mono','Noto Sans SC'; }
+.language-toggle button.active { background:var(--accent); color:var(--accent-ink); }
+.language-toggle.compact { height:38px; }
+.language-toggle.compact button { min-width:27px; padding:0 5px; }
 
 /* Full lesson experience shared by every curriculum row */
 .study-shell { min-height:100vh; background:var(--bg); color:var(--text); }
-.study-topbar { height:64px; position:sticky; top:0; z-index:25; display:grid; grid-template-columns:180px 1fr 38px 38px; align-items:center; gap:10px; padding:0 28px; border-bottom:1px solid var(--line); background:color-mix(in srgb,var(--bg) 90%,transparent); backdrop-filter:blur(18px); }
+.study-topbar { height:64px; position:sticky; top:0; z-index:25; display:grid; grid-template-columns:180px 1fr 38px 66px 38px; align-items:center; gap:10px; padding:0 28px; border-bottom:1px solid var(--line); background:color-mix(in srgb,var(--bg) 90%,transparent); backdrop-filter:blur(18px); }
 .study-topbar > button:first-child { border:0; background:transparent; color:var(--muted); display:flex; align-items:center; gap:8px; cursor:pointer; font-size:11px; }
 .study-topbar > button:first-child:hover { color:var(--text); }
 .study-progress { width:min(520px,100%); justify-self:center; display:flex; align-items:center; gap:15px; }
@@ -643,7 +648,7 @@ pre { margin:0; font:400 11px/1.55 'IBM Plex Mono', 'Noto Sans SC', monospace; t
 @media (max-width: 700px) {
   .theme-toggle:not(.compact) { min-width:38px; width:38px; padding:0; }
   .theme-toggle:not(.compact) span { display:none; }
-  .study-topbar { grid-template-columns:95px 1fr 38px 38px; gap:8px; padding:0 13px; }
+  .study-topbar { grid-template-columns:86px 1fr 38px 60px 38px; gap:6px; padding:0 10px; }
   .study-progress span { display:none; }
   .study-layout { display:block; padding:0 20px; }
   .study-nav { position:relative; top:0; height:auto; padding:30px 0 0; border-right:0; }

@@ -84,8 +84,8 @@ const biliSources = {
   karpathyDeep: { platform:'Bilibili', id:'BV16cNEeXEer', author:'KrillinAI小林', sourceType:'community', sourceLabel:'社区双语', originalUrl:'https://www.youtube.com/watch?v=7xTGNNLPyMI', sourceNote:'Andrej Karpathy 原讲座的中英双语镜像。' },
   raschka: { platform:'Bilibili', id:'BV1RpwzzoErr', author:'脑袋要有光', sourceType:'community', sourceLabel:'作者配套中配', originalUrl:'https://github.com/rasbt/LLMs-from-scratch', sourceNote:'Sebastian Raschka 书籍配套视频的中文配音与字幕版本。' },
   cs336: { platform:'Bilibili', id:'BV1Ect2zjEHR', author:'大模型项目实战教学', sourceType:'community', sourceLabel:'课程字幕镜像', originalUrl:'https://stanford-cs336.github.io/spring2025/', sourceNote:'Stanford CS336 课程镜像；关键结论仍以课程主页、讲义和作业为准。' },
-  calculus: { platform:'Bilibili', id:'BV1qW411N7FU', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.3blue1brown.com/topics/calculus', sourceNote:'3Blue1Brown 官方账号发布。' },
-  neuralNet: { platform:'Bilibili', id:'BV1bx411M7Zx', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.3blue1brown.com/topics/neural-networks', sourceNote:'3Blue1Brown 官方账号发布。' },
+  calculus: { platform:'Bilibili', id:'BV1qW411N7FU', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.youtube.com/watch?v=YG15m2VwSjA', sourceNote:'3Blue1Brown 官方账号发布。' },
+  neuralNet: { platform:'Bilibili', id:'BV1bx411M7Zx', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.youtube.com/watch?v=aircAruvnKk', sourceNote:'3Blue1Brown 官方账号发布。' },
   transformerVisual: { platform:'Bilibili', id:'BV13z421U7cs', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.youtube.com/watch?v=wjZofJX0v4M', sourceNote:'3Blue1Brown 官方 Transformer 可视化课程。' },
   liMuAttention: { platform:'Bilibili', id:'BV1pu411o7BE', author:'跟李沐学AI', sourceType:'original', sourceLabel:'中文原创', sourceNote:'结合论文逐段讲解注意力与 Transformer。' },
   liMuData: { platform:'Bilibili', id:'BV1u142187S5', author:'跟李沐学AI', sourceType:'original', sourceLabel:'中文原创', sourceNote:'Llama 3.1 预训练数据论文精读。' },
@@ -177,6 +177,38 @@ export const lessonMediaStats = {
 
 export const lessonHasMedia = id => Boolean(lessonMedia[id])
 
+function youtubeSourceFromUrl(url, media) {
+  if (!url) return null
+  try {
+    const parsed = new URL(url)
+    const id = parsed.hostname.includes('youtu.be') ? parsed.pathname.slice(1) : parsed.searchParams.get('v')
+    if (!id) return null
+    return {
+      platform: 'YouTube', id, title: media.globalTitle || media.title, author: media.globalAuthor || media.author,
+      duration: media.duration, sourceType: 'primary', sourceLabel: 'Original course', sourceNote: 'Official international source.',
+      originalUrl: url,
+    }
+  } catch {
+    return null
+  }
+}
+
+export function resolveMediaSource(media, network) {
+  if (network === 'cn') {
+    if (media.cn) return { ...media, ...media.cn }
+    return media.platform === 'Bilibili' ? media : null
+  }
+  if (media.platform === 'YouTube') return media
+  if (media.global) return { ...media, ...media.global }
+  const youtube = youtubeSourceFromUrl(media.originalUrl, media)
+  if (youtube) return youtube
+  return media.originalUrl ? {
+    platform: 'Original', title: media.globalTitle || media.title, author: media.globalAuthor || media.author,
+    duration: media.duration, url: media.originalUrl, sourceType: 'primary', sourceLabel: 'Official source',
+    sourceNote: 'Continue with the official course, paper, or repository.',
+  } : null
+}
+
 const conceptRules = [
   [/shape|广播|切片|stride|维度/i, name => `${name}首先是内存与索引契约：它决定哪些元素参与同一次运算，以及结果如何排列。调试时打印维度只是起点，还要检查广播是否悄悄复制了你不想要的关系。`],
   [/矩阵乘法|线性组合|线性层|projection|基变换/i, name => `${name}把一组输入方向重新混合为输出方向。对神经网络而言，每个输出维都是输入维的加权和；批次维不参与混合，因此必须能逐维说清权重矩阵的含义。`],
@@ -240,7 +272,58 @@ function splitTheory(text) {
   return text.split(/[、，,；;]/).map(x => x.trim()).filter(Boolean)
 }
 
-export function buildLessonMaterial(module, lesson) {
+function buildEnglishLessonMaterial(module, lesson) {
+  const [id, title, type, duration, theory, practice] = lesson
+  const concepts = splitTheory(theory)
+  const workflow = ['Define the smallest observable question', 'Build the minimal correct mechanism', 'Compare against a baseline or reference', 'Change one condition and explain the result']
+  const media = lessonMedia[id]
+  return {
+    id, title, type, duration,
+    objectives: [
+      `Explain what problem “${title}” solves without hiding behind terminology.`,
+      `Trace the variables and causal links across ${concepts.slice(0, 3).join(', ') || 'the core mechanism'}.`,
+      `Complete “${practice}” and judge the result with evidence rather than intuition.`,
+    ],
+    opening: [
+      `Start from the failure of a simpler method. Identify the exact condition where it stops working, then introduce the new mechanism only when the need is visible.`,
+      `For every transformation, ask three questions: what enters, what changes, and what observation would prove the output is correct?`,
+    ],
+    concepts: concepts.map((name, index) => ({
+      name,
+      note: `${name} is part of the lesson’s causal model. State its inputs, outputs, invariants, and failure mode; then verify it with a hand-check or a minimal experiment${index === 0 ? ' before moving to an optimized implementation' : ''}.`,
+    })),
+    workflow,
+    practice: {
+      task: practice,
+      steps: [
+        'Predict: write the expected output, trend, or failure before running code.',
+        `Build: implement only the minimum components needed to answer the question.`,
+        'Verify: compare with a baseline or trusted implementation; save seeds, parameters, and raw outputs.',
+        'Transfer: change one shape, dataset, scale, or workload condition and explain whether the conclusion still holds.',
+      ],
+      evidence: ['A minimal reproducible implementation', 'At least one baseline and controlled comparison', 'One preserved failure case with a diagnosis', 'A conclusion written in your own words'],
+    },
+    worked: {
+      title: `Work through “${practice}”`,
+      steps: ['Fix a minimal input, random seed, and baseline.', `Change one factor and trace ${concepts.slice(0, 3).join(' → ') || title}.`, 'Use measurements to decide whether the prediction holds; preserve counterexamples.'],
+      question: 'If prediction and result disagree, inspect inputs and masks/shapes first, then numeric range, objective and metric, and finally system resources.',
+    },
+    code: profiles[module.id]?.code || profiles.foundations.code,
+    misconception: `Recognizing the phrase “${concepts[0] || title}” is not mastery. You must predict how a change propagates and design an experiment that could falsify your prediction.`,
+    quiz: {
+      question: `Which evidence best demonstrates mastery of “${title}”?`,
+      options: [`Predict under a new condition, then verify ${concepts[0] || 'the mechanism'} with an implementation and controlled comparison`, 'Recognize every term after watching the lecture', 'Copy the reference code and reproduce one output'],
+      explanation: 'Mastery is transferable prediction, implementation, and explanation—not familiarity.',
+    },
+    mastery: [`Explain the causal chain behind ${concepts.slice(0, 2).join(' and ') || title} in two minutes.`, `Implement the core of “${practice}” without a reference.`, 'Break one assumption deliberately and locate the error using observations.', 'Change one condition and explain whether the result transfers.'],
+    references: module.sources.slice(0, 3),
+    media: media ? { ...media, globalTitle:title, before:`Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`, after:`Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.` } : null,
+    spotlight: id === '6.6' ? { title:'Paper bridge: from fixed batches to confidence-aware scheduling', body:'Speculative decoding drafts several tokens and verifies them with the target model. DSpark connects parallel drafting, lightweight sequential dependency, prefix-survival confidence, and hardware-aware scheduling.', points:['Sequential heads recover dependencies within a draft block.','Confidence estimates prevent wasteful over-verification.','The scheduler chooses verification length for the current serving load.'] } : null,
+  }
+}
+
+export function buildLessonMaterial(module, lesson, locale = 'zh') {
+  if (locale === 'en') return buildEnglishLessonMaterial(module, lesson)
   const [id, title, type, duration, theory, practice] = lesson
   const profile = profiles[module.id] || profiles.foundations
   const workflow = typeGuides[type] || typeGuides['理论']
