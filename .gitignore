@@ -2,6 +2,7 @@ node_modules/
 dist/
 .vercel/
 .env*
+!.env.example
 
 # Local QA and working files
 qa-*.png
@@ -15,4 +16,3 @@ project_sources/
 # OS/editor noise
 .DS_Store
 *.log
-

@@ -11,7 +11,10 @@
 - 69 节课程均可进入完整学习页：目标、直觉、机制、实践、自测、笔记与掌握门
 - 深度反向传播工作台：理论阅读、公式、代码、计算图和反思题
 - Dark / Light 模式一键切换并持久化偏好
-- 本地保存学习笔记、完成状态，支持上一节 / 下一节连续学习
+- 游客模式本地保存学习笔记与完成状态，登录不阻断学习
+- 邮箱注册、登录、退出与密码找回；首次登录自动导入本机进度
+- Supabase 云端同步课程完成状态、笔记、主题、网络模式和最近学习位置
+- 本地优先同步：离线时继续学习，网络恢复后安全合并；支持多设备进度一致
 - 推理章节加入 DSpark 投机解码论文桥与硬件感知调度视角
 - 大师资料库：Karpathy、Stanford CS336、PyTorch、Hugging Face、FSDL、Megatron-LM、llama.cpp、vLLM、Transformer Circuits 等
 - 视频来源分为官方双语、中文原创、源码带读和社区字幕；社区镜像同时保留原始课程链接
@@ -24,6 +27,15 @@
 npm install
 npm run dev
 ```
+
+复制 `.env.example` 为 `.env.local`，填写 Supabase 项目地址和 publishable key，即可启用账号同步：
+
+```bash
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_your_key
+```
+
+数据库结构与 RLS 策略位于 `supabase/migrations/`。匿名角色无权读取学习数据；登录用户只能访问 `auth.uid()` 对应的个人记录。Service Role Key 不进入浏览器，也不应写入任何 `VITE_` 环境变量。
 
 生产构建：
 
@@ -57,7 +69,7 @@ npm run preview
 
 ## 技术栈
 
-React 19、Vite 7、Phosphor Icons、原生 CSS。当前版本为纯前端站点，学习状态保存在浏览器；账号同步和在线代码执行后端可在下一阶段接入。
+React 19、Vite 7、Supabase Auth + Postgres、Phosphor Icons、原生 CSS。网站部署于 Vercel；学习状态采用 localStorage 本地优先、Supabase 登录后增量同步的双层模型。Supabase 客户端按需加载，不阻塞游客首屏。
 
 ## 内容与版权
 
