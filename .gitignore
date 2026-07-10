@@ -1,0 +1,18 @@
+node_modules/
+dist/
+.vercel/
+.env*
+
+# Local QA and working files
+qa-*.png
+tmp/
+generated_images/
+*.zip
+
+# User-provided copyrighted/reference documents are never published
+project_sources/
+
+# OS/editor noise
+.DS_Store
+*.log
+

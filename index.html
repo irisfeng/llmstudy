@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#07110e" />
+    <meta name="description" content="从第一性原理系统掌握大模型：理论、实现、实验、训练、对齐与部署。" />
+    <title>UNDER THE HOOD · 大模型系统课</title>
+    <script>
+      try {
+        const saved = localStorage.getItem('uth-theme')
+        document.documentElement.dataset.theme = saved || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark')
+      } catch (_) { document.documentElement.dataset.theme = 'dark' }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
