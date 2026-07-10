@@ -233,6 +233,15 @@ const statusCopy = {
   offline: ['本机已保存', '网络恢复后可继续同步'],
 }
 
+const authErrorCopy = {
+  invalid_credentials: '邮箱或密码不正确。',
+  email_address_invalid: '请输入能够正常接收邮件的邮箱地址。',
+  email_address_not_authorized: '当前邮件服务尚未允许向这个地址发信。',
+  over_email_send_rate_limit: '验证邮件发送较多，请稍后再试。',
+  user_already_exists: '这个邮箱已经注册，请直接登录。',
+  weak_password: '密码强度不足，请至少使用 8 位并混合字母与数字。',
+}
+
 export function AccountButton({ onClick, user, syncStatus = 'local', compact = false }) {
   const Icon = user ? (syncStatus === 'synced' ? CloudCheck : syncStatus === 'offline' ? CloudSlash : Cloud) : UserCircle
   return <button className={`account-trigger ${user ? 'signed-in' : ''} ${compact ? 'compact' : ''}`} onClick={onClick} aria-label={user ? '打开学习账户' : '登录并同步进度'} title={user ? statusCopy[syncStatus]?.[0] : '登录并同步'}>
@@ -282,7 +291,7 @@ export function AccountModal({ onClose, progress, completedCount, totalLessons, 
     }
     setBusy(false)
     if (result.error) {
-      setError(result.error.message === 'Invalid login credentials' ? '邮箱或密码不正确。' : result.error.message)
+      setError(authErrorCopy[result.error.code] || (result.error.message === 'Invalid login credentials' ? '邮箱或密码不正确。' : result.error.message))
       return
     }
     if (mode === 'signup') setMessage('确认邮件已发送。打开邮件中的链接后，进度会自动同步。')
