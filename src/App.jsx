@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   ArrowLeft, ArrowRight, BookOpen, BracketsCurly, Check, CheckCircle, Circle,
   Clock, Code, Command, Cube, Flask, FolderOpen, Gauge, GithubLogo, House,
@@ -7,8 +7,10 @@ import {
 } from '@phosphor-icons/react'
 import { modules, principles, resources, sourceTypes } from './data.js'
 import { buildLessonMaterial, lessonHasMedia, lessonMediaStats } from './lessonContent.js'
+import { AccountButton, AccountModal, useAuth, useLearningSync } from './auth.jsx'
 
 const flatLessons = modules.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
+const lessonIds = flatLessons.map(x => x.lesson[0])
 
 const navItems = [
   ['home', '总览', House], ['path', '学习路径', Rows], ['labs', '实验室', Flask],
@@ -58,13 +60,13 @@ function ThemeToggle({ theme, toggleTheme, compact = false }) {
   </button>
 }
 
-function Topbar({ onMenu, onSearch, theme, toggleTheme, progress }) {
+function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, user, syncStatus }) {
   return <header className="topbar">
     <button className="icon-button mobile-only" onClick={onMenu}><List /></button>
     <button className="search-trigger" onClick={onSearch}><MagnifyingGlass size={17} /><span>搜索课程、实验、项目...</span><kbd>⌘ K</kbd></button>
     <div className="top-progress"><span>总进度 <b>{progress}%</b></span><i><em style={{ width: `${progress}%` }} /></i></div>
     <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-    <div className="avatar">L</div>
+    <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} />
   </header>
 }
 
@@ -227,19 +229,37 @@ function Library() {
   </main>
 }
 
-function LessonView({ info, onBack, onNavigate, theme, toggleTheme, complete, onToggleComplete }) {
+function LessonView({ info, onBack, onNavigate, theme, toggleTheme, complete, onToggleComplete, onSaveNote, onAccount, user, syncStatus }) {
   const [tab, setTab] = useState('代码')
   const [ran, setRan] = useState(false)
-  const [reflection, setReflection] = useState('')
   const module = info?.module || modules[1]
   const lesson = info?.lesson || modules[1].lessons[2]
+  const lessonKey = `uth-lesson-${lesson[0]}`
+  const [reflection, setReflection] = useState(() => localStorage.getItem(`${lessonKey}-note`) || '')
   const specialMaterial = buildLessonMaterial(module, lesson)
-  if (lesson[0] !== '1.3') return <LessonStudy key={lesson[0]} module={module} lesson={lesson} onBack={onBack} onNavigate={onNavigate} theme={theme} toggleTheme={toggleTheme} complete={complete} onToggleComplete={onToggleComplete} />
+  useEffect(() => {
+    setReflection(localStorage.getItem(`${lessonKey}-note`) || '')
+  }, [lessonKey])
+  useEffect(() => {
+    if (lesson[0] !== '1.3') return
+    localStorage.setItem(`${lessonKey}-note`, reflection)
+    localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString())
+    onSaveNote?.(lesson[0], reflection)
+  }, [lesson, lessonKey, reflection, onSaveNote])
+  useEffect(() => {
+    const receive = event => {
+      if (event.detail?.lessonId === lesson[0] && typeof event.detail.note === 'string') setReflection(event.detail.note)
+    }
+    addEventListener('uth-learning-sync', receive)
+    return () => removeEventListener('uth-learning-sync', receive)
+  }, [lesson])
+  if (lesson[0] !== '1.3') return <LessonStudy key={lesson[0]} module={module} lesson={lesson} onBack={onBack} onNavigate={onNavigate} theme={theme} toggleTheme={toggleTheme} complete={complete} onToggleComplete={onToggleComplete} onSaveNote={onSaveNote} onAccount={onAccount} user={user} syncStatus={syncStatus} />
   const outline = ['直觉', '链式法则', '计算图', '实现 Value', '拓扑排序', '梯度检查']
   return <main className="lesson-shell">
     <aside className="lesson-outline">
       <button onClick={onBack}><ArrowLeft /> 返回课程</button>
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+      <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} compact />
       <span className="section-no">{module.no} {module.title}</span>
       <h3>{lesson[0]} {lesson[1]}</h3>
       <div>{outline.map((x, i) => <button className={i === 3 ? 'active' : i < 3 ? 'done' : ''} key={x}><span>{i < 3 ? <Check /> : i + 1}</span>{x}</button>)}</div>
@@ -284,7 +304,17 @@ function LessonMedia({ media }) {
     : `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0`
   const external = isYouTube ? `https://www.youtube.com/watch?v=${source.id}` : `https://www.bilibili.com/video/${source.id}?p=${selectedPage}`
   const biliSearch = `https://search.bilibili.com/all?keyword=${encodeURIComponent(media.cnQuery || media.title)}`
-  const changeNetwork = value => { setNetwork(value); setActive(false); localStorage.setItem('uth-network', value) }
+  const changeNetwork = value => {
+    setNetwork(value)
+    setActive(false)
+    localStorage.setItem('uth-network', value)
+    dispatchEvent(new CustomEvent('uth-network-change', { detail: { network: value } }))
+  }
+  useEffect(() => {
+    const receive = event => event.detail?.network && setNetwork(event.detail.network)
+    addEventListener('uth-network-change', receive)
+    return () => removeEventListener('uth-network-change', receive)
+  }, [])
   const changePart = page => { setPartByNetwork(current => ({ ...current, [network]: page })); setActive(false) }
   return <section className="lesson-media">
     <div className="media-heading"><div><span className="section-no">VIDEO SEMINAR · {source.platform}</span><h2>先带着问题看，再用实验验</h2></div><div className="network-switch" aria-label="视频网络模式"><button className={network === 'cn' ? 'active' : ''} onClick={() => changeNetwork('cn')}>国内</button><button className={network === 'global' ? 'active' : ''} onClick={() => changeNetwork('global')}>国际</button></div></div>
@@ -302,7 +332,7 @@ function LessonMedia({ media }) {
   </section>
 }
 
-function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, complete, onToggleComplete }) {
+function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, complete, onToggleComplete, onSaveNote, onAccount, user, syncStatus }) {
   const material = useMemo(() => buildLessonMaterial(module, lesson), [module, lesson])
   const lessonKey = `uth-lesson-${lesson[0]}`
   const [section, setSection] = useState('理解')
@@ -310,13 +340,25 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
   const [showWorked, setShowWorked] = useState(false)
   const [note, setNote] = useState(() => localStorage.getItem(`${lessonKey}-note`) || '')
 
-  useEffect(() => { localStorage.setItem(`${lessonKey}-note`, note) }, [lessonKey, note])
+  useEffect(() => {
+    localStorage.setItem(`${lessonKey}-note`, note)
+    localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString())
+    onSaveNote?.(lesson[0], note)
+  }, [lessonKey, lesson, note, onSaveNote])
+  useEffect(() => {
+    const receive = event => {
+      if (event.detail?.lessonId === lesson[0] && typeof event.detail.note === 'string') setNote(event.detail.note)
+    }
+    addEventListener('uth-learning-sync', receive)
+    return () => removeEventListener('uth-learning-sync', receive)
+  }, [lesson])
 
   return <main className="study-shell">
     <header className="study-topbar">
       <button onClick={onBack}><ArrowLeft /> 学习路径</button>
       <div className="study-progress"><span>{module.no} · {module.title}</span><i><em style={{ width: complete ? '100%' : '42%' }} /></i></div>
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} compact />
+      <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} compact />
     </header>
 
     <div className="study-layout">
@@ -375,7 +417,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         </section>
 
         <section className="notes-card">
-          <span className="section-no">FIELD NOTES · 自动保存在本机</span><h2>写下你的预测、结果与修正</h2>
+          <span className="section-no">FIELD NOTES · {user ? '本机优先，云端同步' : '自动保存在本机'}</span><h2>写下你的预测、结果与修正</h2>
           <textarea value={note} onChange={e => setNote(e.target.value)} placeholder="建议格式：我原来认为…；实验结果…；偏差来自…；下次遇到…我会…" />
           <small>{note.length} 字 · 目标至少 120 字</small>
         </section>
@@ -416,18 +458,24 @@ function SearchModal({ onClose, onOpen }) {
 }
 
 export default function App() {
+  const { user, recovery } = useAuth()
   const [view, setView] = useState('home')
   const [moduleIndex, setModuleIndex] = useState(1)
   const [lessonInfo, setLessonInfo] = useState(null)
   const [mobileNav, setMobileNav] = useState(false)
   const [search, setSearch] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('uth-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'))
   const [completed, setCompleted] = useState(() => new Set(flatLessons.filter(x => localStorage.getItem(`uth-lesson-${x.lesson[0]}-complete`) === '1').map(x => x.lesson[0])))
+  const sync = useLearningSync({ lessonIds, completed, setCompleted, theme, setTheme })
+  const saveNote = useCallback((id, note) => sync.saveLesson(id, { note }, { debounce: true }), [sync.saveLesson])
   const progress = Math.round((completed.size / flatLessons.length) * 100)
   const openLesson = (module = modules[1], lesson = modules[1].lessons[2], index = 2) => {
     setLessonInfo({ module, lesson, index }); setView('lesson'); setSearch(false)
     history.replaceState(null, '', `#lesson=${lesson[0]}`)
     scrollTo(0, 0)
+    sync.saveLesson(lesson[0], { last_opened_at: new Date().toISOString() })
+    sync.saveProfile({ last_lesson_id: lesson[0] })
   }
   const closeLesson = () => {
     setView('path')
@@ -439,8 +487,10 @@ export default function App() {
     if (!id) return
     setCompleted(previous => {
       const next = new Set(previous)
-      if (next.has(id)) { next.delete(id); localStorage.removeItem(`uth-lesson-${id}-complete`) }
+      const isCompleting = !next.has(id)
+      if (!isCompleting) { next.delete(id); localStorage.removeItem(`uth-lesson-${id}-complete`) }
       else { next.add(id); localStorage.setItem(`uth-lesson-${id}-complete`, '1') }
+      sync.saveLesson(id, { completed: isCompleting, completed_at: isCompleting ? new Date().toISOString() : null })
       return next
     })
   }
@@ -471,10 +521,19 @@ export default function App() {
     const fn = e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setSearch(true) } }
     addEventListener('keydown', fn); return () => removeEventListener('keydown', fn)
   }, [])
-  if (view === 'lesson') return <LessonView info={lessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(lessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} />
+  useEffect(() => {
+    const receive = event => sync.saveProfile({ network_mode: event.detail?.network || 'cn' })
+    addEventListener('uth-network-change', receive)
+    return () => removeEventListener('uth-network-change', receive)
+  }, [sync.saveProfile])
+  useEffect(() => {
+    if (recovery) setAccountOpen(true)
+  }, [recovery])
+  const accountModal = accountOpen && <AccountModal onClose={() => setAccountOpen(false)} progress={progress} completedCount={completed.size} totalLessons={flatLessons.length} syncStatus={sync.status} lastSynced={sync.lastSynced} />
+  if (view === 'lesson') return <><LessonView info={lessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(lessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} onSaveNote={saveNote} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />{accountModal}</>
   return <div className="app-shell">
     <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} />
-    <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} />
+    <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />
       {view === 'home' && <Dashboard goLesson={() => openLesson()} setView={setView} />}
       {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} />}
       {view === 'labs' && <Labs goLesson={() => openLesson()} />}
@@ -482,5 +541,6 @@ export default function App() {
       {view === 'library' && <Library />}
     </div>
     {search && <SearchModal onClose={() => setSearch(false)} onOpen={openLesson} />}
+    {accountModal}
   </div>
 }
