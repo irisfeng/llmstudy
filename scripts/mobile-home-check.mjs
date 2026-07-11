@@ -27,7 +27,8 @@ const prepare = async (page, width, height) => {
     localStorage.setItem('uth-theme','light')
   })
   await page.setViewport({ width, height, deviceScaleFactor:1 })
-  await page.goto(url, { waitUntil:'networkidle0' })
+  await page.goto(url, { waitUntil:'domcontentloaded', timeout:45000 })
+  await page.waitForSelector('.hero-copy h1', { timeout:15000 })
 }
 
 const mobile = await browser.newPage()
