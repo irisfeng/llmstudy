@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "build": "vite build && node scripts/prerender-seo.mjs",
     "preview": "vite preview --host 0.0.0.0",
-    "qa:i18n": "node scripts/i18n-media-check.mjs"
+    "qa:i18n": "node scripts/i18n-media-check.mjs",
+    "qa:seo": "node scripts/seo-check.mjs",
+    "qa:routes": "node scripts/route-check.mjs"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.7",

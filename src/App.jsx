@@ -11,6 +11,8 @@ import { AccountButton, AccountModal, useAuth, useLearningSync } from './auth.js
 import { LanguageToggle, useI18n } from './i18n.jsx'
 import { localizeModules, localizeResources, sourceTypesFor } from './localizedData.js'
 import { trackEvent } from './analytics.js'
+import { homePath, legacyLessonId, lessonPath, matchSitePath } from './lessonRoutes.js'
+import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
 const lessonIds = flattenLessons(modules).map(x => x.lesson[0])
@@ -496,7 +498,7 @@ function SearchModal({ onClose, onOpen }) {
 }
 
 export default function App() {
-  const { locale } = useI18n()
+  const { locale, setLocale } = useI18n()
   const { user, recovery } = useAuth()
   const localizedModules = useMemo(() => localizeModules(modules, locale), [locale])
   const flatLessons = useMemo(() => flattenLessons(localizedModules), [localizedModules])
@@ -513,7 +515,8 @@ export default function App() {
   const progress = Math.round((completed.size / flatLessons.length) * 100)
   const openLesson = (module = localizedModules[1], lesson = localizedModules[1].lessons[2], index = 2) => {
     setLessonInfo({ module, lesson, index }); setView('lesson'); setSearch(false)
-    history.replaceState(null, '', `#lesson=${lesson[0]}`)
+    const nextPath = lessonPath(lesson[0], locale)
+    if (location.pathname !== nextPath) history.pushState({ lessonId: lesson[0] }, '', `${nextPath}${location.search}`)
     scrollTo(0, 0)
     sync.saveLesson(lesson[0], { last_opened_at: new Date().toISOString() })
     sync.saveProfile({ last_lesson_id: lesson[0] })
@@ -521,7 +524,7 @@ export default function App() {
   }
   const closeLesson = () => {
     setView('path')
-    history.replaceState(null, '', `${location.pathname}${location.search}`)
+    history.pushState({ view: 'path' }, '', `${homePath(locale)}${location.search}`)
     scrollTo(0, 0)
   }
   const toggleLessonComplete = () => {
@@ -550,16 +553,35 @@ export default function App() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#07110e' : '#f5f7f5')
   }, [theme])
   useEffect(() => {
-    const fromHash = () => {
-      const match = location.hash.match(/^#lesson=(.+)$/)
-      if (!match) return
-      const target = flatLessons.find(x => x.lesson[0] === decodeURIComponent(match[1]))
-      if (target) { setLessonInfo(target); setView('lesson'); setModuleIndex(localizedModules.findIndex(item => item.id === target.module.id)) }
+    const syncFromLocation = () => {
+      const matched = matchSitePath(location.pathname)
+      const legacyId = legacyLessonId(location.hash)
+      const targetRoute = legacyId
+        ? matchSitePath(lessonPath(legacyId, matched.locale || locale)).route
+        : matched.type === 'lesson' ? matched.route : null
+
+      if (targetRoute) {
+        const routeLocale = matched.locale || locale
+        setLocale(routeLocale)
+        setLessonInfo({ module: targetRoute.module, lesson: targetRoute.lesson, index: targetRoute.lessonIndex })
+        setModuleIndex(targetRoute.moduleIndex)
+        setView('lesson')
+        if (legacyId || matched.needsCanonical || location.hash) {
+          history.replaceState({ lessonId: targetRoute.id }, '', `${lessonPath(targetRoute.id, routeLocale)}${location.search}`)
+        }
+        return
+      }
+
+      if (matched.locale) setLocale(matched.locale)
+      else history.replaceState({ view: 'home' }, '', `${homePath(locale)}${location.search}`)
+      setView('home')
+      setLessonInfo(null)
     }
-    fromHash()
-    addEventListener('hashchange', fromHash)
-    return () => removeEventListener('hashchange', fromHash)
-  }, [flatLessons, localizedModules])
+
+    syncFromLocation()
+    addEventListener('popstate', syncFromLocation)
+    return () => removeEventListener('popstate', syncFromLocation)
+  }, [locale, setLocale])
   useEffect(() => {
     const fn = e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setSearch(true) } }
     addEventListener('keydown', fn); return () => removeEventListener('keydown', fn)
@@ -572,6 +594,21 @@ export default function App() {
   useEffect(() => {
     if (recovery) setAccountOpen(true)
   }, [recovery])
+  useEffect(() => {
+    const receive = event => {
+      const nextLocale = event.detail?.locale
+      if (nextLocale !== 'zh' && nextLocale !== 'en') return
+      const lessonId = lessonInfo?.lesson?.[0]
+      const nextPath = view === 'lesson' && lessonId ? lessonPath(lessonId, nextLocale) : homePath(nextLocale)
+      history.replaceState(history.state, '', `${nextPath}${location.search}`)
+    }
+    addEventListener('uth-locale-change', receive)
+    return () => removeEventListener('uth-locale-change', receive)
+  }, [view, lessonInfo?.lesson?.[0]])
+  useEffect(() => {
+    const lessonId = lessonInfo?.lesson?.[0]
+    applyDocumentSeo(view === 'lesson' && lessonId ? getLessonSeo(lessonId, locale) : getHomeSeo(locale))
+  }, [view, locale, lessonInfo?.lesson?.[0]])
   useEffect(() => {
     trackEvent('view_changed', { view, locale })
   }, [view, locale])

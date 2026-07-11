@@ -20,7 +20,8 @@ const url = process.env.QA_URL || `file://${resolve('dist/index.html')}`
 const errors = []
 
 const prepare = async (page, width, height) => {
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+  page.on('console', message => { if (message.type() === 'error' && !message.text().includes('Failed to load resource')) errors.push(message.text()) })
+  page.on('response', response => { if (response.status() >= 400 && !response.url().includes('/_vercel/insights/')) errors.push(`${response.status()} ${response.url()}`) })
   page.on('pageerror', error => errors.push(error.message))
   await page.evaluateOnNewDocument(() => {
     localStorage.setItem('uth-locale','en')

@@ -20,7 +20,8 @@ const errors = []
 const url = process.env.QA_URL || `file://${resolve('dist/index.html')}`
 
 const page = await browser.newPage()
-page.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+page.on('console', message => { if (message.type() === 'error' && !message.text().includes('Failed to load resource')) errors.push(message.text()) })
+page.on('response', response => { if (response.status() >= 400 && !response.url().includes('/_vercel/insights/')) errors.push(`${response.status()} ${response.url()}`) })
 page.on('pageerror', error => errors.push(error.message))
 await page.evaluateOnNewDocument(() => {
   localStorage.setItem('uth-locale','zh')
@@ -49,7 +50,8 @@ const globalTitle = await page.$eval('.lesson-media .media-meta h3', element => 
 await page.screenshot({ path:'/tmp/llmstudy-desktop-en.png', fullPage:true })
 
 const mobile = await browser.newPage()
-mobile.on('console', message => { if (message.type() === 'error') errors.push(message.text()) })
+mobile.on('console', message => { if (message.type() === 'error' && !message.text().includes('Failed to load resource')) errors.push(message.text()) })
+mobile.on('response', response => { if (response.status() >= 400 && !response.url().includes('/_vercel/insights/')) errors.push(`${response.status()} ${response.url()}`) })
 mobile.on('pageerror', error => errors.push(error.message))
 await mobile.evaluateOnNewDocument(() => {
   localStorage.setItem('uth-locale','en')

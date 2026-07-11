@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <style>@import url('../node_modules/@fontsource/noto-sans-sc/700.css');</style>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#06100d"/>
+      <stop offset="1" stop-color="#10231d"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="76%" cy="30%" r="55%">
+      <stop offset="0" stop-color="#37d6a2" stop-opacity=".24"/>
+      <stop offset="1" stop-color="#37d6a2" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#8ff5d1" stroke-opacity=".06"/>
+    </pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <g transform="translate(82 68)">
+    <rect width="58" height="58" rx="15" fill="#37d6a2"/>
+    <text x="29" y="43" text-anchor="middle" font-size="42" font-family="Arial, sans-serif" font-weight="700" fill="#07110e">μ</text>
+    <text x="78" y="22" font-size="18" font-family="Arial, sans-serif" font-weight="700" letter-spacing="3" fill="#dff8ef">UNDER THE HOOD</text>
+    <text x="78" y="48" font-size="15" font-family="Arial, sans-serif" letter-spacing="2" fill="#77a99a">LLM STUDY</text>
+  </g>
+  <g transform="translate(82 202)">
+    <text y="0" font-size="62" font-family="Noto Sans SC, Arial, sans-serif" font-weight="700" fill="#f4fbf8">别只会调用模型。</text>
+    <text y="82" font-size="62" font-family="Noto Sans SC, Arial, sans-serif" font-weight="700" fill="#58e0b4">亲手造一个。</text>
+    <text y="144" font-size="23" font-family="Noto Sans SC, Arial, sans-serif" font-weight="700" fill="#a9c7bd">从 Token、Transformer 到训练、对齐、部署与 Agent</text>
+  </g>
+  <g transform="translate(82 500)" font-family="Arial, sans-serif" font-size="16" font-weight="700">
+    <rect width="150" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="75" y="29" text-anchor="middle" fill="#baf4df">69 LESSONS</text>
+    <rect x="166" width="150" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="241" y="29" text-anchor="middle" fill="#baf4df">26 WEEKS</text>
+    <rect x="332" width="190" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="427" y="29" text-anchor="middle" fill="#baf4df">ZH / EN · FREE</text>
+  </g>
+  <g transform="translate(870 444)">
+    <circle cx="72" cy="-72" r="70" fill="none" stroke="#58e0b4" stroke-width="2" stroke-opacity=".35"/>
+    <circle cx="72" cy="-72" r="43" fill="none" stroke="#58e0b4" stroke-width="2" stroke-opacity=".65"/>
+    <circle cx="72" cy="-72" r="9" fill="#58e0b4"/>
+    <path d="M2-72h210M72-142v210" stroke="#58e0b4" stroke-opacity=".18"/>
+    <text x="0" y="98" font-size="19" font-family="Arial, sans-serif" letter-spacing="1" fill="#8db4a7">llmstudy.shddai.net</text>
+  </g>
+</svg>

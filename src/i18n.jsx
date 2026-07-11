@@ -63,7 +63,6 @@ export function I18nProvider({ children }) {
   useEffect(() => {
     localStorage.setItem('uth-locale', locale)
     document.documentElement.lang = locale === 'zh' ? 'zh-CN' : 'en'
-    document.title = locale === 'zh' ? 'LLM Study · 从原理到系统' : 'LLM Study · From Principles to Systems'
   }, [locale])
   const value = useMemo(() => ({
     locale,
@@ -84,6 +83,7 @@ export function LanguageToggle({ compact = false }) {
   const changeLocale = value => {
     if (value !== locale) trackEvent('language_switched', { from: locale, to: value })
     setLocale(value)
+    dispatchEvent(new CustomEvent('uth-locale-change', { detail: { locale: value } }))
   }
   return <div className={`language-toggle ${compact ? 'compact' : ''}`} role="group" aria-label="Language / 语言">
     <button className={locale === 'zh' ? 'active' : ''} onClick={() => changeLocale('zh')} aria-pressed={locale === 'zh'}>中</button>
