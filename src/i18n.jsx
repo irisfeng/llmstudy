@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
+import { trackEvent } from './analytics.js'
 
 const I18nContext = createContext(null)
 
@@ -80,8 +81,12 @@ export function useI18n() {
 
 export function LanguageToggle({ compact = false }) {
   const { locale, setLocale } = useI18n()
+  const changeLocale = value => {
+    if (value !== locale) trackEvent('language_switched', { from: locale, to: value })
+    setLocale(value)
+  }
   return <div className={`language-toggle ${compact ? 'compact' : ''}`} role="group" aria-label="Language / 语言">
-    <button className={locale === 'zh' ? 'active' : ''} onClick={() => setLocale('zh')} aria-pressed={locale === 'zh'}>中</button>
-    <button className={locale === 'en' ? 'active' : ''} onClick={() => setLocale('en')} aria-pressed={locale === 'en'}>EN</button>
+    <button className={locale === 'zh' ? 'active' : ''} onClick={() => changeLocale('zh')} aria-pressed={locale === 'zh'}>中</button>
+    <button className={locale === 'en' ? 'active' : ''} onClick={() => changeLocale('en')} aria-pressed={locale === 'en'}>EN</button>
   </div>
 }

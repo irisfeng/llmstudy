@@ -5,6 +5,7 @@ import {
 } from '@phosphor-icons/react'
 import { getSupabase, isCloudConfigured } from './lib/supabase.js'
 import { useI18n } from './i18n.jsx'
+import { trackEvent } from './analytics.js'
 
 const AuthContext = createContext(null)
 
@@ -311,10 +312,12 @@ export function AccountModal({ onClose, progress, completedCount, totalLessons, 
     }
     setBusy(false)
     if (result.error) {
+      trackEvent('auth_failed', { mode, code: result.error.code || 'unknown' })
       const errorCopy = locale === 'zh' ? authErrorCopy : authErrorCopyEn
       setError(errorCopy[result.error.code] || (result.error.message === 'Invalid login credentials' ? pick('邮箱或密码不正确。','Incorrect email or password.') : result.error.message))
       return
     }
+    trackEvent('auth_completed', { mode })
     if (mode === 'signup') setMessage(pick('确认邮件已发送。打开邮件中的链接后，进度会自动同步。','Confirmation email sent. Open its link and your progress will sync automatically.'))
     if (mode === 'reset') setMessage(pick('密码重置邮件已发送，请检查收件箱。','Password reset email sent. Check your inbox.'))
     if (mode === 'update') {
@@ -336,7 +339,7 @@ export function AccountModal({ onClose, progress, completedCount, totalLessons, 
   const displayEmail = user?.email || ''
 
   return <div className="account-backdrop" onMouseDown={onClose}>
-    <section className="account-modal" role="dialog" aria-modal="true" aria-label={user ? pick('学习账户','Learning account') : pick('登录','Sign in')} onMouseDown={event => event.stopPropagation()}>
+    <section className="account-modal" data-clarity-mask="true" role="dialog" aria-modal="true" aria-label={user ? pick('学习账户','Learning account') : pick('登录','Sign in')} onMouseDown={event => event.stopPropagation()}>
       <header><div><span className="section-no">LEARNING ID</span><h2>{mode === 'update' ? pick('设置新密码','Set a new password') : user ? pick('你的学习档案','Your learning profile') : mode === 'signup' ? pick('创建学习档案','Create a learning profile') : mode === 'reset' ? pick('找回密码','Reset password') : pick('登录并继续','Sign in and continue')}</h2></div><button className="icon-button" onClick={onClose} aria-label={pick('关闭','Close')}><X /></button></header>
       {loading ? <div className="account-loading"><SpinnerGap className="spin" />{pick('正在读取账户…','Loading account…')}</div> : user && !recovery ? <>
         <div className="account-identity"><span>{displayEmail.slice(0, 1).toUpperCase()}</span><div><b>{displayEmail}</b><small><Check /> {pick('已登录 · 本机进度不会丢失','Signed in · local progress stays safe')}</small></div></div>

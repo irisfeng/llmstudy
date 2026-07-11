@@ -10,6 +10,7 @@ import { buildLessonMaterial, lessonHasMedia, lessonMediaStats, resolveMediaSour
 import { AccountButton, AccountModal, useAuth, useLearningSync } from './auth.jsx'
 import { LanguageToggle, useI18n } from './i18n.jsx'
 import { localizeModules, localizeResources, sourceTypesFor } from './localizedData.js'
+import { trackEvent } from './analytics.js'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
 const lessonIds = flattenLessons(modules).map(x => x.lesson[0])
@@ -340,6 +341,7 @@ function LessonMedia({ media }) {
     setNetwork(value)
     setActive(false)
     localStorage.setItem('uth-network', value)
+    trackEvent('video_source_selected', { network: value, platform: resolveMediaSource(media, value)?.platform || 'none' })
     dispatchEvent(new CustomEvent('uth-network-change', { detail: { network: value } }))
   }
   useEffect(() => {
@@ -357,7 +359,7 @@ function LessonMedia({ media }) {
     </div>
     {parts.length > 0 && <div className="media-parts" aria-label={t('selectedParts')}><span>{t('selectedParts')}</span><div>{parts.map(item => <button key={item.page} className={selectedPage === item.page ? 'active' : ''} onClick={() => changePart(item.page)}><b>P{item.page}</b>{item.label}</button>)}</div></div>}
     <div className="media-frame">
-      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{t('globalOriginal')}</b><p>{resolvedSource ? t('noGlobalEmbed') : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => setActive(true)}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
+      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{t('globalOriginal')}</b><p>{resolvedSource ? t('noGlobalEmbed') : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
     <div className="media-meta"><div><span>{source.author} · {source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{locale === 'en' ? (media.globalTitle || media.title) : source.title}</h3></div>{isEmbeddable && external && <a href={external} target="_blank" rel="noreferrer">{t('openExternal')} <ArrowRight /></a>}</div>
     <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{media.after}</p></article></div>
@@ -515,6 +517,7 @@ export default function App() {
     scrollTo(0, 0)
     sync.saveLesson(lesson[0], { last_opened_at: new Date().toISOString() })
     sync.saveProfile({ last_lesson_id: lesson[0] })
+    trackEvent('lesson_started', { lesson_id: lesson[0], module_id: module.id, locale })
   }
   const closeLesson = () => {
     setView('path')
@@ -530,6 +533,7 @@ export default function App() {
       if (!isCompleting) { next.delete(id); localStorage.removeItem(`uth-lesson-${id}-complete`) }
       else { next.add(id); localStorage.setItem(`uth-lesson-${id}-complete`, '1') }
       sync.saveLesson(id, { completed: isCompleting, completed_at: isCompleting ? new Date().toISOString() : null })
+      trackEvent(isCompleting ? 'lesson_completed' : 'lesson_reopened', { lesson_id: id, locale })
       return next
     })
   }
@@ -568,6 +572,9 @@ export default function App() {
   useEffect(() => {
     if (recovery) setAccountOpen(true)
   }, [recovery])
+  useEffect(() => {
+    trackEvent('view_changed', { view, locale })
+  }, [view, locale])
   const accountModal = accountOpen && <AccountModal onClose={() => setAccountOpen(false)} progress={progress} completedCount={completed.size} totalLessons={flatLessons.length} syncStatus={sync.status} lastSynced={sync.lastSynced} />
   const currentLessonInfo = lessonInfo ? flatLessons.find(item => item.lesson[0] === lessonInfo.lesson[0]) || lessonInfo : null
   if (view === 'lesson') return <><LessonView info={currentLessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(currentLessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} onSaveNote={saveNote} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />{accountModal}</>
