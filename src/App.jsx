@@ -13,6 +13,7 @@ import { localizeModules, localizeResources, sourceTypesFor } from './localizedD
 import { trackEvent } from './analytics.js'
 import { homePath, legacyLessonId, lessonPath, matchSitePath } from './lessonRoutes.js'
 import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
+import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
 const lessonIds = flattenLessons(modules).map(x => x.lesson[0])
@@ -414,6 +415,8 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <h1>{material.title}</h1>
         <p className="study-lead">{t('lessonLead')}</p>
 
+        <GeoAnswer lessonId={lesson[0]} />
+
         <section className="objective-card">
           <div><span className="section-no">LEARNING OBJECTIVES</span><h2>{t('objectives')}</h2></div>
           <ol>{material.objectives.map((x, i) => <li key={x}><span>0{i + 1}</span>{x}</li>)}</ol>
@@ -473,6 +476,21 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
       </article>
     </div>
   </main>
+}
+
+function GeoAnswer({ lessonId }) {
+  const { locale, pick } = useI18n()
+  const brief = getGeoBrief(lessonId, locale)
+  if (!brief) return null
+  return <section className="geo-answer" data-geo-answer>
+    <header><div><span className="section-no">DIRECT ANSWER · VERIFIED SOURCES</span><h2>{brief.question}</h2></div><time dateTime={GEO_UPDATED_AT}>{pick('更新于','Updated')} {GEO_UPDATED_AT}</time></header>
+    <p className="geo-answer-lead">{brief.answer}</p>
+    <div className="geo-answer-grid">
+      <div><strong>{pick('三个关键结论','Three key takeaways')}</strong><ul>{brief.points.map(point => <li key={point}><Check />{point}</li>)}</ul></div>
+      <aside><strong>{pick('边界与常见误解','Boundary & caveat')}</strong><p>{brief.boundaries}</p></aside>
+    </div>
+    <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}</footer>
+  </section>
 }
 
 function Graph({ ran, large }) {

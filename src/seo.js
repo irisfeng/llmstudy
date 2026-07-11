@@ -1,4 +1,5 @@
 import { getLessonRoute, homePath, lessonPath } from './lessonRoutes.js'
+import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
 
 export const SITE_URL = 'https://llmstudy.shddai.net'
 export const SITE_NAME = 'LLM Study · Under the Hood'
@@ -26,9 +27,10 @@ export function getLessonSeo(id, locale = 'zh') {
   const lesson = locale === 'zh' ? route.lesson : route.englishLesson
   const module = locale === 'zh' ? route.module : route.englishModule
   const isZh = locale === 'zh'
-  const description = isZh
+  const geoBrief = getGeoBrief(id, locale)
+  const description = geoBrief?.answer || (isZh
     ? `${lesson[1]}：理解${lesson[4]}，完成“${lesson[5]}”。属于大模型系统课「${module.title}」阶段。`
-    : `${lesson[1]}. Learn ${lesson[4]} and complete: ${lesson[5]}. Part of the “${module.title}” LLM learning path.`
+    : `${lesson[1]}. Learn ${lesson[4]} and complete: ${lesson[5]}. Part of the “${module.title}” LLM learning path.`)
   return {
     locale,
     id,
@@ -39,6 +41,7 @@ export function getLessonSeo(id, locale = 'zh') {
     type: 'article',
     lesson,
     module,
+    geoBrief,
   }
 }
 
@@ -79,7 +82,7 @@ export function applyDocumentSeo(meta) {
 }
 
 export function lessonStructuredData(meta) {
-  return {
+  const data = {
     '@context': 'https://schema.org',
     '@type': 'LearningResource',
     name: meta.title,
@@ -96,4 +99,10 @@ export function lessonStructuredData(meta) {
       provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     },
   }
+  if (meta.geoBrief) {
+    data.dateModified = GEO_UPDATED_AT
+    data.about = meta.geoBrief.question
+    data.citation = meta.geoBrief.sources.map(source => source.url)
+  }
+  return data
 }

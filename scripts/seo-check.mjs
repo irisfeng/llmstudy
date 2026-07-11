@@ -1,6 +1,7 @@
 import { access, readFile } from 'node:fs/promises'
 import { lessonPath, lessonRoutes } from '../src/lessonRoutes.js'
 import { SITE_URL } from '../src/seo.js'
+import { GEO_UPDATED_AT, geoLessonIds, getGeoBrief } from '../src/geoContent.js'
 
 const dist = new URL('../dist/', import.meta.url)
 const failures = []
@@ -28,5 +29,17 @@ for (const route of lessonRoutes) {
   }
 }
 
-console.log(JSON.stringify({ lessons: lessonRoutes.length, localizedLessonPages: lessonRoutes.length * 2, sitemapUrls: urls.length, failures }, null, 2))
+for (const id of geoLessonIds) {
+  for (const locale of ['zh', 'en']) {
+    const routePath = lessonPath(id, locale)
+    const html = await readFile(new URL(`.${routePath}index.html`, dist), 'utf8')
+    const brief = getGeoBrief(id, locale)
+    check(html.includes('data-geo-answer'), `Missing GEO answer block: ${routePath}`)
+    check(html.includes(brief.question), `Missing GEO question: ${routePath}`)
+    check(html.includes(brief.sources[0].url), `Missing primary citation: ${routePath}`)
+    check(html.includes(`"dateModified":"${GEO_UPDATED_AT}"`), `Missing GEO dateModified schema: ${routePath}`)
+  }
+}
+
+console.log(JSON.stringify({ lessons: lessonRoutes.length, localizedLessonPages: lessonRoutes.length * 2, geoPilotLessons: geoLessonIds.length, sitemapUrls: urls.length, failures }, null, 2))
 if (failures.length) process.exit(1)

@@ -4,6 +4,7 @@ import { modules } from '../src/data.js'
 import { buildLessonMaterial } from '../src/lessonContent.js'
 import { lessonPath, lessonRoutes } from '../src/lessonRoutes.js'
 import { DEFAULT_OG_IMAGE, getHomeSeo, getLessonSeo, lessonStructuredData, SITE_URL } from '../src/seo.js'
+import { GEO_UPDATED_AT, getGeoBrief } from '../src/geoContent.js'
 
 const dist = new URL('../dist/', import.meta.url)
 const template = await readFile(new URL('index.html', dist), 'utf8')
@@ -42,12 +43,25 @@ function seoHead(meta, structuredData) {
 
 function staticLessonContent(meta, material) {
   const isZh = meta.locale === 'zh'
+  const geoBrief = getGeoBrief(material.id, meta.locale)
+  const geoContent = geoBrief ? `<section data-geo-answer>
+      <p>DIRECT ANSWER · VERIFIED SOURCES · <time datetime="${GEO_UPDATED_AT}">${GEO_UPDATED_AT}</time></p>
+      <h2>${escapeHtml(geoBrief.question)}</h2>
+      <p>${escapeHtml(geoBrief.answer)}</p>
+      <h3>${isZh ? '关键结论' : 'Key takeaways'}</h3>
+      <ul>${geoBrief.points.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+      <h3>${isZh ? '边界与常见误解' : 'Boundary and caveat'}</h3>
+      <p>${escapeHtml(geoBrief.boundaries)}</p>
+      <h3>${isZh ? '一手来源' : 'Primary sources'}</h3>
+      <ul>${geoBrief.sources.map(source => `<li><a href="${escapeHtml(source.url)}">${escapeHtml(source.title)}</a></li>`).join('')}</ul>
+    </section>` : ''
   return `<main class="seo-fallback" data-seo-fallback>
     <nav><a href="/${meta.locale}/">${isZh ? 'LLM Study 大模型系统课' : 'LLM Study'}</a> / ${escapeHtml(meta.module.title)}</nav>
     <article>
       <p>LESSON ${escapeHtml(material.id)} · ${escapeHtml(material.type)} · ${escapeHtml(material.duration)}</p>
       <h1>${escapeHtml(material.title)}</h1>
       <p>${escapeHtml(meta.description)}</p>
+      ${geoContent}
       <h2>${isZh ? '学完你应该能够' : 'Learning objectives'}</h2>
       <ol>${material.objectives.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ol>
       <h2>${isZh ? '核心概念' : 'Core concepts'}</h2>
