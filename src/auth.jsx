@@ -262,9 +262,9 @@ const authErrorCopyEn = {
 export function AccountButton({ onClick, user, syncStatus = 'local', compact = false }) {
   const { locale, pick } = useI18n()
   const statuses = locale === 'zh' ? statusCopy : statusCopyEn
-  const Icon = user ? (syncStatus === 'synced' ? CloudCheck : syncStatus === 'offline' ? CloudSlash : Cloud) : UserCircle
+  const Icon = UserCircle
   return <button className={`account-trigger ${user ? 'signed-in' : ''} ${compact ? 'compact' : ''}`} onClick={onClick} aria-label={user ? pick('打开学习账户','Open learning account') : pick('登录并同步进度','Sign in and sync progress')} title={user ? statuses[syncStatus]?.[0] : pick('登录并同步','Sign in and sync')}>
-    <Icon weight={user ? 'fill' : 'regular'} />
+    <span className="account-icon"><Icon weight={user ? 'fill' : 'regular'} />{user && <i className={`sync-dot ${syncStatus}`} aria-hidden="true" />}</span>
     {!compact && <span>{user ? statuses[syncStatus]?.[0] : pick('登录','Sign in')}</span>}
   </button>
 }

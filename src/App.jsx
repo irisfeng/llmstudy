@@ -41,7 +41,7 @@ function Brand() {
   </button>
 }
 
-function Sidebar({ view, setView, open, onClose, progress }) {
+function Sidebar({ view, setView, open, onClose, progress, theme, toggleTheme }) {
   const { t, pick } = useI18n()
   return <aside className={`sidebar ${open ? 'open' : ''}`}>
     <div className="side-head"><Brand /><button className="icon-button mobile-only" onClick={onClose}><X /></button></div>
@@ -50,6 +50,10 @@ function Sidebar({ view, setView, open, onClose, progress }) {
         <Icon size={20} weight={view === id ? 'fill' : 'regular'} /><span>{t(label)}</span>
       </button>)}
     </nav>
+    <div className="mobile-settings" aria-label={pick('显示设置','Display settings')}>
+      <LanguageToggle compact />
+      <ThemeToggle theme={theme} toggleTheme={toggleTheme} compact />
+    </div>
     <div className="sidebar-foot">
       <div className="mastery-ring" style={{ '--p': `${progress}%` }}><span>{progress}%</span></div>
       <div><span className="micro">{t('overallMastery')}</span><strong>{progress === 100 ? t('courseComplete') : progress > 50 ? t('forming') : progress > 0 ? t('foundationsForming') : t('startFirst')}</strong></div>
@@ -69,7 +73,7 @@ function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, use
   const { t } = useI18n()
   return <header className="topbar">
     <button className="icon-button mobile-only" onClick={onMenu}><List /></button>
-    <button className="search-trigger" onClick={onSearch}><MagnifyingGlass size={17} /><span>{t('search')}</span><kbd>⌘ K</kbd></button>
+    <button className="search-trigger" onClick={onSearch} aria-label={t('search')}><MagnifyingGlass size={17} /><span>{t('search')}</span><kbd>⌘ K</kbd></button>
     <div className="top-progress"><span>{t('totalProgress')} <b>{progress}%</b></span><i><em style={{ width: `${progress}%` }} /></i></div>
     <LanguageToggle />
     <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
@@ -568,7 +572,7 @@ export default function App() {
   const currentLessonInfo = lessonInfo ? flatLessons.find(item => item.lesson[0] === lessonInfo.lesson[0]) || lessonInfo : null
   if (view === 'lesson') return <><LessonView info={currentLessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(currentLessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} onSaveNote={saveNote} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />{accountModal}</>
   return <div className="app-shell">
-    <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} />
+    <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} theme={theme} toggleTheme={toggleTheme} />
     <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />
       {view === 'home' && <Dashboard goLesson={() => openLesson()} setView={setView} />}
       {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} />}
