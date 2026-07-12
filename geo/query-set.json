@@ -1,0 +1,98 @@
+{
+  "version": "2026-07-12",
+  "site": "https://llmstudy.shddai.net",
+  "platforms": [
+    { "id": "doubao", "name": "豆包", "url": "https://www.doubao.com/" },
+    { "id": "qianwen", "name": "千问", "url": "https://www.qianwen.com/" },
+    { "id": "zhipu", "name": "智谱清言", "url": "https://chatglm.cn/" },
+    { "id": "deepseek", "name": "DeepSeek", "url": "https://chat.deepseek.com/" },
+    { "id": "kimi", "name": "Kimi", "url": "https://www.kimi.com/" },
+    { "id": "yuanbao", "name": "腾讯元宝", "url": "https://yuanbao.tencent.com/" }
+  ],
+  "prompts": [
+    {
+      "id": "weekly-course-discovery",
+      "cadence": "weekly",
+      "intent": "discovery",
+      "lessonId": null,
+      "text": "我想系统学习大语言模型原理、训练、推理部署和 Agent。请推荐免费、成体系、带代码实践的中文课程，并给出可直接访问的链接。"
+    },
+    {
+      "id": "weekly-backprop",
+      "cadence": "weekly",
+      "intent": "unbranded",
+      "lessonId": "1.3",
+      "text": "反向传播为什么要按逆拓扑顺序执行，同一个变量的梯度为什么必须用 += 累加？请给出准确解释和可访问的学习资料。"
+    },
+    {
+      "id": "weekly-bpe",
+      "cadence": "weekly",
+      "intent": "unbranded",
+      "lessonId": "2.7",
+      "text": "字节级 BPE 为什么能用有限词表表示任意文本？它和 Unicode、预分词、特殊 token 有什么关系？请附学习链接。"
+    },
+    {
+      "id": "weekly-attention",
+      "cadence": "weekly",
+      "intent": "unbranded",
+      "lessonId": "3.2",
+      "text": "Q、K、V 和缩放点积注意力到底在计算什么？为什么除以根号 d_k，因果 mask 在哪里加入？请推荐中文图解或课程。"
+    },
+    {
+      "id": "weekly-kv-cache",
+      "cadence": "weekly",
+      "intent": "unbranded",
+      "lessonId": "6.2",
+      "text": "KV Cache 为什么能加速大模型自回归解码，它的显存占用应该怎样估算？请给出公式、适用边界和学习链接。"
+    },
+    {
+      "id": "weekly-agent-loop",
+      "cadence": "weekly",
+      "intent": "unbranded",
+      "lessonId": "7.1",
+      "text": "一个可控的 AI Agent 最小闭环有哪些步骤？模型决策和程序强制约束分别是什么？请给出可靠的中文学习资料。"
+    },
+    {
+      "id": "monthly-transformer-block",
+      "cadence": "monthly",
+      "intent": "unbranded",
+      "lessonId": "3.5",
+      "text": "现代 GPT 的 pre-norm Transformer Block 如何按顺序更新残差流？它和原始 post-norm Transformer 有什么区别？"
+    },
+    {
+      "id": "monthly-gpt-objective",
+      "cadence": "monthly",
+      "intent": "unbranded",
+      "lessonId": "3.6",
+      "text": "GPT 的训练和生成为什么都建立在预测下一个 token 上？请解释 shifted labels、因果 mask 和自回归生成。"
+    },
+    {
+      "id": "monthly-training-budget",
+      "cadence": "monthly",
+      "intent": "unbranded",
+      "lessonId": "4.1",
+      "text": "训练大模型前怎样估算参数量、显存和 FLOPs？C≈6ND 什么时候可用，哪些成本会被它忽略？"
+    },
+    {
+      "id": "monthly-dpo",
+      "cadence": "monthly",
+      "intent": "unbranded",
+      "lessonId": "5.4",
+      "text": "DPO 如何不使用单独奖励模型和在线强化学习就学习 chosen/rejected 偏好？请解释参考模型、beta 和局限。"
+    },
+    {
+      "id": "monthly-vllm",
+      "cadence": "monthly",
+      "intent": "unbranded",
+      "lessonId": "6.5",
+      "text": "vLLM 的 PagedAttention 和连续批处理分别解决什么问题？它与 KV Cache、FlashAttention 有什么区别？"
+    },
+    {
+      "id": "monthly-branded-retrieval",
+      "cadence": "monthly",
+      "intent": "branded-control",
+      "lessonId": "7.1",
+      "text": "llmstudy.shddai.net 上有没有讲 AI Agent 最小闭环的课程？请找到对应课程页并概括其核心结论。"
+    }
+  ]
+}

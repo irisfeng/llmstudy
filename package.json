@@ -9,6 +9,7 @@
     "preview": "vite preview --host 0.0.0.0",
     "qa:i18n": "node scripts/i18n-media-check.mjs",
     "qa:geo": "node scripts/geo-content-check.mjs",
+    "qa:geo-baseline": "node scripts/geo-baseline-check.mjs",
     "qa:seo": "node scripts/seo-check.mjs",
     "qa:routes": "node scripts/route-check.mjs"
   },
