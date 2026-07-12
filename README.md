@@ -4,6 +4,16 @@
 
 在线访问：[llmstudy.shddai.net](https://llmstudy.shddai.net)
 
+[![LLM Study · 从第一性原理掌握大模型](public/og-cover.png)](https://llmstudy.shddai.net/zh/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_cover)
+
+无需登录即可学习，进度先保存在本机；登录后可跨设备同步。可以先从这三节试看：
+
+- [反向传播为什么需要逆拓扑与梯度累加](https://llmstudy.shddai.net/zh/lesson/1-3-make-gradients-flow-backward-through-a-graph/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_backprop)
+- [Q、K、V 与缩放点积注意力](https://llmstudy.shddai.net/zh/lesson/3-2-scaled-dot-product-attention/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_attention)
+- [一个可控的 AI Agent 最小闭环](https://llmstudy.shddai.net/zh/lesson/7-1-the-minimal-agent-loop/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_agent)
+
+适合希望从“会调用 API”继续走到“能解释、能实现、能诊断”的学习者。若课程结构、事实或来源有问题，欢迎提交 Issue；具体、可复现的纠错比单纯 Star 更有价值。
+
 ## 当前版本
 
 - 8 个阶段、69 节深度课、24 类核心实验、8 个阶段作品

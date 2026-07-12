@@ -11,6 +11,7 @@
     "qa:geo": "node scripts/geo-content-check.mjs",
     "qa:geo-baseline": "node scripts/geo-baseline-check.mjs",
     "qa:indexnow": "node scripts/indexnow-submit.mjs",
+    "qa:promotion": "node scripts/promotion-check.mjs",
     "qa:seo": "node scripts/seo-check.mjs",
     "qa:routes": "node scripts/route-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"

@@ -1,0 +1,55 @@
+{
+  "version": "2026-07-13",
+  "site": "https://llmstudy.shddai.net",
+  "campaign": "organic_launch",
+  "channels": [
+    {
+      "id": "github",
+      "week": 1,
+      "medium": "referral",
+      "content": "repository_readme",
+      "targetPath": "/zh/",
+      "goal": "把仓库访问者转成课程学习者"
+    },
+    {
+      "id": "v2ex",
+      "week": 1,
+      "medium": "community",
+      "content": "build_in_public",
+      "targetPath": "/zh/",
+      "goal": "获得开发者对课程结构和移动体验的真实反馈"
+    },
+    {
+      "id": "juejin",
+      "week": 2,
+      "medium": "article",
+      "content": "backprop_deep_dive",
+      "targetPath": "/zh/lesson/1-3-make-gradients-flow-backward-through-a-graph/",
+      "goal": "用完整技术文章带来高意图学习访问"
+    },
+    {
+      "id": "zhihu",
+      "week": 3,
+      "medium": "answer",
+      "content": "qkv_explainer",
+      "targetPath": "/zh/lesson/3-2-scaled-dot-product-attention/",
+      "goal": "用高质量问答覆盖长期搜索需求"
+    },
+    {
+      "id": "bilibili",
+      "week": 4,
+      "medium": "video",
+      "content": "kv_cache_short",
+      "targetPath": "/zh/lesson/6-2-kv-cache-trade-memory-for-repeated-compute/",
+      "goal": "用一分钟技术短视频验证视频转化"
+    },
+    {
+      "id": "wechat_video",
+      "week": 4,
+      "medium": "video",
+      "content": "course_intro",
+      "targetPath": "/zh/",
+      "goal": "触达已有关系网络中的 AI 学习者"
+    }
+  ]
+}
