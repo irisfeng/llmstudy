@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
 import { Analytics } from '@vercel/analytics/react'
-import { trackCampaignLanding } from './analytics.js'
+import { trackAiReferralLanding, trackCampaignLanding } from './analytics.js'
 
 export default function Monitoring() {
   useEffect(() => {
     trackCampaignLanding()
+    trackAiReferralLanding()
 
     const projectId = import.meta.env.VITE_CLARITY_PROJECT_ID?.trim()
     if (!projectId || document.querySelector('script[data-uth-clarity]')) return
