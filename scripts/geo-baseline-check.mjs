@@ -37,6 +37,8 @@ check(inferAiPlatform('not a url') === null, 'Malformed referrer was misclassifi
 check(firstObservation.platformRuns.length === 6, 'First observation must include all 6 platforms')
 check(firstObservation.platformRuns.every(run => platformIds.includes(run.platform)), 'First observation contains an unknown platform')
 check(firstObservation.siteReadiness.localizedGeoUrlCount === geoLessonIds.length * 2, 'First observation GEO URL count is stale')
+check(firstObservation.indexNowSubmission.urlCount === geoLessonIds.length * 2 + 2, 'First IndexNow submission URL count is stale')
+check(firstObservation.indexNowSubmission.accepted === true, 'First IndexNow submission was not accepted')
 
 const weeklyRuns = baseline.platforms.length * baseline.prompts.filter(prompt => prompt.cadence === 'weekly').length
 const fullRuns = baseline.platforms.length * baseline.prompts.length

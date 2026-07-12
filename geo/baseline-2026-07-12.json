@@ -19,6 +19,13 @@
     "geoLessonCount": 10,
     "localizedGeoUrlCount": 20
   },
+  "indexNowSubmission": {
+    "submittedAt": "2026-07-12T12:22:46Z",
+    "urlCount": 22,
+    "httpStatus": 202,
+    "accepted": true,
+    "interpretation": "The endpoint received the URL set and will validate the key. Acceptance does not guarantee crawling, indexing, or ranking."
+  },
   "platformRuns": [
     { "platform": "doubao", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
     { "platform": "qianwen", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
