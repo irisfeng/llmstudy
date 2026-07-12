@@ -485,6 +485,7 @@ function GeoAnswer({ lessonId }) {
   return <section className="geo-answer" data-geo-answer>
     <header><div><span className="section-no">DIRECT ANSWER · VERIFIED SOURCES</span><h2>{brief.question}</h2></div><time dateTime={GEO_UPDATED_AT}>{pick('更新于','Updated')} {GEO_UPDATED_AT}</time></header>
     <p className="geo-answer-lead">{brief.answer}</p>
+    {brief.alignment && <p className="geo-answer-alignment"><strong>{pick('视频对齐','Lecture alignment')}</strong>{brief.alignment}</p>}
     <div className="geo-answer-grid">
       <div><strong>{pick('三个关键结论','Three key takeaways')}</strong><ul>{brief.points.map(point => <li key={point}><Check />{point}</li>)}</ul></div>
       <aside><strong>{pick('边界与常见误解','Boundary & caveat')}</strong><p>{brief.boundaries}</p></aside>

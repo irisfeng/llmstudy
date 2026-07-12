@@ -48,6 +48,7 @@ function staticLessonContent(meta, material) {
       <p>DIRECT ANSWER · VERIFIED SOURCES · <time datetime="${GEO_UPDATED_AT}">${GEO_UPDATED_AT}</time></p>
       <h2>${escapeHtml(geoBrief.question)}</h2>
       <p>${escapeHtml(geoBrief.answer)}</p>
+      ${geoBrief.alignment ? `<h3>${isZh ? '视频对齐' : 'Lecture alignment'}</h3><p>${escapeHtml(geoBrief.alignment)}</p>` : ''}
       <h3>${isZh ? '关键结论' : 'Key takeaways'}</h3>
       <ul>${geoBrief.points.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
       <h3>${isZh ? '边界与常见误解' : 'Boundary and caveat'}</h3>

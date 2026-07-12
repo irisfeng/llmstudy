@@ -559,6 +559,8 @@ pre { margin:0; font:400 11px/1.55 'IBM Plex Mono', 'Noto Sans SC', monospace; t
 .geo-answer h2 { max-width:590px; margin:8px 0 0; font-size:23px; line-height:1.4; letter-spacing:-.035em; }
 .geo-answer time { flex:none; color:var(--muted-2); font:500 8px 'IBM Plex Mono','Noto Sans SC'; }
 .geo-answer-lead { margin:21px 0 23px; color:var(--text); font-size:13px; line-height:1.95; }
+.geo-answer-alignment { display:grid; grid-template-columns:auto 1fr; gap:12px; margin:-5px 0 23px; padding:12px 14px; border-left:2px solid var(--accent); background:color-mix(in srgb,var(--accent-dim) 55%,transparent); color:var(--muted); font-size:10px; line-height:1.8; }
+.geo-answer-alignment strong { color:var(--accent); white-space:nowrap; }
 .geo-answer-grid { display:grid; grid-template-columns:1.15fr .85fr; gap:1px; border:1px solid var(--line); background:var(--line); }
 .geo-answer-grid > * { padding:18px; background:var(--bg-2); }
 .geo-answer-grid strong { color:var(--accent); font-size:10px; }
@@ -710,6 +712,7 @@ pre { margin:0; font:400 11px/1.55 'IBM Plex Mono', 'Noto Sans SC', monospace; t
   .geo-answer h2 { font-size:20px; }
   .geo-answer time { display:block; margin-top:10px; }
   .geo-answer-grid { grid-template-columns:1fr; }
+  .geo-answer-alignment { grid-template-columns:1fr; gap:4px; }
   .objective-card,.evidence-box,.mastery-gate-study { grid-template-columns:1fr; gap:18px; }
   .objective-card { margin:42px 0 65px; }
   .mechanism-loop { grid-template-columns:1fr; }

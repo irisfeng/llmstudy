@@ -6,6 +6,12 @@ import { GEO_UPDATED_AT, geoLessonIds, getGeoBrief } from '../src/geoContent.js'
 const dist = new URL('../dist/', import.meta.url)
 const failures = []
 const check = (condition, message) => { if (!condition) failures.push(message) }
+const escapeHtml = value => String(value)
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;')
 
 const sitemap = await readFile(new URL('sitemap.xml', dist), 'utf8')
 const robots = await readFile(new URL('robots.txt', dist), 'utf8')
@@ -36,6 +42,7 @@ for (const id of geoLessonIds) {
     const brief = getGeoBrief(id, locale)
     check(html.includes('data-geo-answer'), `Missing GEO answer block: ${routePath}`)
     check(html.includes(brief.question), `Missing GEO question: ${routePath}`)
+    if (brief.alignment) check(html.includes(escapeHtml(brief.alignment)), `Missing lecture alignment: ${routePath}`)
     check(html.includes(brief.sources[0].url), `Missing primary citation: ${routePath}`)
     check(html.includes(`"dateModified":"${GEO_UPDATED_AT}"`), `Missing GEO dateModified schema: ${routePath}`)
   }
