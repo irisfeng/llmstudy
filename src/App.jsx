@@ -3,7 +3,7 @@ import {
   ArrowLeft, ArrowRight, BookOpen, BracketsCurly, Check, CheckCircle, Circle,
   Clock, Code, Command, Cube, Flask, FolderOpen, Gauge, GithubLogo, House,
   List, MagnifyingGlass, Play, ReadCvLogo, RocketLaunch, Rows, Sparkle,
-  TerminalWindow, X, Moon, Sun, VideoCamera,
+  TerminalWindow, X, Moon, Sun, VideoCamera, ShareNetwork,
 } from '@phosphor-icons/react'
 import { modules, resources } from './data.js'
 import { buildLessonMaterial, lessonHasMedia, lessonMediaStats, resolveMediaSource } from './lessonContent.js'
@@ -73,6 +73,39 @@ function ThemeToggle({ theme, toggleTheme, compact = false }) {
   </button>
 }
 
+function ShareButton({ title, text, surface = 'home', lessonId = null, compact = false }) {
+  const { pick } = useI18n()
+  const [done, setDone] = useState(false)
+  const onShare = async () => {
+    const url = new URL(location.pathname, location.origin)
+    url.searchParams.set('utm_source', 'learner_share')
+    url.searchParams.set('utm_medium', 'referral')
+    url.searchParams.set('utm_campaign', 'organic_growth')
+    url.searchParams.set('utm_content', lessonId ? `lesson_${lessonId}` : surface)
+    let method = 'copy'
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, text, url: url.toString() })
+        method = 'native'
+      } else if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(url.toString())
+      } else {
+        const input = document.createElement('textarea')
+        input.value = url.toString(); input.style.position = 'fixed'; input.style.opacity = '0'
+        document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove()
+      }
+      setDone(true)
+      setTimeout(() => setDone(false), 1800)
+      trackEvent('content_shared', { method, surface, lesson_id: lessonId })
+    } catch (error) {
+      if (error?.name !== 'AbortError') trackEvent('content_share_failed', { surface, lesson_id: lessonId })
+    }
+  }
+  return <button className={`share-button ${compact ? 'compact' : ''}`} data-share-button onClick={onShare} aria-label={pick('分享课程','Share course')}>
+    <ShareNetwork weight={done ? 'fill' : 'regular'} /> {done ? pick('已准备好','Ready') : pick('分享课程','Share course')}
+  </button>
+}
+
 function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, user, syncStatus }) {
   const { t } = useI18n()
   return <header className="topbar">
@@ -96,6 +129,7 @@ function Dashboard({ goLesson, setView }) {
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
+          <ShareButton title={pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={pick('69 节中英双语课程，从反向传播、Token 和 Transformer 到训练、推理与 Agent。','69 bilingual lessons from backpropagation, tokens, and Transformers to training, inference, and agents.')} />
         </div>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <div className="signal-line" />
@@ -490,7 +524,7 @@ function GeoAnswer({ lessonId }) {
       <div><strong>{pick('三个关键结论','Three key takeaways')}</strong><ul>{brief.points.map(point => <li key={point}><Check />{point}</li>)}</ul></div>
       <aside><strong>{pick('边界与常见误解','Boundary & caveat')}</strong><p>{brief.boundaries}</p></aside>
     </div>
-    <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}</footer>
+    <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}<ShareButton compact surface="geo_answer" lessonId={lessonId} title={brief.question} text={brief.answer.slice(0, 100)} /></footer>
   </section>
 }
 

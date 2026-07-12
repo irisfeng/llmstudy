@@ -54,6 +54,8 @@ const mobileMetrics = await mobile.evaluate(() => {
     titleSize:title.fontSize,
     titleTracking:title.letterSpacing,
     heroHeight:rect('.hero-copy')?.height,
+    shareCount:document.querySelectorAll('.hero-actions [data-share-button]').length,
+    share:rect('.hero-actions [data-share-button]'),
     visibleSignals:[...document.querySelectorAll('.signal-map > span')].filter(node => getComputedStyle(node).display !== 'none').map(node => node.textContent),
   }
 })
@@ -81,6 +83,7 @@ const assertions = [
   ['mobile search copy is hidden', mobileMetrics.searchLabel === 'none' && mobileMetrics.searchShortcut === 'none'],
   ['mobile topbar theme is moved to sidebar', mobileMetrics.topbarTheme === 'none'],
   ['mobile signal map is reduced', mobileMetrics.visibleSignals.length === 3],
+  ['mobile share action is present and fits the viewport', mobileMetrics.shareCount === 1 && mobileMetrics.share?.right <= mobileMetrics.viewport],
   ['open sidebar is visible and has a shadow', (openSidebar.transform === 'none' || openSidebar.transform === 'matrix(1, 0, 0, 1, 0, 0)') && openSidebar.shadow !== 'none'],
   ['desktop has no horizontal overflow', desktopMetrics.scrollWidth === desktopMetrics.viewport],
   ['desktop controls remain visible', desktopMetrics.searchLabel !== 'none' && desktopMetrics.topbarTheme !== 'none'],
