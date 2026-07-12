@@ -4,6 +4,7 @@ import { geoLessonIds } from '../src/geoContent.js'
 import { lessonPath } from '../src/lessonRoutes.js'
 
 const baseline = JSON.parse(await readFile(new URL('../geo/query-set.json', import.meta.url), 'utf8'))
+const firstObservation = JSON.parse(await readFile(new URL('../geo/baseline-2026-07-12.json', import.meta.url), 'utf8'))
 const failures = []
 const check = (condition, message) => { if (!condition) failures.push(message) }
 const platformIds = baseline.platforms.map(platform => platform.id)
@@ -33,6 +34,9 @@ for (const prompt of baseline.prompts) {
 
 check(inferAiPlatform('https://example.com/') === null, 'Unrelated referrer was misclassified')
 check(inferAiPlatform('not a url') === null, 'Malformed referrer was misclassified')
+check(firstObservation.platformRuns.length === 6, 'First observation must include all 6 platforms')
+check(firstObservation.platformRuns.every(run => platformIds.includes(run.platform)), 'First observation contains an unknown platform')
+check(firstObservation.siteReadiness.localizedGeoUrlCount === geoLessonIds.length * 2, 'First observation GEO URL count is stale')
 
 const weeklyRuns = baseline.platforms.length * baseline.prompts.filter(prompt => prompt.cadence === 'weekly').length
 const fullRuns = baseline.platforms.length * baseline.prompts.length

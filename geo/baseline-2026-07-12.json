@@ -1,0 +1,30 @@
+{
+  "observedAt": "2026-07-12",
+  "site": "https://llmstudy.shddai.net",
+  "publicSearch": {
+    "status": "no_results_observed",
+    "resultCount": 0,
+    "queries": [
+      "site:llmstudy.shddai.net",
+      "site:llmstudy.shddai.net \"Agent 的最小闭环\"",
+      "site:llmstudy.shddai.net \"KV Cache 为什么能加速\"",
+      "site:llmstudy.shddai.net \"Q、K、V\""
+    ],
+    "interpretation": "The public web search used for this baseline returned no indexed results. This is an observation, not proof that every search provider has zero indexed URLs."
+  },
+  "siteReadiness": {
+    "productionHttp": 200,
+    "robotsAllowsGeneralCrawlers": true,
+    "sitemapUrlCount": 140,
+    "geoLessonCount": 10,
+    "localizedGeoUrlCount": 20
+  },
+  "platformRuns": [
+    { "platform": "doubao", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
+    { "platform": "qianwen", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
+    { "platform": "zhipu", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
+    { "platform": "deepseek", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
+    { "platform": "kimi", "status": "not_measured", "reason": "Requires a user-controlled platform session" },
+    { "platform": "yuanbao", "status": "not_measured", "reason": "Requires a user-controlled platform session" }
+  ]
+}

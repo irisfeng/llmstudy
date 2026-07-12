@@ -44,3 +44,10 @@ date, platform, model_mode, prompt_id, score, citation_rank, cited_url, answer_s
 - 某平台有引用、其他平台没有：先比较平台搜索源和刷新周期，不为单个平台制造重复页面。
 
 `robots.txt` 使用 `User-agent: *` 和 `Allow: /`。在国内平台没有公开稳定爬虫标识时，不写未经证实的专用 User-Agent，也不采用尚无通用支持的非标准文件代替可抓取 HTML、Sitemap 和结构化数据。
+
+## 发现与主动通知
+
+- Sitemap 保存全站 URL 清单，作为长期发现入口。
+- 仅在核心课程新增或有实质内容更新时运行 `npm run seo:indexnow:submit`，主动通知支持 IndexNow 的搜索引擎。
+- `npm run qa:indexnow` 只检查密钥文件、URL 范围和请求载荷，不发送网络请求。
+- IndexNow 返回 200/202 只表示请求被接收，不代表页面一定会收录或获得排名；收录状态仍按公开搜索与六平台实测记录。
