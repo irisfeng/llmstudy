@@ -191,8 +191,9 @@ function CurrentLesson({ goLesson, trackId }) {
 function Roadmap({ modulesData = modules, trackId = 'llm' }) {
   const { pick } = useI18n()
   const isWorld = trackId === 'world-models'
+  const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
   return <section className="roadmap-block">
-    <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '29 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '250–290'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')}{!isWorld && <> · {lessonMediaStats.lessons} {pick('节视频研讨','video seminars')}</>}</p></div>
+    <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '29 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '250–290'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {mediaLessons} {pick('节视频研讨','video seminars')}</p></div>
     <div className="roadmap-rail">
       {modulesData.map((m, i) => <div className={`road-stop ${i === 1 ? 'current' : ''} ${i === 0 ? 'done' : ''}`} key={m.id}>
         <span>{i === 0 ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
@@ -235,12 +236,13 @@ function Curriculum({ selected, setSelected, goLesson, completed, trackId }) {
   const modulesData = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const current = modulesData[selected]
   const isWorld = trackId === 'world-models'
+  const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
   return <main className="page curriculum-page">
     <header className="page-lead">
       <span className="section-no">THE COMPLETE PATH</span>
       <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
       <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('29 周不是速成承诺，而是一套持续更新、可验证的能力建造计划。每阶段都以作品和掌握门结束。','This is not a 29-week shortcut. It is an updated, verifiable capability-building plan; every phase ends with a project and a mastery gate.')}</p>
-      <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span>{!isWorld && <span><b>{lessonMediaStats.lessons}</b> {pick('视频研讨','video seminars')}</span>}<span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
+      <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span><span><b>{mediaLessons}</b> {pick('视频研讨','video seminars')}</span><span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
     </header>
     <div className="curriculum-layout">
       <aside className="module-index">
@@ -426,7 +428,7 @@ function LessonMedia({ media }) {
   return <section className="lesson-media">
     <div className="media-heading"><div><span className="section-no">VIDEO SEMINAR · {source.platform}</span><h2>{t('watchThenBuild')}</h2></div><div className="network-switch" aria-label={t('videoMode')}><button className={network === 'cn' ? 'active' : ''} onClick={() => changeNetwork('cn')}>{t('domestic')}</button><button className={network === 'global' ? 'active' : ''} onClick={() => changeNetwork('global')}>{t('global')}</button></div></div>
     <div className="media-source-line">
-      <span className={`source-badge ${source.sourceType || 'primary'}`}>{locale === 'en' ? (network === 'global' ? t('globalOriginal') : t('curatedVideo')) : (source.sourceLabel || (isYouTube ? t('originalCourse') : t('curatedVideo')))}</span>
+      <span className={`source-badge ${source.sourceType || 'primary'}`}>{network === 'global' ? t('globalOriginal') : (locale === 'en' ? t('curatedVideo') : (source.sourceLabel || t('curatedVideo')))}</span>
       <p>{locale === 'en' ? t('sourceDefault') : (source.sourceNote || t('sourceDefault'))}</p>
       {source.originalUrl && network === 'cn' && <a href={source.originalUrl} target="_blank" rel="noreferrer">{t('originalSource')} <ArrowRight /></a>}
     </div>

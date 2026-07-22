@@ -137,6 +137,16 @@ const biliSources = {
   vllm: { platform:'Bilibili', id:'BV1kx4y1x7bu', author:'RethinkFun', sourceType:'original', sourceLabel:'中文原创', originalUrl:'https://arxiv.org/abs/2309.06180', sourceNote:'用 KV Cache 与 PagedAttention 建立 vLLM 核心直觉。' },
   llamaCpp: { platform:'Bilibili', id:'BV1N4wreWE8z', author:'比飞鸟贵重的多_HKL', sourceType:'original', sourceLabel:'源码带读', originalUrl:'https://github.com/ggml-org/llama.cpp', sourceNote:'逐行调试 llama.cpp，适合作为源码研读伴侣。' },
   agentic: { platform:'Bilibili', id:'BV1DfrdByE2H', author:'吴恩达Agent', sourceType:'community', sourceLabel:'课程字幕镜像', originalUrl:'https://www.deeplearning.ai/courses/agentic-ai/', sourceNote:'DeepLearning.AI Agentic AI 课程镜像；保留官方课程入口。' },
+  worldOverview: { platform:'Bilibili', id:'BV11LPWzNEkm', author:'硅谷101', sourceType:'original', sourceLabel:'中文深度总览', sourceNote:'49 分钟梳理世界模型的定义、生成式路线、JEPA、空间智能与 Physical AI；用于建立地图，技术结论回到正文和一手资料核验。' },
+  pomdpCn: { platform:'Bilibili', id:'BV1AzkaBNEEk', author:'人工智能方法论', sourceType:'original', sourceLabel:'中文专题课', sourceNote:'聚焦部分可观察马尔可夫决策过程；观看时重点记录隐藏状态、观察与 belief update 的关系。' },
+  worldFramework: { platform:'Bilibili', id:'BV1YnuWzbEQi', author:'VALSE_Webinar', sourceType:'official', sourceLabel:'中文学术报告', sourceNote:'VALSE 2025 世界模型理论与框架报告，适合在经典架构和评测课建立研究全景。' },
+  dreamerCn: { platform:'Bilibili', id:'BV17e411k7zS', author:'B站学术讲解', sourceType:'original', sourceLabel:'中文论文精讲', sourceNote:'从 DreamerV1 到 DreamerV3 梳理 model-based RL；用于理解 RSSM 和 imagined rollout，不替代本站的最小实现实验。' },
+  muzeroCn: { platform:'Bilibili', id:'BV1JV411b7Wz', author:'强化学习课程整理', sourceType:'community', sourceLabel:'中文课程视频', sourceNote:'沿 AlphaGo、AlphaZero 到 MuZero 理解 MCTS 与学习动力学；算法细节以原论文和作者报告为准。' },
+  jepaCn: { platform:'Bilibili', id:'BV1v1421Q73e', author:'ZOMI酱', sourceType:'original', sourceLabel:'中文原创', sourceNote:'用 14 分钟建立 JEPA 的关键直觉；随后回到正文区分表征预测、坍塌规避与世界模型能力。' },
+  vjepa2Cn: { platform:'Bilibili', id:'BV12PMAzdEZ8', author:'CVer计算机视觉', sourceType:'original', sourceLabel:'中文前沿速览', sourceNote:'短视频用于预习 V-JEPA 2 的研究结论；完整机制与机器人规划证据以作者演讲和论文为主。' },
+  genie3Cn: { platform:'Bilibili', id:'BV1if4ZzGEeF', author:'双语技术讲解', sourceType:'community', sourceLabel:'中文双语讲解', sourceNote:'结合 Genie 3 演示理解实时交互与世界记忆；注意演示效果不等同于规划效用。' },
+  marbleCn: { platform:'Bilibili', id:'BV1UyUVB6E4r', author:'一枚卓子', sourceType:'original', sourceLabel:'中文产品实测', sourceNote:'通过实际体验观察可导航、可回访和可编辑性；产品实测只作现象入口，技术边界以 World Labs 一手资料为准。' },
+  cosmosCn: { platform:'Bilibili', id:'BV18hwLeREUK', author:'ZOMI酱', sourceType:'original', sourceLabel:'中文技术剖析', sourceNote:'从视频生成、世界基础模型到 Physical AI 管线拆解 Cosmos，并与普通视频模型区分。' },
 }
 
 const bili = (source, details = {}) => ({ ...biliSources[source], ...details })
@@ -150,6 +160,16 @@ const karpathy = (id, title, duration, page, details = {}) => {
     ...rest,
   }
 }
+
+const pairedWorldVideo = (cnSource, cnDetails, global, guidance = {}) => ({
+  ...bili(cnSource, { ...cnDetails, originalUrl:`https://www.youtube.com/watch?v=${global.id}` }),
+  global: {
+    platform:'YouTube', sourceType:'primary', sourceLabel:'Original lecture',
+    sourceNote:'优先选择作者、大学课程或项目官方频道，用于核对技术机制与能力边界。',
+    ...global,
+  },
+  ...guidance,
+})
 
 const lessonMedia = {
   '0.1': bili('karpathyDeep', { title:'深入探索像 ChatGPT 这样的大语言模型', duration:'3h31m' }),
@@ -210,14 +230,90 @@ const lessonMedia = {
   '7.2': bili('agentic', { title:'工具调用、代码执行与 MCP', duration:'28m46s', page:14, parts:[part(14,'什么是工具'), part(15,'创建工具'), part(16,'工具语法'), part(17,'代码执行'), part(18,'MCP')] }),
   '7.4': bili('agentic', { title:'规划与多 Agent 工作流', duration:'30m', page:26, parts:[part(26,'规划工作流'), part(27,'创建与执行计划'), part(28,'结合代码执行'), part(29,'多 Agent 工作流'), part(30,'通信模式')] }),
   '7.5': bili('agentic', { title:'Agent 评测、误差分析与优化', duration:'50m', page:19, parts:[part(19,'Agent Evals'), part(20,'误差分析'), part(22,'组件级评估'), part(24,'延迟与成本'), part(25,'开发过程总结')] }),
+
+  'wm.0.1': pairedWorldVideo('worldOverview', { title:'全面解析世界模型：定义、路线、实践与 AGI', duration:'49m36s' }, {
+    id:'CkOSMqwvFiQ', title:'Building Generative World Models', author:'Ruiqi Gao · TUM AI Lecture Series', duration:'lecture',
+  }, {
+    before:'先写下你判断“视频生成器是不是世界模型”的三个标准；观看时检查讲者是否讨论状态、动作和可验证的未来后果。',
+    after:'用本站六项判据审计视频中出现的三个项目，并分别写出支持证据与缺失证据。',
+  }),
+  'wm.0.2': pairedWorldVideo('pomdpCn', { title:'部分可观察马尔可夫决策过程', duration:'专题课' }, {
+    id:'2dNp7QyoF_k', title:'Lecture 15: Partially Observable MDPs', author:'UC Berkeley CS287 Advanced Robotics', duration:'lecture',
+  }, {
+    before:'先区分真实状态、观察和 belief：如果传感器只告诉你“可能在左侧”，策略应该以什么作为输入？',
+    after:'手算两轮 action → observation → belief update，并验证概率是否归一化。',
+  }),
+  'wm.0.3': pairedWorldVideo('dreamerCn', { title:'从 DreamerV1 到 DreamerV3：最小实现的进阶预习', duration:'1h24m56s' }, {
+    id:'viXppDhx4R0', title:'DreamerV3 Tutorial: Paper, Diagrams, Clean Code', author:'eclecticsheep.ai', duration:'tutorial',
+  }, {
+    before:'视频讲的是更完整的 latent world model。观看前先画出本站最小版本的 state + action → next state 接口，避免被复杂架构淹没。',
+    after:'只实现 GridWorld 的一步动力学与三步 rollout；再标出 Dreamer 比这个最小版本多出的组件。',
+  }),
+  'wm.1.1': pairedWorldVideo('worldFramework', { title:'世界模型理论与框架', duration:'17m47s' }, {
+    id:'dPsXxLyqpfs', title:'World Models', author:'David Ha & Jürgen Schmidhuber', duration:'paper video',
+  }, {
+    before:'画出 VAE、MDN-RNN、Controller 三个盒子，并写清每个盒子的输入、输出和训练目标。',
+    after:'沿一次 dream rollout 追踪 z、hidden state、action 和 predicted mixture，找出误差开始累积的位置。',
+  }),
+  'wm.1.2': pairedWorldVideo('dreamerCn', { title:'从 DreamerV1 到 DreamerV3', duration:'1h24m56s' }, {
+    id:'awyuuJoHawo', title:'Dream to Control: Learning Behaviors by Latent Imagination', author:'Danijar Hafner · DeepMind', duration:'research talk',
+  }, {
+    before:'先解释“在想象中训练”为什么仍需要真实环境数据，并预测 actor 会怎样利用一个有偏的世界模型。',
+    after:'把真实轨迹和 imagined trajectory 的训练信号分色画出，并设计一个检测 model exploitation 的实验。',
+  }),
+  'wm.1.3': pairedWorldVideo('muzeroCn', { title:'从 AlphaGo、AlphaZero 到 MuZero', duration:'课程视频' }, {
+    id:'L0A86LmH7Yw', title:'MuZero — ICAPS 2020', author:'Julian Schrittwieser', duration:'1h00m',
+  }, {
+    before:'写下 MuZero 不预测的内容，以及 representation、dynamics、prediction 三个网络各自必须提供什么。',
+    after:'在玩具棋盘上展开两层 MCTS，记录 reward、policy、value 如何影响选边，而不是尝试重建棋盘像素。',
+  }),
+  'wm.2.1': pairedWorldVideo('jepaCn', { title:'JEPA 世界模型详细解读', duration:'14m10s' }, {
+    id:'vJKC31YpA8c', title:'Special Lecture on AI and World Models', author:'Yann LeCun', duration:'lecture',
+  }, {
+    before:'先列出逐像素预测会浪费容量的两类不可预测细节，再预测 JEPA 的 target 应该保留什么。',
+    after:'用同一遮挡任务比较 pixel loss 与 representation loss，并写出两者各自可能“作弊”的方式。',
+  }),
+  'wm.2.2': pairedWorldVideo('vjepa2Cn', { title:'V-JEPA 2：从视频训练到机器人规划', duration:'4m47s' }, {
+    id:'o8Cexk56oBk', title:'V-JEPA 2', author:'Nicolas Ballas', duration:'research talk',
+  }, {
+    before:'把 action-free 视频预训练与 action-conditioned 机器人后训练分成两栏，预测它们分别学到什么。',
+    after:'画出候选动作序列在 latent space 中 rollout 到目标表征的规划流程，并列出一个不能由视频 benchmark 证明的能力。',
+  }),
+  'wm.3.1': pairedWorldVideo('genie3Cn', { title:'详解 Genie 3：世界变得可玩', duration:'双语讲解' }, {
+    id:'PDKhUknuQDg', title:'Genie 3: Creating Dynamic Worlds You Can Navigate in Real Time', author:'Google DeepMind', duration:'official demo',
+  }, {
+    before:'把“画面真实”与“动作响应、物体恒常、世界记忆”分开列项，观看时只记录可观察证据。',
+    after:'为同一动作脚本设计 Genie 的控制、回访和长时漂移测试；不要用一次顺利演示代替评测。',
+  }),
+  'wm.3.2': pairedWorldVideo('marbleCn', { title:'Marble 世界模型初体验', duration:'产品实测' }, {
+    id:'UslQB4LUueI', title:'Introducing Marble by World Labs', author:'World Labs', duration:'official demo',
+  }, {
+    before:'先写出视频生成、3D 重建和生成式世界各自允许用户做什么，再观察 Marble 展示了哪些交互。',
+    after:'从可导航、可回访、可编辑、可导出四项记录证据，并单独标记官方演示没有证明的几何与物理能力。',
+  }),
+  'wm.4.1': pairedWorldVideo('cosmosCn', { title:'NVIDIA Cosmos 世界模型深度剖析', duration:'35m20s' }, {
+    id:'9Uch931cDx8', title:'NVIDIA Cosmos: A World Foundation Model Platform for Physical AI', author:'NVIDIA', duration:'official overview',
+  }, {
+    before:'画出真实传感器数据 → 世界基础模型 → 合成数据 → perception/policy → 现实评测的闭环。',
+    after:'为一个机器人任务填写数据来源、后训练目标、guardrail、现实 holdout 和 sim-to-real 指标。',
+  }),
+  'wm.4.2': pairedWorldVideo('worldFramework', { title:'世界模型理论与框架：评测视角', duration:'17m47s' }, {
+    id:'CkOSMqwvFiQ', title:'Building Generative World Models: Progress and Challenges', author:'Ruiqi Gao · TUM AI Lecture Series', duration:'lecture',
+  }, {
+    before:'先把视觉质量、动作可控性、长期一致性、规划效用和 sim-to-real 写成互不替代的五列。',
+    after:'用统一矩阵给 Genie、V-JEPA 2、Marble、Cosmos 填“有证据 / 无证据 / 不适用”，并为每格附来源。',
+  }),
 }
 
 export const lessonMediaStats = {
   lessons: Object.keys(lessonMedia).length,
+  llm: Object.keys(lessonMedia).filter(id => !id.startsWith('wm.')).length,
+  world: Object.keys(lessonMedia).filter(id => id.startsWith('wm.')).length,
   domestic: Object.values(lessonMedia).filter(media => media.platform === 'Bilibili' || media.cn?.platform === 'Bilibili').length,
 }
 
 export const lessonHasMedia = id => Boolean(lessonMedia[id])
+export const getLessonMedia = id => lessonMedia[id] || null
 
 function youtubeSourceFromUrl(url, media) {
   if (!url) return null
