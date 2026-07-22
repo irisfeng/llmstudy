@@ -1,21 +1,8 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
-import { createReadStream, createWriteStream, existsSync, chmodSync } from 'node:fs'
-import { createBrotliDecompress } from 'node:zlib'
-import { pipeline } from 'node:stream/promises'
 import { resolve } from 'node:path'
+import { browserLaunchOptions } from './browser-runtime.mjs'
 
-const executablePath = '/tmp/under-the-hood-chromium'
-if (!existsSync(executablePath)) {
-  await pipeline(createReadStream('node_modules/@sparticuz/chromium/bin/chromium.br'), createBrotliDecompress(), createWriteStream(executablePath))
-  chmodSync(executablePath, 0o700)
-}
-
-const browser = await puppeteer.launch({
-  executablePath,
-  headless: true,
-  args: ['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage','--single-process','--no-zygote','--allow-file-access-from-files','--disable-web-security'],
-})
+const browser = await puppeteer.launch(await browserLaunchOptions({ fileAccess: true, disableWebSecurity: true }))
 const errors = []
 const url = process.env.QA_URL || `file://${resolve('dist/index.html')}`
 

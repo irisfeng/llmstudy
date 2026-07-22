@@ -3,7 +3,7 @@ import {
   ArrowLeft, ArrowRight, BookOpen, BracketsCurly, Check, CheckCircle, Circle,
   Clock, Code, Command, Cube, Flask, FolderOpen, Gauge, GithubLogo, House,
   List, MagnifyingGlass, Play, ReadCvLogo, RocketLaunch, Rows, Sparkle,
-  TerminalWindow, X, Moon, Sun, VideoCamera, ShareNetwork,
+  TerminalWindow, X, Moon, Sun, VideoCamera,
 } from '@phosphor-icons/react'
 import { modules, resources } from './data.js'
 import { localizeWorldModules, worldModules, worldResources } from './worldModelData.js'
@@ -15,6 +15,7 @@ import { trackEvent } from './analytics.js'
 import { legacyLessonId, lessonPath, matchSitePath, trackPath } from './lessonRoutes.js'
 import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
 import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
+import { ShareButton } from './ShareDialog.jsx'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
 const lessonIds = [...flattenLessons(modules), ...flattenLessons(worldModules)].map(x => x.lesson[0])
@@ -85,39 +86,6 @@ function ThemeToggle({ theme, toggleTheme, compact = false }) {
   </button>
 }
 
-function ShareButton({ title, text, surface = 'home', lessonId = null, compact = false }) {
-  const { pick } = useI18n()
-  const [done, setDone] = useState(false)
-  const onShare = async () => {
-    const url = new URL(location.pathname, location.origin)
-    url.searchParams.set('utm_source', 'learner_share')
-    url.searchParams.set('utm_medium', 'referral')
-    url.searchParams.set('utm_campaign', 'organic_growth')
-    url.searchParams.set('utm_content', lessonId ? `lesson_${lessonId}` : surface)
-    let method = 'copy'
-    try {
-      if (navigator.share) {
-        await navigator.share({ title, text, url: url.toString() })
-        method = 'native'
-      } else if (navigator.clipboard?.writeText) {
-        await navigator.clipboard.writeText(url.toString())
-      } else {
-        const input = document.createElement('textarea')
-        input.value = url.toString(); input.style.position = 'fixed'; input.style.opacity = '0'
-        document.body.appendChild(input); input.select(); document.execCommand('copy'); input.remove()
-      }
-      setDone(true)
-      setTimeout(() => setDone(false), 1800)
-      trackEvent('content_shared', { method, surface, lesson_id: lessonId })
-    } catch (error) {
-      if (error?.name !== 'AbortError') trackEvent('content_share_failed', { surface, lesson_id: lessonId })
-    }
-  }
-  return <button className={`share-button ${compact ? 'compact' : ''}`} data-share-button onClick={onShare} aria-label={pick('分享课程','Share course')}>
-    <ShareNetwork weight={done ? 'fill' : 'regular'} /> {done ? pick('已准备好','Ready') : pick('分享课程','Share course')}
-  </button>
-}
-
 function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, user, syncStatus }) {
   const { t } = useI18n()
   return <header className="topbar">
@@ -137,15 +105,15 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
   return <main className="page dashboard-page">
     <section className="hero-grid">
       <div className="hero-copy">
-        <span className="hero-track-label">{isWorld ? 'WORLD MODELS · 2026' : 'LARGE LANGUAGE MODELS · UPDATED 2026'}</span>
+        <span className="hero-track-label">{isWorld ? 'WORLD MODELS COURSE' : 'LLM SYSTEMS COURSE'}</span>
         <h1>{isWorld ? pick('别只生成画面。','Don’t just generate frames.') : pick('别只会调用模型。','Don’t just call a model.')}<br /><em>{isWorld ? pick('学会预测世界。','Learn to predict worlds.') : pick('亲手造一个。','Build one yourself.')}</em></h1>
         <p>{isWorld
           ? pick('从状态、动作与隐空间动力学，到 JEPA、Genie、空间智能与 Physical AI。判断一个模型是否真的能理解、预测和规划。','From state, action, and latent dynamics to JEPA, Genie, spatial intelligence, and physical AI. Learn when a model can truly predict and plan.')
-          : pick('从 0 到 1 拆开大模型：推导、实现、训练、推理、对齐、部署，并补入 2025–2026 前沿系统。','Take an LLM apart from first principles—then connect it to 2025–2026 advances in reasoning, sparse architecture, and serving.')}</p>
+          : pick('从 0 到 1 拆开大模型：推导、实现、训练、推理、对齐、部署，并补入 2025-2026 前沿系统。','Take an LLM apart from first principles, then connect it to 2025-2026 advances in reasoning, sparse architecture, and serving.')}</p>
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
-          <ShareButton title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('75 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','75 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
+          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('75 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','75 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
         </div>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <div className="signal-line" />
@@ -155,8 +123,8 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
       <CurrentLesson goLesson={goLesson} trackId={trackId} />
     </section>
     <section className="track-chooser" aria-label={pick('两条学习路线','Two learning tracks')}>
-      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>01 · LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>75 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
-      <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>02 · WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>75 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
     </section>
     <Roadmap modulesData={localized} trackId={trackId} />
     <section className="dashboard-lower">
@@ -467,6 +435,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
     <header className="study-topbar">
       <button onClick={onBack}><ArrowLeft /> {t('backPath')}</button>
       <div className="study-progress"><span>{module.no} · {module.title}</span><i><em style={{ width: complete ? '100%' : '42%' }} /></i></div>
+      <ShareButton compact surface="lesson_header" lessonId={lesson[0]} trackId={lesson[0].startsWith('wm.') ? 'world-models' : 'llm'} title={material.title} text={material.opening[0] || t('lessonLead')} />
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} compact />
       <LanguageToggle compact />
       <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} compact />
@@ -562,7 +531,7 @@ function GeoAnswer({ lessonId }) {
       <div><strong>{pick('三个关键结论','Three key takeaways')}</strong><ul>{brief.points.map(point => <li key={point}><Check />{point}</li>)}</ul></div>
       <aside><strong>{pick('边界与常见误解','Boundary & caveat')}</strong><p>{brief.boundaries}</p></aside>
     </div>
-    <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}<ShareButton compact surface="geo_answer" lessonId={lessonId} title={brief.question} text={brief.answer.slice(0, 100)} /></footer>
+    <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}</footer>
   </section>
 }
 

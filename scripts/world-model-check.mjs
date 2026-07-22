@@ -1,20 +1,11 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
-import { createReadStream, createWriteStream, existsSync, chmodSync } from 'node:fs'
-import { createBrotliDecompress } from 'node:zlib'
-import { pipeline } from 'node:stream/promises'
 import { lessonPath } from '../src/lessonRoutes.js'
 import { worldModules } from '../src/worldModelData.js'
 import { getLessonMedia, lessonHasMedia, resolveMediaSource } from '../src/lessonContent.js'
+import { browserLaunchOptions } from './browser-runtime.mjs'
 
-const executablePath = '/tmp/under-the-hood-chromium'
-if (!existsSync(executablePath)) {
-  await pipeline(createReadStream('node_modules/@sparticuz/chromium/bin/chromium.br'), createBrotliDecompress(), createWriteStream(executablePath))
-  chmodSync(executablePath, 0o700)
-}
-
-const baseUrl = process.env.QA_URL || 'http://127.0.0.1:4173'
-const browser = await puppeteer.launch({ executablePath, headless:true, args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage','--single-process','--no-zygote'] })
+const baseUrl = (process.env.QA_URL || 'http://127.0.0.1:4173').replace(/\/+$/, '')
+const browser = await puppeteer.launch(await browserLaunchOptions())
 const failures = []
 const errors = []
 const check = (value, message) => { if (!value) failures.push(message) }

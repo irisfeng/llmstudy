@@ -1,20 +1,9 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
-import { createReadStream, createWriteStream, existsSync, chmodSync } from 'node:fs'
-import { createBrotliDecompress } from 'node:zlib'
-import { pipeline } from 'node:stream/promises'
 import { resolve } from 'node:path'
-
-const executablePath = '/tmp/under-the-hood-chromium'
-if (!existsSync(executablePath)) {
-  await pipeline(createReadStream('node_modules/@sparticuz/chromium/bin/chromium.br'), createBrotliDecompress(), createWriteStream(executablePath))
-  chmodSync(executablePath, 0o700)
-}
+import { browserLaunchOptions } from './browser-runtime.mjs'
 
 const browser = await puppeteer.launch({
-  executablePath,
-  headless:true,
-  args:['--no-sandbox','--disable-setuid-sandbox','--disable-gpu','--disable-dev-shm-usage','--single-process','--no-zygote','--allow-file-access-from-files','--disable-web-security'],
+  ...await browserLaunchOptions({ fileAccess: true, disableWebSecurity: true }),
 })
 const url = process.env.QA_URL || `file://${resolve('dist/index.html')}`
 const errors = []
@@ -56,6 +45,7 @@ const mobileMetrics = await mobile.evaluate(() => {
     heroHeight:rect('.hero-copy')?.height,
     shareCount:document.querySelectorAll('.hero-actions [data-share-button]').length,
     share:rect('.hero-actions [data-share-button]'),
+    trackColumns:getComputedStyle(document.querySelector('.track-chooser')).gridTemplateColumns,
     visibleSignals:[...document.querySelectorAll('.signal-map > span')].filter(node => getComputedStyle(node).display !== 'none').map(node => node.textContent),
   }
 })
@@ -71,6 +61,7 @@ const desktopMetrics = await desktop.evaluate(() => ({
   scrollWidth:document.documentElement.scrollWidth,
   sidebarWidth:document.querySelector('.sidebar').getBoundingClientRect().width,
   heroColumns:getComputedStyle(document.querySelector('.hero-grid')).gridTemplateColumns,
+  trackColumns:getComputedStyle(document.querySelector('.track-chooser')).gridTemplateColumns,
   searchLabel:getComputedStyle(document.querySelector('.search-trigger span')).display,
   topbarTheme:getComputedStyle(document.querySelector('.topbar > .theme-toggle')).display,
 }))
@@ -84,10 +75,12 @@ const assertions = [
   ['mobile topbar theme is moved to sidebar', mobileMetrics.topbarTheme === 'none'],
   ['mobile signal map is reduced', mobileMetrics.visibleSignals.length === 3],
   ['mobile share action is present and fits the viewport', mobileMetrics.shareCount === 1 && mobileMetrics.share?.right <= mobileMetrics.viewport],
+  ['mobile track chooser is a single column', mobileMetrics.trackColumns.split(' ').length === 1],
   ['open sidebar is visible and has a shadow', (openSidebar.transform === 'none' || openSidebar.transform === 'matrix(1, 0, 0, 1, 0, 0)') && openSidebar.shadow !== 'none'],
   ['desktop has no horizontal overflow', desktopMetrics.scrollWidth === desktopMetrics.viewport],
   ['desktop controls remain visible', desktopMetrics.searchLabel !== 'none' && desktopMetrics.topbarTheme !== 'none'],
   ['desktop hero remains two-column', desktopMetrics.heroColumns.split(' ').length === 2],
+  ['desktop track chooser remains two-column in light theme', desktopMetrics.trackColumns.split(' ').length === 2],
   ['no browser errors', errors.length === 0],
 ]
 const failed = assertions.filter(([,passed]) => !passed).map(([name]) => name)

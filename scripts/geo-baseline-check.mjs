@@ -36,11 +36,19 @@ check(inferAiPlatform('https://example.com/') === null, 'Unrelated referrer was 
 check(inferAiPlatform('not a url') === null, 'Malformed referrer was misclassified')
 check(firstObservation.platformRuns.length === 6, 'First observation must include all 6 platforms')
 check(firstObservation.platformRuns.every(run => platformIds.includes(run.platform)), 'First observation contains an unknown platform')
-check(firstObservation.siteReadiness.localizedGeoUrlCount === geoLessonIds.length * 2, 'First observation GEO URL count is stale')
-check(firstObservation.indexNowSubmission.urlCount === geoLessonIds.length * 2 + 2, 'First IndexNow submission URL count is stale')
+check(firstObservation.siteReadiness.localizedGeoUrlCount === firstObservation.siteReadiness.geoLessonCount * 2, 'First observation GEO URL count is internally inconsistent')
+check(firstObservation.indexNowSubmission.urlCount === firstObservation.siteReadiness.localizedGeoUrlCount + 2, 'First IndexNow submission URL count is internally inconsistent')
 check(firstObservation.indexNowSubmission.accepted === true, 'First IndexNow submission was not accepted')
 
 const weeklyRuns = baseline.platforms.length * baseline.prompts.filter(prompt => prompt.cadence === 'weekly').length
 const fullRuns = baseline.platforms.length * baseline.prompts.length
-console.log(JSON.stringify({ version: baseline.version, platforms: platformIds, prompts: baseline.prompts.length, weeklyRuns, fullRuns, failures }, null, 2))
+console.log(JSON.stringify({
+  version: baseline.version,
+  platforms: platformIds,
+  prompts: baseline.prompts.length,
+  weeklyRuns,
+  fullRuns,
+  geoLessons: { firstObservation: firstObservation.siteReadiness.geoLessonCount, current: geoLessonIds.length },
+  failures,
+}, null, 2))
 if (failures.length) process.exit(1)

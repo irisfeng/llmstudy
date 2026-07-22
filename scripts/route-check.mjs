@@ -1,22 +1,9 @@
 import puppeteer from 'puppeteer-core'
-import chromium from '@sparticuz/chromium'
-import { chmodSync, createReadStream, createWriteStream, existsSync } from 'node:fs'
-import { createBrotliDecompress } from 'node:zlib'
-import { pipeline } from 'node:stream/promises'
 import { lessonPath } from '../src/lessonRoutes.js'
-
-const executablePath = '/tmp/under-the-hood-chromium'
-if (!existsSync(executablePath)) {
-  await pipeline(createReadStream('node_modules/@sparticuz/chromium/bin/chromium.br'), createBrotliDecompress(), createWriteStream(executablePath))
-  chmodSync(executablePath, 0o700)
-}
+import { browserLaunchOptions } from './browser-runtime.mjs'
 
 const baseUrl = (process.env.QA_URL || 'http://127.0.0.1:4173/').replace(/\/$/, '')
-const browser = await puppeteer.launch({
-  executablePath,
-  headless: true,
-  args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu', '--disable-dev-shm-usage', '--single-process', '--no-zygote'],
-})
+const browser = await puppeteer.launch(await browserLaunchOptions())
 const failures = []
 const errors = []
 const check = (condition, message) => { if (!condition) failures.push(message) }
@@ -42,10 +29,19 @@ check(new URL(direct.url()).pathname === zhPath, 'Direct lesson URL did not rema
 check((await direct.$eval('.study-reading h1', node => node.textContent)).includes('Scaled Dot-Product Attention'), 'Direct Chinese lesson did not render')
 check((await direct.$eval('.geo-answer h2', node => node.textContent)).includes('Q、K、V'), 'GEO direct-answer block did not render')
 check((await direct.$$eval('.geo-answer footer a', nodes => nodes.length)) >= 3, 'GEO primary-source links are missing')
-check((await direct.$$eval('.geo-answer [data-share-button]', nodes => nodes.length)) === 1, 'Lesson share action is missing')
+check((await direct.$$eval('.study-topbar [data-share-button]', nodes => nodes.length)) === 1, 'Universal lesson share action is missing')
 check((await direct.title()).includes('Scaled Dot-Product Attention'), 'Lesson document title was not applied')
 check((await direct.$eval('link[rel="canonical"]', node => node.href)).endsWith(zhPath), 'Client canonical URL is incorrect')
 await direct.screenshot({ path: '/tmp/llmstudy-geo-desktop.png', fullPage: false })
+
+await direct.click('.study-topbar [data-share-button]')
+await direct.waitForSelector('[data-share-card-preview]')
+const desktopShareCard = await direct.$eval('[data-share-card-preview]', node => ({ width: node.naturalWidth, height: node.naturalHeight }))
+const shareUrl = await direct.$eval('[data-share-url]', node => node.value)
+check(desktopShareCard.width === 1080 && desktopShareCard.height === 1440, 'Lesson share card dimensions are incorrect')
+check(shareUrl.includes('utm_source=learner_share') && shareUrl.includes('lesson_3.2'), 'Trackable lesson share URL is incorrect')
+await direct.screenshot({ path: '/tmp/llmstudy-share-card-desktop.png', fullPage: false })
+await direct.click('.share-dialog > header .icon-button')
 
 await direct.click('.study-topbar .language-toggle button:last-child')
 await direct.waitForFunction(expected => location.pathname === expected, {}, lessonPath('3.2', 'en'))
@@ -80,13 +76,19 @@ const mobilePath = lessonPath('7.1', 'zh')
 await mobile.goto(`${baseUrl}${mobilePath}`, { waitUntil: 'domcontentloaded' })
 await mobile.waitForSelector('.study-reading h1')
 await mobile.waitForSelector('.geo-answer')
-await mobile.waitForSelector('.geo-answer [data-share-button]')
+await mobile.waitForSelector('.study-topbar [data-share-button]')
 check((await mobile.$eval('.geo-answer-alignment', node => node.textContent)).includes('goal/state'), 'Lecture-alignment note is missing on the second-wave GEO lesson')
+await mobile.click('.study-topbar [data-share-button]')
+await mobile.waitForSelector('[data-share-card-preview]')
+const mobileShareCard = await mobile.$eval('[data-share-card-preview]', node => ({ width: node.naturalWidth, height: node.naturalHeight }))
+check(mobileShareCard.width === 1080 && mobileShareCard.height === 1440, 'Mobile lesson share card dimensions are incorrect')
+await mobile.screenshot({ path: '/tmp/llmstudy-share-card-mobile.png', fullPage: false })
+await mobile.click('.share-dialog > header .icon-button')
 const mobileWidth = await mobile.evaluate(() => ({ client: document.documentElement.clientWidth, scroll: document.documentElement.scrollWidth }))
 check(mobileWidth.client === mobileWidth.scroll, 'Direct mobile lesson has horizontal overflow')
 await mobile.screenshot({ path: '/tmp/llmstudy-geo-mobile.png', fullPage: true })
 
 await browser.close()
 check(errors.length === 0, `Browser errors: ${errors.join(' | ')}`)
-console.log(JSON.stringify({ direct: zhPath, legacy: lessonPath('1.3', 'zh'), mobile: mobilePath, mobileWidth, errors, failures }, null, 2))
+console.log(JSON.stringify({ direct: zhPath, legacy: lessonPath('1.3', 'zh'), mobile: mobilePath, desktopShareCard, mobileShareCard, mobileWidth, errors, failures }, null, 2))
 if (failures.length) process.exit(1)
