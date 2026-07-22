@@ -1,4 +1,4 @@
-import { getLessonRoute, homePath, lessonPath } from './lessonRoutes.js'
+import { getLessonRoute, lessonPath, trackPath } from './lessonRoutes.js'
 import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
 
 export const SITE_URL = 'https://llmstudy.shddai.net'
@@ -7,16 +7,19 @@ export const DEFAULT_OG_IMAGE = `${SITE_URL}/og-cover.png`
 
 const absolute = path => `${SITE_URL}${path}`
 
-export function getHomeSeo(locale = 'zh') {
+export function getHomeSeo(locale = 'zh', trackId = 'llm') {
   const isZh = locale === 'zh'
+  const isWorld = trackId === 'world-models'
   return {
-    locale,
-    title: isZh ? 'LLM Study · 从原理到系统的大模型课程' : 'LLM Study · Build Large Language Models from First Principles',
-    description: isZh
-      ? '69节系统课程，从Token、反向传播和Transformer，到训练、对齐、推理部署与Agent。包含推导、代码、实验、国内外视频与学习进度。'
-      : 'A 69-lesson path from tokens, backpropagation, and Transformers to training, post-training, inference, deployment, and agents.',
-    canonical: absolute(homePath(locale)),
-    alternates: { zh: absolute(homePath('zh')), en: absolute(homePath('en')) },
+    locale, trackId,
+    title: isWorld
+      ? (isZh ? 'World Models · 从状态、预测到空间智能' : 'World Models · From State and Prediction to Spatial Intelligence')
+      : (isZh ? 'LLM Study · 从原理到系统的大模型课程' : 'LLM Study · Build Large Language Models from First Principles'),
+    description: isWorld
+      ? (isZh ? '12节世界模型系统课：POMDP、隐空间动力学、Dreamer、MuZero、JEPA、Genie、Marble、Cosmos与评测。' : 'A 12-lesson world-model path through POMDPs, latent dynamics, Dreamer, MuZero, JEPA, Genie, Marble, Cosmos, and evaluation.')
+      : (isZh ? '75节系统课程，从Token、反向传播和Transformer，到推理模型、训练、对齐、部署与Agent。' : 'A 75-lesson path from tokens, backpropagation, and Transformers to reasoning models, training, post-training, inference, and agents.'),
+    canonical: absolute(trackPath(trackId, locale)),
+    alternates: { zh: absolute(trackPath(trackId, 'zh')), en: absolute(trackPath(trackId, 'en')) },
     type: 'website',
   }
 }
@@ -29,12 +32,13 @@ export function getLessonSeo(id, locale = 'zh') {
   const isZh = locale === 'zh'
   const geoBrief = getGeoBrief(id, locale)
   const description = geoBrief?.answer || (isZh
-    ? `${lesson[1]}：理解${lesson[4]}，完成“${lesson[5]}”。属于大模型系统课「${module.title}」阶段。`
-    : `${lesson[1]}. Learn ${lesson[4]} and complete: ${lesson[5]}. Part of the “${module.title}” LLM learning path.`)
+    ? `${lesson[1]}：理解${lesson[4]}，完成“${lesson[5]}”。属于「${module.title}」学习阶段。`
+    : `${lesson[1]}. Learn ${lesson[4]} and complete: ${lesson[5]}. Part of the “${module.title}” learning path.`)
   return {
     locale,
     id,
-    title: `${lesson[1]} · ${isZh ? '大模型系统课' : 'LLM Study'}`,
+    trackId: route.trackId,
+    title: `${lesson[1]} · ${route.trackId === 'world-models' ? 'World Models' : (isZh ? '大模型系统课' : 'LLM Study')}`,
     description: description.slice(0, 180),
     canonical: absolute(lessonPath(id, locale)),
     alternates: { zh: absolute(lessonPath(id, 'zh')), en: absolute(lessonPath(id, 'en')) },
@@ -94,8 +98,10 @@ export function lessonStructuredData(meta) {
     educationalLevel: 'Intermediate',
     isPartOf: {
       '@type': 'Course',
-      name: meta.locale === 'zh' ? 'LLM Study · 大模型系统课' : 'LLM Study · From Principles to Systems',
-      url: absolute(homePath(meta.locale)),
+      name: meta.trackId === 'world-models'
+        ? (meta.locale === 'zh' ? 'World Models · 世界模型学习路径' : 'World Models Learning Path')
+        : (meta.locale === 'zh' ? 'LLM Study · 大模型系统课' : 'LLM Study · From Principles to Systems'),
+      url: absolute(trackPath(meta.trackId, meta.locale)),
       provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     },
   }

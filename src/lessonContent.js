@@ -55,6 +55,48 @@ const profiles = {
     transfer: '换一个工具、失败模式或权限边界后仍保持可控',
     code: `while not state.done:\n    action = policy.observe_and_decide(state)\n    validated = schema.validate(action)\n    result = tools.call(validated, least_privilege=True)\n    state = state.record(action, result)`,
   },
+  'frontier-llm': {
+    journey: '把前沿名词拆回架构、目标、算法、系统与评测五层',
+    lens: '任何能力或速度结论都同时追问基线、负载、质量约束与可复现证据',
+    verify: '最小实现、论文公式对照、匹配质量的基准与失败样本分层',
+    transfer: '更换模型规模、任务域、上下文长度或并发后重新判断收益',
+    code: `# 前缀存活概率：越靠后，继续被接受的概率只会下降\nsurvival = torch.cumprod(confidence, dim=-1)\nexpected_accepts = 1 + survival.sum(dim=-1)\nthroughput = expected_accepts * profiled_steps_per_second(batch_tokens)`,
+  },
+  'world-foundations': {
+    journey: '从观察到隐藏状态，再从动作条件预测走到规划',
+    lens: '始终区分世界本身、智能体看到的观察、采取的动作和模型内部状态',
+    verify: '状态转移表、手算 belief update 与多步 rollout 成功率',
+    transfer: '增加部分可观察性、随机性或新动作后重新规划',
+    code: `# action-conditioned one-step dynamics\nnext_state_logits = model(state, action)\nloss = F.cross_entropy(next_state_logits, next_state)\n# planning evaluates complete imagined rollouts, not one-step accuracy\nplan = max(candidate_actions, key=lambda a: rollout_return(model, state, a))`,
+  },
+  'world-dynamics': {
+    journey: '把高维观察压进隐状态，让动力学与策略在想象轨迹中协同',
+    lens: '同时追踪表示是否保留任务信息、动力学误差如何累积、策略是否利用模型漏洞',
+    verify: '单步误差、不同长度 rollout、真实回报与 imagined return 偏差',
+    transfer: '改变预测跨度、随机环境或奖励稀疏度后检查规划',
+    code: `z = encoder(observation)\nfor action in candidate_plan:\n    z = dynamics(z, action)\n    imagined_return += reward_head(z)\nbest_plan = candidate_plans[imagined_returns.argmax()]`,
+  },
+  jepa: {
+    journey: '从重建所有像素转向预测对理解与行动真正有用的抽象表征',
+    lens: '检查 context、target、predictor 的信息边界，以及表征是否坍塌',
+    verify: '冻结表征的线性探针、视频检索、动作预测与规划任务',
+    transfer: '更换遮挡策略、视频域或机器人本体后检查表征',
+    code: `context = context_encoder(masked_video)\nwith torch.no_grad():\n    target = target_encoder(target_clip)\nprediction = predictor(context, target_positions)\nloss = representation_loss(prediction, target)`,
+  },
+  'generative-worlds': {
+    journey: '从生成下一帧走向动作可控、空间持久和可编辑的交互世界',
+    lens: '不只看画质，持续检查动作响应、物体恒常性、几何和长时记忆',
+    verify: '固定动作脚本、回访测试、视角闭环、几何一致性与人工盲评',
+    transfer: '更换场景风格、相机轨迹或未见动作组合后检查世界一致性',
+    code: `for action in scripted_actions:\n    frame, state = world_model.step(state, action)\n    log(control_error(frame, action))\n    log(object_permanence(frame, landmarks))\nassert revisit_consistency(trajectory) > threshold`,
+  },
+  'physical-ai': {
+    journey: '把生成世界接入合成数据、策略训练、现实验证和安全回归',
+    lens: '所有仿真收益都要穿过 sim-to-real 偏差与安全边界审查',
+    verify: '覆盖度、物理约束、策略回报、现实小样本验证与故障注入',
+    transfer: '更换传感器、机器人本体或现实扰动后重新评估',
+    code: `synthetic = world_model.generate(scenarios, controls)\npolicy.train(synthetic)\nreport = evaluate(policy, real_holdout)\nassert report.safety_violations == 0\nassert report.sim_to_real_gap < allowed_gap`,
+  },
 }
 
 const typeGuides = {
@@ -250,6 +292,19 @@ const conceptRules = [
   [/observe|reason|act|termination|Agent|tool loop/i, name => `${name}把生成模型嵌入状态机：观察环境、选择动作、执行工具、记录结果并判断终止。可靠性来自显式状态和边界，不来自更长的思维文本。`],
   [/schema|validation|idempotency|side effect|工具调用/i, name => `${name}控制模型输出与真实世界副作用之间的接口。结构校验防止格式漂移，幂等键避免重试造成重复操作，高风险动作必须在执行前审批。`],
   [/记忆|working context|retrieval|summary|memory policy/i, name => `${name}解决有限上下文下“保留什么”的问题。短期工作状态、可检索事实和长期摘要应分层；写入记忆也需要质量门，否则错误会被长期放大。`],
+  [/POMDP|belief state|隐藏状态|观测模型|状态、观察|transition|转移/i, name => `${name}把真实世界与智能体能看到的信息分开。世界状态通过动作发生变化，观察只是状态的不完整投影；belief state 用概率汇总历史证据，供预测与规划使用。`],
+  [/GridWorld|action-conditioned|模型预测控制|rollout/i, name => `${name}用模型在执行前模拟动作后果。单步误差会在多步滚动中累积，因此规划必须用完整轨迹的回报和失败率验证，而不能只看下一状态准确率。`],
+  [/VAE|MDN-RNN|latent dynamics|RSSM|imagined trajectory|dream rollout/i, name => `${name}把高维观察压成隐状态，并在隐空间预测未来。压缩必须保留对奖励和行动有用的信息；动力学模型的系统偏差可能被策略利用。`],
+  [/MuZero|MCTS|representation、dynamics、prediction/i, name => `${name}不要求隐状态重建真实画面，而用 value、policy 与 reward 监督学习对搜索有用的动力学。这样的状态是任务相关表征，不应直接解释为真实物理状态。`],
+  [/JEPA|joint embedding|context encoder|target encoder|collapse/i, name => `${name}在表征空间预测被遮挡或未来内容，主动忽略难以预测的像素细节。target 分支提供学习目标，predictor 建模条件关系，而防坍塌机制保证表征不退化为常数。`],
+  [/latent action|video tokenizer|real-time interaction|动作可控性/i, name => `${name}尝试从视频变化中抽取可控因素，再让动力学根据动作生成后续观察。验证时要固定动作脚本，测响应延迟、方向一致性和长期漂移。`],
+  [/persistent 3D|World API|navigation|空间智能|物体恒常性/i, name => `${name}要求世界在视角离开后仍保存几何和对象状态。可导航、可回访、可编辑比单段视频的局部逼真更强，也需要独立的闭环轨迹测试。`],
+  [/world foundation model|physical AI|synthetic data|sim-to-real/i, name => `${name}把生成模型作为现实训练的上游数据与仿真系统。价值最终由下游策略在真实留出环境的表现决定，视觉逼真不能替代覆盖度、物理约束和安全验证。`],
+  [/Mixture-of-Experts|routing|load balance|MLA|multi-token prediction/i, name => `${name}通过稀疏激活、缓存压缩或额外预测目标改变训练与推理成本。比较时必须分别报告总参数、激活参数、通信、KV 占用和真实吞吐。`],
+  [/RLVR|outcome reward|reasoning trace|test-time compute/i, name => `${name}在答案可自动验证的任务上强化成功行为，并允许推理时投入更多计算。奖励能验证最终结果，不代表每一步推理都真实可靠；长度和格式也可能被策略利用。`],
+  [/sparse attention|context rot|needle|长上下文/i, name => `${name}涉及模型能否在长序列里定位、组合和使用信息。最大窗口只是容量上限；评测还要分开检索、多跳推理、位置敏感性与干扰鲁棒性。`],
+  [/parallel drafter|semi-autoregressive|prefix survival|hardware-aware/i, name => `${name}把草稿质量与服务调度连起来：并行骨干降低草稿时延，轻量顺序头补回块内依赖，前缀存活概率帮助调度器避免在高并发下浪费验证批容量。`],
+  [/masked diffusion|block diffusion|parallel decoding/i, name => `${name}尝试并行修复或生成多个 token，减少纯自回归的串行步数。端到端收益取决于迭代次数、草稿接受率、目标模型验证成本和质量约束。`],
 ]
 
 const moduleFallback = {
@@ -261,6 +316,12 @@ const moduleFallback = {
   alignment: name => `${name}要放进目标—数据—优化—评测闭环，特别检查代理指标是否会被模型钻空子。`,
   inference: name => `${name}需要在固定质量与负载下比较延迟、吞吐、显存和成本，单独的速度数字没有决策意义。`,
   agents: name => `${name}必须映射为可观察状态、权限边界和可回放轨迹，才能被测试与审计。`,
+  'frontier-llm': name => `${name}必须同时标出论文目标、计算路径、质量约束和系统负载，避免把单点 benchmark 当成普遍结论。`,
+  'world-foundations': name => `${name}要明确它属于真实环境、观察、模型状态还是动作，并用状态转移或 belief update 验证。`,
+  'world-dynamics': name => `${name}要在单步预测之外检查长时 rollout、规划回报和模型偏差。`,
+  jepa: name => `${name}要说明预测发生在像素还是表征空间、目标如何产生，以及怎样防止表征坍塌。`,
+  'generative-worlds': name => `${name}必须用固定动作与回访轨迹验证控制和持久性，不能只凭视觉演示判断。`,
+  'physical-ai': name => `${name}最终要由真实留出环境中的策略表现、安全约束和 sim-to-real gap 验收。`,
 }
 
 function explainConcept(name, moduleId, index) {
@@ -318,7 +379,7 @@ function buildEnglishLessonMaterial(module, lesson) {
     mastery: [`Explain the causal chain behind ${concepts.slice(0, 2).join(' and ') || title} in two minutes.`, `Implement the core of “${practice}” without a reference.`, 'Break one assumption deliberately and locate the error using observations.', 'Change one condition and explain whether the result transfers.'],
     references: module.sources.slice(0, 3),
     media: media ? { ...media, globalTitle:title, before:`Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`, after:`Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.` } : null,
-    spotlight: id === '6.6' ? { title:'Paper bridge: from fixed batches to confidence-aware scheduling', body:'Speculative decoding drafts several tokens and verifies them with the target model. DSpark connects parallel drafting, lightweight sequential dependency, prefix-survival confidence, and hardware-aware scheduling.', points:['Sequential heads recover dependencies within a draft block.','Confidence estimates prevent wasteful over-verification.','The scheduler chooses verification length for the current serving load.'] } : null,
+    spotlight: id === '8.4' ? { title:'Paper bridge: from fixed batches to confidence-aware scheduling', body:'Speculative decoding drafts several tokens and verifies them with the target model. DSpark connects parallel drafting, lightweight sequential dependency, prefix-survival confidence, and hardware-aware scheduling.', points:['Sequential heads recover dependencies within a draft block.','Confidence estimates prevent wasteful over-verification.','The scheduler chooses verification length for the current serving load.'] } : null,
   }
 }
 
@@ -328,7 +389,7 @@ export function buildLessonMaterial(module, lesson, locale = 'zh') {
   const profile = profiles[module.id] || profiles.foundations
   const workflow = typeGuides[type] || typeGuides['理论']
   const concepts = splitTheory(theory)
-  const isDSpark = id === '6.6'
+  const isDSpark = id === '8.4'
 
   return {
     id, title, type, duration,

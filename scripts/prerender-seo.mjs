@@ -1,8 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
-import { modules } from '../src/data.js'
 import { buildLessonMaterial } from '../src/lessonContent.js'
-import { lessonPath, lessonRoutes } from '../src/lessonRoutes.js'
+import { lessonPath, lessonRoutes, trackCatalog, trackPath } from '../src/lessonRoutes.js'
 import { DEFAULT_OG_IMAGE, getHomeSeo, getLessonSeo, lessonStructuredData, SITE_URL } from '../src/seo.js'
 import { GEO_UPDATED_AT, getGeoBrief } from '../src/geoContent.js'
 
@@ -57,7 +56,7 @@ function staticLessonContent(meta, material) {
       <ul>${geoBrief.sources.map(source => `<li><a href="${escapeHtml(source.url)}">${escapeHtml(source.title)}</a></li>`).join('')}</ul>
     </section>` : ''
   return `<main class="seo-fallback" data-seo-fallback>
-    <nav><a href="/${meta.locale}/">${isZh ? 'LLM Study 大模型系统课' : 'LLM Study'}</a> / ${escapeHtml(meta.module.title)}</nav>
+    <nav><a href="${trackPath(meta.trackId, meta.locale)}">${meta.trackId === 'world-models' ? 'World Models' : (isZh ? 'LLM Study 大模型系统课' : 'LLM Study')}</a> / ${escapeHtml(meta.module.title)}</nav>
     <article>
       <p>LESSON ${escapeHtml(material.id)} · ${escapeHtml(material.type)} · ${escapeHtml(material.duration)}</p>
       <h1>${escapeHtml(material.title)}</h1>
@@ -77,11 +76,12 @@ function staticLessonContent(meta, material) {
 
 function staticHomeContent(meta) {
   const isZh = meta.locale === 'zh'
+  const isWorld = meta.trackId === 'world-models'
   return `<main class="seo-fallback" data-seo-fallback>
-    <h1>${isZh ? '从第一性原理掌握大模型' : 'Build large language models from first principles'}</h1>
+    <h1>${isWorld ? (isZh ? '从状态、预测到空间智能' : 'From state and prediction to spatial intelligence') : (isZh ? '从第一性原理掌握大模型' : 'Build large language models from first principles')}</h1>
     <p>${escapeHtml(meta.description)}</p>
-    <p>${isZh ? '69节深度课，覆盖反向传播、Token、Transformer、训练、对齐、推理部署与Agent。' : '69 in-depth lessons spanning backpropagation, tokens, Transformers, training, post-training, inference, deployment, and agents.'}</p>
-    <a href="${lessonPath('0.1', meta.locale)}">${isZh ? '开始第一节' : 'Start lesson one'}</a>
+    <p>${isWorld ? (isZh ? '12节深度课，覆盖POMDP、隐空间动力学、JEPA、Genie、空间智能与Physical AI。' : '12 lessons spanning POMDPs, latent dynamics, JEPA, Genie, spatial intelligence, and physical AI.') : (isZh ? '75节深度课，覆盖反向传播、Transformer、推理模型、训练、对齐、推理部署与Agent。' : '75 lessons spanning backpropagation, Transformers, reasoning models, training, post-training, inference, and agents.')}</p>
+    <a href="${lessonPath(isWorld ? 'wm.0.1' : '0.1', meta.locale)}">${isZh ? '开始第一节' : 'Start lesson one'}</a>
   </main>`
 }
 
@@ -101,8 +101,11 @@ async function writePage(relativePath, html) {
 }
 
 for (const locale of ['zh', 'en']) {
-  const homeMeta = getHomeSeo(locale)
-  await writePage(locale, renderPage(homeMeta, staticHomeContent(homeMeta)))
+  for (const trackId of Object.keys(trackCatalog)) {
+    const homeMeta = getHomeSeo(locale, trackId)
+    const relativeHome = trackPath(trackId, locale).replace(/^\//, '').replace(/\/$/, '')
+    await writePage(relativeHome, renderPage(homeMeta, staticHomeContent(homeMeta)))
+  }
 
   for (const route of lessonRoutes) {
     const meta = getLessonSeo(route.id, locale)
@@ -130,10 +133,12 @@ const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url><loc>${SITE_URL}/zh/</loc><lastmod>${today}</lastmod></url>
   <url><loc>${SITE_URL}/en/</loc><lastmod>${today}</lastmod></url>
+  <url><loc>${SITE_URL}/zh/world-models/</loc><lastmod>${today}</lastmod></url>
+  <url><loc>${SITE_URL}/en/world-models/</loc><lastmod>${today}</lastmod></url>
 ${sitemapEntries.join('\n')}
 </urlset>
 `
 await writeFile(new URL('sitemap.xml', dist), sitemap)
 await writeFile(new URL('robots.txt', dist), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`)
 
-console.log(`Prerendered ${lessonRoutes.length * 2 + 3} localized pages and ${lessonRoutes.length * 2 + 2} sitemap URLs.`)
+console.log(`Prerendered ${lessonRoutes.length * 2 + 5} localized pages and ${lessonRoutes.length * 2 + 4} sitemap URLs.`)

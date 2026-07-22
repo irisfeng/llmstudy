@@ -1,6 +1,6 @@
-# UNDER THE HOOD · 大模型系统课
+# UNDER THE HOOD · LLM 与 World Models 系统课
 
-一个面向认真自学者的中英双语大模型学习网站。课程以“能解释、能实现、能诊断、能迁移”为掌握标准，沿着 26 周路线从数学与自动微分走到 GPT、训练系统、后训练、推理部署与 Agent。
+一个面向认真自学者的中英双语 AI 系统学习网站。课程以“能解释、能实现、能诊断、能迁移”为掌握标准，提供两条相互独立的学习路径：从零构建 LLM，以及从状态与动力学走向空间智能的 World Models。
 
 在线访问：[llmstudy.shddai.net](https://llmstudy.shddai.net)
 
@@ -11,16 +11,17 @@
 - [反向传播为什么需要逆拓扑与梯度累加](https://llmstudy.shddai.net/zh/lesson/1-3-make-gradients-flow-backward-through-a-graph/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_backprop)
 - [Q、K、V 与缩放点积注意力](https://llmstudy.shddai.net/zh/lesson/3-2-scaled-dot-product-attention/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_attention)
 - [一个可控的 AI Agent 最小闭环](https://llmstudy.shddai.net/zh/lesson/7-1-the-minimal-agent-loop/?utm_source=github&utm_medium=referral&utm_campaign=organic_launch&utm_content=readme_agent)
+- [世界模型究竟是什么](https://llmstudy.shddai.net/zh/world-models/lesson/wm-0-1-what-is-a-world-model-exactly/?utm_source=github&utm_medium=referral&utm_campaign=world_models_launch&utm_content=readme_world_models)
 
 适合希望从“会调用 API”继续走到“能解释、能实现、能诊断”的学习者。若课程结构、事实或来源有问题，欢迎提交 Issue；具体、可复现的纠错比单纯 Star 更有价值。
 
 ## 当前版本
 
-- 8 个阶段、69 节深度课、24 类核心实验、8 个阶段作品
-- 中 / EN 整站切换：导航、69 节课程数据、学习页、实验、项目、资料库与账户流程均支持双语
+- 双学习路径：LLM 9 个阶段、75 节；World Models 5 个阶段、12 节；进度分别计算
+- 中 / EN 整站切换：导航、87 节课程数据、学习页、实验、项目、资料库与账户流程均支持双语
 - 51 节课程配有视频研讨：国内模式全部使用 B站；国际模式使用 YouTube 或官方课程、论文、代码仓库，不再回落到 B站
 - 长课程精确映射到对应分P；无法合法嵌入的国际材料明确展示官方原始入口
-- 69 节课程均可进入完整学习页：目标、直觉、机制、实践、自测、笔记与掌握门
+- 87 节课程均有独立双语 URL，并可进入完整学习页：目标、直觉、机制、实践、自测、笔记与掌握门
 - 深度反向传播工作台：理论阅读、公式、代码、计算图和反思题
 - Dark / Light 模式一键切换并持久化偏好
 - 游客模式本地保存学习笔记与完成状态，登录不阻断学习
@@ -28,6 +29,8 @@
 - Supabase 云端同步课程完成状态、笔记、主题、网络模式和最近学习位置
 - 本地优先同步：离线时继续学习，网络恢复后安全合并；支持多设备进度一致
 - 推理章节加入 DSpark 投机解码论文桥与硬件感知调度视角
+- World Models 首期覆盖 POMDP、经典 World Models、Dreamer、MuZero、JEPA / V-JEPA 2、Genie、Marble、Cosmos 与系统评测
+- LLM 新增 2025–2026 前沿阶段：MoE / MLA / MTP、RLVR、长上下文、DSpark、块扩散解码与 Agent 后训练
 - 大师资料库：Karpathy、Stanford CS336、PyTorch、Hugging Face、FSDL、Megatron-LM、llama.cpp、vLLM、Transformer Circuits 等
 - 视频来源分为官方双语、中文原创、源码带读和社区字幕；社区镜像同时保留原始课程链接
 - 可用交互：全站搜索、课程切换、资源筛选、代码运行状态、进度操作和移动端导航

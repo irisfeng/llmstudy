@@ -1,4 +1,4 @@
-export const GEO_UPDATED_AT = '2026-07-12'
+export const GEO_UPDATED_AT = '2026-07-22'
 
 const briefs = {
   '1.3': {
@@ -332,6 +332,126 @@ const briefs = {
         { title: 'Anthropic · Building Effective Agents', url: 'https://www.anthropic.com/engineering/building-effective-agents' },
         { title: 'OpenAI · A Practical Guide to Building Agents', url: 'https://cdn.openai.com/business-guides-and-resources/a-practical-guide-to-building-agents.pdf' },
         { title: 'DeepLearning.AI · Agentic AI', url: 'https://www.deeplearning.ai/courses/agentic-ai/' },
+      ],
+    },
+  },
+  'wm.0.1': {
+    zh: {
+      question: '世界模型究竟是什么，为什么不能把视频生成模型都叫世界模型？',
+      answer: '世界模型是智能体内部对环境状态及其变化规律的可学习模型：它根据历史观察形成状态表示，在给定动作或条件后预测未来，并让智能体用这些预测评估行动。视频生成器只要生成视觉上合理的帧即可；若缺少稳定状态、动作因果、长期一致性或规划用途，就不能仅凭“画面像世界”证明它是可用于决策的世界模型。',
+      points: ['核心接口是状态、观察、动作与转移，而不是单纯的文字到视频。','真正的价值要由多步预测、反事实与规划任务验证。','像素生成、隐空间预测和3D世界都可能是实现路线，但名称不能代替能力证据。'],
+      boundaries: '学界并没有唯一排他的定义；有些工作把大规模视频预测器称为世界模型。课程采用功能性判据：模型必须表达环境变化，并在控制、预测或规划中接受独立评测。',
+      sources: [
+        { title:'Ha & Schmidhuber · World Models', url:'https://arxiv.org/abs/1803.10122' },
+        { title:'LeCun · A Path Towards Autonomous Machine Intelligence', url:'https://openreview.net/forum?id=BZ5a1r-kVsf' },
+        { title:'Hafner et al. · DreamerV3', url:'https://arxiv.org/abs/2301.04104' },
+      ],
+    },
+    en: {
+      question: 'What is a world model, and why is every video generator not automatically one?',
+      answer: 'A world model is a learned internal model of environmental state and change: it uses observation history to form a state representation, predicts futures under actions or conditions, and lets an agent evaluate behavior through those predictions. A video generator only needs visually plausible frames. Without stable state, action-conditioned consequences, long-horizon consistency, or demonstrated planning utility, world-like imagery alone does not establish a useful world model.',
+      points: ['The core interface is state, observation, action, and transition—not merely text-to-video.','Multi-step prediction, counterfactual control, and planning provide stronger evidence than visual quality.','Pixel generation, latent prediction, and persistent 3D can all be implementation routes, but labels are not capability evidence.'],
+      boundaries: 'Research uses several overlapping definitions, and some work calls large video predictors world models. This course uses a functional test: the model must represent environmental change and be independently evaluated for prediction, control, or planning.',
+      sources: [
+        { title:'Ha & Schmidhuber · World Models', url:'https://arxiv.org/abs/1803.10122' },
+        { title:'LeCun · A Path Towards Autonomous Machine Intelligence', url:'https://openreview.net/forum?id=BZ5a1r-kVsf' },
+        { title:'Hafner et al. · DreamerV3', url:'https://arxiv.org/abs/2301.04104' },
+      ],
+    },
+  },
+  'wm.2.2': {
+    zh: {
+      question: 'V-JEPA 2 如何从无动作标签视频学习，最后又用于机器人规划？',
+      answer: 'V-JEPA 2 首先用大量图像和无动作标签视频做自监督预训练：context encoder 读取可见视频块，predictor 在抽象表征空间预测被遮挡或未来部分的 target 表征。随后再用少量带机器人动作的数据训练 action-conditioned world model，使候选动作序列能够在隐空间滚动预测；规划器比较预测目标与期望目标的距离，选择更合适的动作执行。',
+      points: ['大规模预训练阶段学习视觉与运动表征，并不需要机器人动作标签。','动作条件后训练把“理解视频”转成“预测某个动作会造成什么变化”。','规划效用必须由新环境中的真实控制结果检验，视频 benchmark 不能替代机器人评测。'],
+      boundaries: 'V-JEPA 2 展示的是特定机械臂设置中的零样本规划结果，不等于通用机器人智能；性能仍受本体、相机、动作空间、目标表示与规划搜索限制。',
+      sources: [
+        { title:'Meta AI · V-JEPA 2', url:'https://ai.meta.com/research/vjepa/' },
+        { title:'V-JEPA 2 paper', url:'https://arxiv.org/abs/2506.09985' },
+        { title:'Meta Research · V-JEPA 2 code', url:'https://github.com/facebookresearch/vjepa2' },
+      ],
+    },
+    en: {
+      question: 'How does V-JEPA 2 learn from action-free video and later support robot planning?',
+      answer: 'V-JEPA 2 first pretrains self-supervised on large image and action-free video collections: a context encoder reads visible video regions and a predictor estimates masked or future target representations in embedding space. A smaller amount of robot interaction data then trains an action-conditioned world model. Candidate action sequences can be rolled forward in latent space, and a planner selects actions whose predicted representation best approaches the desired goal.',
+      points: ['Large-scale pretraining learns visual and motion representations without robot action labels.','Action-conditioned post-training turns video understanding into predictions of action consequences.','Planning utility must be tested through physical control in new environments; video benchmarks are not a substitute.'],
+      boundaries: 'V-JEPA 2 demonstrates zero-shot planning in a particular manipulation setup, not general-purpose robotics. Results remain constrained by embodiment, cameras, action space, goal representation, and the planning search procedure.',
+      sources: [
+        { title:'Meta AI · V-JEPA 2', url:'https://ai.meta.com/research/vjepa/' },
+        { title:'V-JEPA 2 paper', url:'https://arxiv.org/abs/2506.09985' },
+        { title:'Meta Research · V-JEPA 2 code', url:'https://github.com/facebookresearch/vjepa2' },
+      ],
+    },
+  },
+  'wm.3.1': {
+    zh: {
+      question: 'Genie 1 到 Genie 3 的核心演进是什么？',
+      answer: 'Genie 1 的关键是从无动作标签视频中联合学习视频表示、潜在动作和动作条件动力学，让用户能控制生成的二维环境。Genie 2 把范围扩展到从图像生成多样的可控制三维环境，用于训练和评估智能体。Genie 3 进一步以文字生成可实时导航的世界，在720p、24 FPS下维持数分钟的一致性，并加入可提示的世界事件，但长期记忆与精确动作仍有限。',
+      points: ['潜在动作模型从相邻视频变化中抽取可控制因素，避免依赖现成键盘标签。','演进重点从短时二维交互走向更通用的三维、实时和更长一致性。','评测必须分别观察动作响应、世界记忆、物体恒常性和长时漂移。'],
+      boundaries: 'Genie 3 的公开材料主要是官方研究演示与产品原型信息，完整架构、训练数据和可复现实验尚不等同于开放论文与代码；课程不会把产品描述当成已独立验证的结论。',
+      sources: [
+        { title:'Genie: Generative Interactive Environments', url:'https://arxiv.org/abs/2402.15391' },
+        { title:'Google DeepMind · Genie 2', url:'https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/' },
+        { title:'Google DeepMind · Genie 3', url:'https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/' },
+      ],
+    },
+    en: {
+      question: 'What changed fundamentally from Genie 1 through Genie 3?',
+      answer: 'Genie 1 jointly learned video representations, latent actions, and action-conditioned dynamics from videos without action labels, enabling control of generated 2D environments. Genie 2 expanded toward diverse controllable 3D environments generated from images for agent training and evaluation. Genie 3 generates real-time navigable worlds from text, maintains minutes of consistency at 720p and 24 FPS, and adds promptable world events, while long memory and precise action spaces remain limited.',
+      points: ['Latent action modeling extracts controllable factors from video changes without requiring keyboard labels.','The progression moves from short 2D interaction toward more general 3D, real-time generation, and longer consistency.','Evaluation should separate action response, world memory, object permanence, and long-horizon drift.'],
+      boundaries: 'Public Genie 3 evidence is primarily official research demonstration and product-prototype material. Architecture, training data, and reproducibility are not yet equivalent to a fully open paper and codebase, so product claims are not treated as independently verified results.',
+      sources: [
+        { title:'Genie: Generative Interactive Environments', url:'https://arxiv.org/abs/2402.15391' },
+        { title:'Google DeepMind · Genie 2', url:'https://deepmind.google/blog/genie-2-a-large-scale-foundation-world-model/' },
+        { title:'Google DeepMind · Genie 3', url:'https://deepmind.google/blog/genie-3-a-new-frontier-for-world-models/' },
+      ],
+    },
+  },
+  'wm.3.2': {
+    zh: {
+      question: 'World Labs 的空间智能与普通视频生成、3D重建有什么不同？',
+      answer: '空间智能要求模型理解并生成可导航、可回访、可编辑的三维环境，而不只是输出固定视角的视频。Marble 接受文字、图像、全景、多视图或视频输入，生成具有一定空间持久性的世界，并可在网页中探索或导出。它也不同于只还原已有场景的3D重建：生成式世界可以创造和扩展未被完整观测的空间，但同时引入几何与真实性的不确定性。',
+      points: ['视频生成主要优化时间上的画面序列，持久世界还要维护跨视角几何与对象状态。','3D重建强调忠实恢复已有场景，生成式世界还承担补全、创造与编辑。','真正的空间一致性要通过闭环相机轨迹、回访位置和几何测量验证。'],
+      boundaries: '可导航不等于具有完整物理动力学；Marble 的场景生成与机器人可交互世界模型仍是不同层级。空间持久性、几何准确度和下游仿真适用性需要按任务分别评测。',
+      sources: [
+        { title:'World Labs · Marble', url:'https://www.worldlabs.ai/blog/marble-world-model' },
+        { title:'World Labs · World API', url:'https://www.worldlabs.ai/blog/announcing-the-world-api' },
+        { title:'World Labs · Spatial Intelligence', url:'https://www.worldlabs.ai/blog' },
+      ],
+    },
+    en: {
+      question: 'How does World Labs spatial intelligence differ from video generation and 3D reconstruction?',
+      answer: 'Spatial intelligence requires models to understand and generate navigable, revisitable, editable 3D environments rather than a video from one prescribed camera path. Marble accepts text, images, panoramas, multi-view input, or video and creates spatially persistent worlds that can be explored on the web or exported. Unlike reconstruction, which recovers an observed scene, a generative world can invent and extend unobserved space, adding geometric and factual uncertainty.',
+      points: ['Video generation models temporal imagery; persistent worlds must also maintain geometry and object state across viewpoints.','3D reconstruction prioritizes faithful recovery, while generative worlds also complete, create, and edit.','Spatial consistency needs closed camera loops, revisited locations, and geometric measurements—not screenshots alone.'],
+      boundaries: 'Navigability does not imply a complete physical dynamics model. Marble scene generation and an action-interactive robotics world model remain different capability levels; persistence, geometry, and simulation fitness require task-specific evaluation.',
+      sources: [
+        { title:'World Labs · Marble', url:'https://www.worldlabs.ai/blog/marble-world-model' },
+        { title:'World Labs · World API', url:'https://www.worldlabs.ai/blog/announcing-the-world-api' },
+        { title:'World Labs · Spatial Intelligence', url:'https://www.worldlabs.ai/blog' },
+      ],
+    },
+  },
+  'wm.4.1': {
+    zh: {
+      question: 'NVIDIA Cosmos 如何把世界基础模型用于机器人和自动驾驶？',
+      answer: 'Cosmos 把预训练世界基础模型、视频 tokenizer、后训练工具、护栏和数据管线组合成 Physical AI 平台。开发者可以用真实传感器或仿真数据进行领域后训练，生成或转换符合目标场景的视频与世界状态，扩大极端场景覆盖，再把这些数据用于感知或策略模型训练。最终收益必须通过真实留出环境中的任务成功率和安全指标验证。',
+      points: ['世界基础模型是可适配的上游模型，不是拿来直接控制所有机器人的统一策略。','合成数据价值来自覆盖稀有场景、可控变化与标注效率，而不只是真实感。','闭环必须包含现实评测、分布偏差检测和安全故障注入。'],
+      boundaries: '生成数据可能复制训练偏差、违反物理约束或遗漏关键长尾。Cosmos 的开放模型与工具降低实验门槛，但不能消除 sim-to-real gap；不同硬件、传感器和本体仍需独立验证。',
+      sources: [
+        { title:'NVIDIA · Cosmos', url:'https://www.nvidia.com/en-us/ai/cosmos/' },
+        { title:'NVIDIA Research · Cosmos Lab', url:'https://research.nvidia.com/labs/cosmos-lab/' },
+        { title:'Cosmos World Foundation Model Platform', url:'https://arxiv.org/abs/2501.03575' },
+      ],
+    },
+    en: {
+      question: 'How does NVIDIA Cosmos apply world foundation models to robotics and autonomous driving?',
+      answer: 'Cosmos combines pretrained world foundation models, video tokenizers, post-training tools, guardrails, and data pipelines into a physical-AI platform. Developers adapt models with sensor or simulation data, generate or transform videos and world states to expand rare-scenario coverage, and use those outputs to train perception or policy models. The final value must be measured through task success and safety metrics in held-out real environments.',
+      points: ['A world foundation model is an adaptable upstream model, not one universal robot-control policy.','Synthetic data is useful for controllable variation, rare-event coverage, and labeling efficiency—not realism alone.','A complete loop includes real-world evaluation, distribution-shift checks, and safety fault injection.'],
+      boundaries: 'Generated data can reproduce training bias, violate physical constraints, or omit critical long-tail events. Open Cosmos models and tools lower experimentation costs but do not remove the sim-to-real gap; each hardware, sensor, and embodiment still needs independent validation.',
+      sources: [
+        { title:'NVIDIA · Cosmos', url:'https://www.nvidia.com/en-us/ai/cosmos/' },
+        { title:'NVIDIA Research · Cosmos Lab', url:'https://research.nvidia.com/labs/cosmos-lab/' },
+        { title:'Cosmos World Foundation Model Platform', url:'https://arxiv.org/abs/2501.03575' },
       ],
     },
   },

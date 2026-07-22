@@ -17,7 +17,7 @@ const sitemap = await readFile(new URL('sitemap.xml', dist), 'utf8')
 const robots = await readFile(new URL('robots.txt', dist), 'utf8')
 const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1])
 
-check(urls.length === lessonRoutes.length * 2 + 2, `Expected ${lessonRoutes.length * 2 + 2} sitemap URLs, found ${urls.length}`)
+check(urls.length === lessonRoutes.length * 2 + 4, `Expected ${lessonRoutes.length * 2 + 4} sitemap URLs, found ${urls.length}`)
 check(new Set(urls).size === urls.length, 'Sitemap contains duplicate URLs')
 check(!sitemap.includes('#lesson='), 'Sitemap contains legacy hash URLs')
 check(robots.includes('User-agent: *\nAllow: /'), 'robots.txt does not allow general-purpose crawlers')

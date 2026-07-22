@@ -6,17 +6,20 @@ import {
   TerminalWindow, X, Moon, Sun, VideoCamera, ShareNetwork,
 } from '@phosphor-icons/react'
 import { modules, resources } from './data.js'
+import { localizeWorldModules, worldModules, worldResources } from './worldModelData.js'
 import { buildLessonMaterial, lessonHasMedia, lessonMediaStats, resolveMediaSource } from './lessonContent.js'
 import { AccountButton, AccountModal, useAuth, useLearningSync } from './auth.jsx'
 import { LanguageToggle, useI18n } from './i18n.jsx'
 import { localizeModules, localizeResources, sourceTypesFor } from './localizedData.js'
 import { trackEvent } from './analytics.js'
-import { homePath, legacyLessonId, lessonPath, matchSitePath } from './lessonRoutes.js'
+import { legacyLessonId, lessonPath, matchSitePath, trackPath } from './lessonRoutes.js'
 import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
 import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
-const lessonIds = flattenLessons(modules).map(x => x.lesson[0])
+const lessonIds = [...flattenLessons(modules), ...flattenLessons(worldModules)].map(x => x.lesson[0])
+const trackModules = (trackId, locale) => trackId === 'world-models' ? localizeWorldModules(locale) : localizeModules(modules, locale)
+const trackResources = trackId => trackId === 'world-models' ? worldResources : resources
 
 const navItems = [
   ['home', 'overview', House], ['path', 'path', Rows], ['labs', 'labs', Flask],
@@ -45,10 +48,19 @@ function Brand() {
   </button>
 }
 
-function Sidebar({ view, setView, open, onClose, progress, theme, toggleTheme }) {
+function TrackSwitcher({ trackId, onTrack, compact = false }) {
+  const { pick } = useI18n()
+  return <div className={`track-switcher ${compact ? 'compact' : ''}`} role="group" aria-label={pick('学习方向','Learning track')}>
+    <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')} aria-pressed={trackId === 'llm'}><BracketsCurly /> <span>LLM</span></button>
+    <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')} aria-pressed={trackId === 'world-models'}><Cube /> <span>{pick('世界模型','World Models')}</span></button>
+  </div>
+}
+
+function Sidebar({ view, setView, open, onClose, progress, theme, toggleTheme, trackId, onTrack }) {
   const { t, pick } = useI18n()
   return <aside className={`sidebar ${open ? 'open' : ''}`}>
     <div className="side-head"><Brand /><button className="icon-button mobile-only" onClick={onClose}><X /></button></div>
+    <TrackSwitcher trackId={trackId} onTrack={onTrack} compact />
     <nav className="main-nav" aria-label="主要导航">
       {navItems.map(([id, label, Icon]) => <button key={id} className={view === id ? 'active' : ''} onClick={() => { setView(id); onClose() }}>
         <Icon size={20} weight={view === id ? 'fill' : 'regular'} /><span>{t(label)}</span>
@@ -118,27 +130,35 @@ function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, use
   </header>
 }
 
-function Dashboard({ goLesson, setView }) {
+function Dashboard({ goLesson, setView, trackId, onTrack }) {
   const { pick, locale } = useI18n()
-  const localized = useMemo(() => localizeModules(modules, locale), [locale])
+  const localized = useMemo(() => trackModules(trackId, locale), [trackId, locale])
+  const isWorld = trackId === 'world-models'
   return <main className="page dashboard-page">
     <section className="hero-grid">
       <div className="hero-copy">
-        <h1>{pick('别只会调用模型。','Don’t just call a model.')}<br /><em>{pick('亲手造一个。','Build one yourself.')}</em></h1>
-        <p>{pick('从 0 到 1 拆开大模型：推导、实现、训练、对齐、部署。不是“看懂了”，而是能够解释、复现和诊断。','Take an LLM apart from first principles: derive, implement, train, align, and deploy. The goal is not recognition—it is explanation, reproduction, and diagnosis.')}</p>
+        <span className="hero-track-label">{isWorld ? 'WORLD MODELS · 2026' : 'LARGE LANGUAGE MODELS · UPDATED 2026'}</span>
+        <h1>{isWorld ? pick('别只生成画面。','Don’t just generate frames.') : pick('别只会调用模型。','Don’t just call a model.')}<br /><em>{isWorld ? pick('学会预测世界。','Learn to predict worlds.') : pick('亲手造一个。','Build one yourself.')}</em></h1>
+        <p>{isWorld
+          ? pick('从状态、动作与隐空间动力学，到 JEPA、Genie、空间智能与 Physical AI。判断一个模型是否真的能理解、预测和规划。','From state, action, and latent dynamics to JEPA, Genie, spatial intelligence, and physical AI. Learn when a model can truly predict and plan.')
+          : pick('从 0 到 1 拆开大模型：推导、实现、训练、推理、对齐、部署，并补入 2025–2026 前沿系统。','Take an LLM apart from first principles—then connect it to 2025–2026 advances in reasoning, sparse architecture, and serving.')}</p>
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
-          <ShareButton title={pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={pick('69 节中英双语课程，从反向传播、Token 和 Transformer 到训练、推理与 Agent。','69 bilingual lessons from backpropagation, tokens, and Transformers to training, inference, and agents.')} />
+          <ShareButton title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('75 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','75 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
         </div>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <div className="signal-line" />
-          {['TOKENS', 'BACKPROP', 'GPT', 'ALIGNMENT', 'AGENTS'].map((x, i) => <span key={x} style={{ left: `${i * 24.5}%`, top: i % 2 ? 57 : 26 }}>{x}</span>)}
+          {(isWorld ? ['STATE', 'DYNAMICS', 'JEPA', 'WORLDS', 'PHYSICAL AI'] : ['TOKENS', 'BACKPROP', 'GPT', 'REASONING', 'AGENTS']).map((x, i) => <span key={x} style={{ left: `${i * 24.5}%`, top: i % 2 ? 57 : 26 }}>{x}</span>)}
         </div>
       </div>
-      <CurrentLesson goLesson={goLesson} />
+      <CurrentLesson goLesson={goLesson} trackId={trackId} />
     </section>
-    <Roadmap modulesData={localized} />
+    <section className="track-chooser" aria-label={pick('两条学习路线','Two learning tracks')}>
+      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>01 · LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>75 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>02 · WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
+    </section>
+    <Roadmap modulesData={localized} trackId={trackId} />
     <section className="dashboard-lower">
       <Today goLesson={goLesson} />
       <MasteryPanel />
@@ -152,25 +172,27 @@ function Dashboard({ goLesson, setView }) {
   </main>
 }
 
-function CurrentLesson({ goLesson }) {
+function CurrentLesson({ goLesson, trackId }) {
   const { pick } = useI18n()
+  const isWorld = trackId === 'world-models'
   return <article className="current-lesson">
-    <div className="current-meta"><span><i /> {pick('当前学习','CURRENT')}</span><span>{pick('本周 4 / 6','THIS WEEK 4 / 6')}</span></div>
-    <span className="chapter-code">01 · {pick('神经网络地基','NEURAL FOUNDATIONS')}</span>
-    <h2>{pick('让梯度沿计算图','Make gradients flow')}<br />{pick('倒着走','backward')}</h2>
-    <p>{pick('从局部导数到 reverse-mode autodiff，亲手实现一个微型 autograd 引擎。','Move from local derivatives to reverse-mode autodiff by implementing a tiny autograd engine.')}</p>
+    <div className="current-meta"><span><i /> {pick('推荐起点','START HERE')}</span><span>{isWorld ? 'W0 · 01' : '01 · 03'}</span></div>
+    <span className="chapter-code">{isWorld ? pick('W0 · 定义与状态','W0 · DEFINITIONS & STATE') : pick('01 · 神经网络地基','01 · NEURAL FOUNDATIONS')}</span>
+    <h2>{isWorld ? pick('世界模型','What is a') : pick('让梯度沿计算图','Make gradients flow')}<br />{isWorld ? pick('究竟是什么','world model?') : pick('倒着走','backward')}</h2>
+    <p>{isWorld ? pick('用状态、观察、动作、转移与规划建立严格定义，先学会识别营销概念。','Build a strict definition from state, observation, action, transition, and planning.') : pick('从局部导数到 reverse-mode autodiff，亲手实现一个微型 autograd 引擎。','Move from local derivatives to reverse-mode autodiff by implementing a tiny autograd engine.')}</p>
     <div className="code-window">
-      <div className="code-title"><span>micrograd.py</span><span>Python</span></div>
-      <pre><code>{codeSample.split('\n').slice(0, 9).join('\n')}</code></pre>
+      <div className="code-title"><span>{isWorld ? 'world_model.py' : 'micrograd.py'}</span><span>Python</span></div>
+      <pre><code>{isWorld ? `state = encode(observation)\nfor action in candidates:\n    future = dynamics(state, action)\n    score[action] = reward(future)\n\nbest = max(score, key=score.get)` : codeSample.split('\n').slice(0, 9).join('\n')}</code></pre>
     </div>
     <button className="lesson-continue" onClick={goLesson}>{pick('打开学习工作台','Open learning workspace')} <ArrowRight /></button>
   </article>
 }
 
-function Roadmap({ modulesData = modules }) {
+function Roadmap({ modulesData = modules, trackId = 'llm' }) {
   const { pick } = useI18n()
+  const isWorld = trackId === 'world-models'
   return <section className="roadmap-block">
-    <div className="section-title-row"><div><span className="section-no">ROADMAP · 26 WEEKS</span><h2>{pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>220–260 {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {lessonMediaStats.lessons} {pick('节视频研讨','video seminars')}</p></div>
+    <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '29 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '250–290'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')}{!isWorld && <> · {lessonMediaStats.lessons} {pick('节视频研讨','video seminars')}</>}</p></div>
     <div className="roadmap-rail">
       {modulesData.map((m, i) => <div className={`road-stop ${i === 1 ? 'current' : ''} ${i === 0 ? 'done' : ''}`} key={m.id}>
         <span>{i === 0 ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
@@ -208,16 +230,17 @@ function MasteryPanel() {
   </section>
 }
 
-function Curriculum({ selected, setSelected, goLesson, completed }) {
+function Curriculum({ selected, setSelected, goLesson, completed, trackId }) {
   const { locale, pick, t } = useI18n()
-  const modulesData = useMemo(() => localizeModules(modules, locale), [locale])
+  const modulesData = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const current = modulesData[selected]
+  const isWorld = trackId === 'world-models'
   return <main className="page curriculum-page">
     <header className="page-lead">
       <span className="section-no">THE COMPLETE PATH</span>
-      <h1>{pick('一条能走到底的','A complete path through')}<br />{pick('大模型学习路线','large language models')}</h1>
-      <p>{pick('26 周不是速成承诺，而是一套可验证的能力建造计划。每阶段都以作品和掌握门结束。','This is not a 26-week shortcut. It is a verifiable capability-building plan; every phase ends with a project and a mastery gate.')}</p>
-      <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span><span><b>{lessonMediaStats.lessons}</b> {pick('视频研讨','video seminars')}</span><span><b>24</b> {pick('核心实验','core labs')}</span><span><b>8</b> {pick('阶段作品','phase projects')}</span></div>
+      <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
+      <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('29 周不是速成承诺，而是一套持续更新、可验证的能力建造计划。每阶段都以作品和掌握门结束。','This is not a 29-week shortcut. It is an updated, verifiable capability-building plan; every phase ends with a project and a mastery gate.')}</p>
+      <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span>{!isWorld && <span><b>{lessonMediaStats.lessons}</b> {pick('视频研讨','video seminars')}</span>}<span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
     </header>
     <div className="curriculum-layout">
       <aside className="module-index">
@@ -244,16 +267,29 @@ function Curriculum({ selected, setSelected, goLesson, completed }) {
   </main>
 }
 
-function Labs({ goLesson }) {
+function Labs({ goLesson, trackId }) {
   const { locale, pick } = useI18n()
-  const labs = locale === 'zh' ? [
+  const isWorld = trackId === 'world-models'
+  const labs = isWorld ? (locale === 'zh' ? [
+    ['W01', '状态与观察实验台', '改变传感器可见范围，观察真实状态、观察与 belief state 如何分离。', 'POMDP', '45 min'],
+    ['W02', 'Rollout 漂移显微镜', '比较单步误差与 5、20、50 步想象轨迹的累积偏差。', '动力学', '60 min'],
+    ['W03', '像素 vs 表征预测', '对同一视频遮挡任务比较重建损失与 JEPA 表征目标。', 'JEPA', '70 min'],
+    ['W04', '交互世界审计', '用固定动作脚本测试动作响应、物体恒常性与回访一致性。', 'Genie', '55 min'],
+    ['W05', 'Sim-to-Real 风险表', '从生成数据分布中寻找会被机器人策略放大的仿真偏差。', 'Physical AI', '65 min'],
+  ] : [
+    ['W01','State & Observation Lab','Change sensor visibility and separate world state, observations, and belief state.','POMDP','45 min'],
+    ['W02','Rollout Drift Microscope','Compare one-step error with 5-, 20-, and 50-step imagined trajectories.','Dynamics','60 min'],
+    ['W03','Pixels vs Representations','Compare reconstruction loss and JEPA objectives on one masked-video task.','JEPA','70 min'],
+    ['W04','Interactive World Audit','Use fixed action scripts to test response, permanence, and revisit consistency.','Genie','55 min'],
+    ['W05','Sim-to-Real Risk Card','Find simulation biases that a robot policy could amplify.','Physical AI','65 min'],
+  ]) : (locale === 'zh' ? [
     ['01', '梯度显微镜', '拖动输入与权重，观察局部导数如何沿计算图累积。', '反向传播', '35 min'],
     ['02', 'Tokenizer 病理室', '比较中、英、日、数字和代码的 BPE 切分与压缩率。', 'Token', '45 min'],
     ['03', 'Attention 解剖台', '逐格查看 QK 相似度、mask、softmax 与 value 聚合。', 'Transformer', '55 min'],
     ['04', '训练急诊室', '面对 loss spike、NaN、显存溢出和过拟合，完成故障定位。', '训练系统', '70 min'],
     ['05', '采样风洞', '改变 temperature、top-k、top-p，建立输出多样性相图。', '推理', '40 min'],
     ['06', 'Agent 轨迹审计', '从工具调用轨迹判断规划、权限和终止条件是否可靠。', 'Agent', '60 min'],
-  ] : [['01','Gradient Microscope','Drag inputs and weights to observe local derivatives accumulate through a graph.','Backprop','35 min'],['02','Tokenizer Pathology Lab','Compare BPE splits and compression for language, numbers, and code.','Tokens','45 min'],['03','Attention Dissection','Inspect QK similarity, masks, softmax, and value aggregation cell by cell.','Transformer','55 min'],['04','Training ER','Diagnose loss spikes, NaNs, OOMs, and overfitting.','Training','70 min'],['05','Sampling Wind Tunnel','Map temperature, top-k, and top-p to diversity and quality.','Inference','40 min'],['06','Agent Trace Audit','Judge planning, permissions, and termination from tool-call traces.','Agents','60 min']]
+  ] : [['01','Gradient Microscope','Drag inputs and weights to observe local derivatives accumulate through a graph.','Backprop','35 min'],['02','Tokenizer Pathology Lab','Compare BPE splits and compression for language, numbers, and code.','Tokens','45 min'],['03','Attention Dissection','Inspect QK similarity, masks, softmax, and value aggregation cell by cell.','Transformer','55 min'],['04','Training ER','Diagnose loss spikes, NaNs, OOMs, and overfitting.','Training','70 min'],['05','Sampling Wind Tunnel','Map temperature, top-k, and top-p to diversity and quality.','Inference','40 min'],['06','Agent Trace Audit','Judge planning, permissions, and termination from tool-call traces.','Agents','60 min']])
   return <main className="page catalog-page">
     <header className="page-lead compact"><span className="section-no">EXPERIMENTS</span><h1>{pick('最好的老师，','The best teacher')}<br />{pick('是一个反直觉的结果。','is a surprising result.')}</h1><p>{pick('每个实验都要求先预测、再运行、后解释；没有“点一下看动画”的伪互动。','Every lab requires a prediction, a run, and an explanation—no click-to-watch pseudo-interactivity.')}</p></header>
     <div className="lab-grid">{labs.map(([n, title, desc, phase, time], i) => <article key={n}>
@@ -262,9 +298,9 @@ function Labs({ goLesson }) {
   </main>
 }
 
-function Projects() {
+function Projects({ trackId }) {
   const { locale, pick } = useI18n()
-  const modulesData = useMemo(() => localizeModules(modules, locale), [locale])
+  const modulesData = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   return <main className="page projects-page">
     <header className="page-lead compact"><span className="section-no">BUILD IN PUBLIC</span><h1>{pick('八个作品，','Eight projects.')}<br />{pick('证明你真的会。','Proof that you can build.')}</h1><p>{pick('每个作品都能独立发布：有源码、有实验、有测试、有失败复盘，不只是 notebook 截图。','Every project is publishable: source, experiments, tests, and failure reviews—not notebook screenshots.')}</p></header>
     <div className="project-list">{modulesData.map((m, i) => <article key={m.id}>
@@ -276,10 +312,10 @@ function Projects() {
   </main>
 }
 
-function Library() {
+function Library({ trackId }) {
   const { locale, pick } = useI18n()
   const types = sourceTypesFor(locale)
-  const localizedResources = useMemo(() => localizeResources(resources, locale), [locale])
+  const localizedResources = useMemo(() => localizeResources(trackResources(trackId), locale), [trackId, locale])
   const [type, setType] = useState(types[0])
   const [query, setQuery] = useState('')
   useEffect(() => setType(types[0]), [locale])
@@ -540,20 +576,24 @@ function Graph({ ran, large }) {
 
 function SearchModal({ onClose, onOpen }) {
   const { locale, pick } = useI18n()
-  const flatLessons = useMemo(() => flattenLessons(localizeModules(modules, locale)), [locale])
+  const flatLessons = useMemo(() => [
+    ...flattenLessons(localizeModules(modules, locale)).map(item => ({ ...item, trackId:'llm' })),
+    ...flattenLessons(localizeWorldModules(locale)).map(item => ({ ...item, trackId:'world-models' })),
+  ], [locale])
   const [q, setQ] = useState('')
   const results = flatLessons.filter(x => `${x.lesson[1]}${x.lesson[4]}${x.lesson[5]}`.toLowerCase().includes(q.toLowerCase())).slice(0, 8)
   useEffect(() => { const fn = e => e.key === 'Escape' && onClose(); addEventListener('keydown', fn); return () => removeEventListener('keydown', fn) }, [onClose])
   return <div className="modal-backdrop" onMouseDown={onClose}><div className="command-modal" onMouseDown={e => e.stopPropagation()}>
     <label><MagnifyingGlass /><input autoFocus value={q} onChange={e => setQ(e.target.value)} placeholder={pick('搜索课程、概念或实践任务','Search lessons, concepts, or deliverables')} /><kbd>ESC</kbd></label>
-    <div className="command-results"><span className="section-no">{q ? pick(`找到 ${results.length} 项`,`${results.length} results`) : pick('推荐继续','Recommended next')}</span>{results.map(x => <button key={`${x.module.id}-${x.lesson[0]}`} onClick={() => onOpen(x.module, x.lesson, x.index)}><BookOpen /><span><strong>{x.lesson[1]}</strong><small>{x.module.no} {x.module.title} · {x.lesson[2]}</small></span><ArrowRight /></button>)}</div>
+    <div className="command-results"><span className="section-no">{q ? pick(`找到 ${results.length} 项`,`${results.length} results`) : pick('推荐继续','Recommended next')}</span>{results.map(x => <button key={`${x.module.id}-${x.lesson[0]}`} onClick={() => onOpen(x.module, x.lesson, x.index, x.trackId)}><BookOpen /><span><strong>{x.lesson[1]}</strong><small>{x.trackId === 'world-models' ? 'WORLD MODELS' : 'LLM'} · {x.module.no} {x.module.title}</small></span><ArrowRight /></button>)}</div>
   </div></div>
 }
 
 export default function App() {
   const { locale, setLocale } = useI18n()
   const { user, recovery } = useAuth()
-  const localizedModules = useMemo(() => localizeModules(modules, locale), [locale])
+  const [trackId, setTrackId] = useState(() => matchSitePath(location.pathname).trackId || 'llm')
+  const localizedModules = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const flatLessons = useMemo(() => flattenLessons(localizedModules), [localizedModules])
   const [view, setView] = useState('home')
   const [moduleIndex, setModuleIndex] = useState(1)
@@ -562,22 +602,24 @@ export default function App() {
   const [search, setSearch] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
   const [theme, setTheme] = useState(() => localStorage.getItem('uth-theme') || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'))
-  const [completed, setCompleted] = useState(() => new Set(flatLessons.filter(x => localStorage.getItem(`uth-lesson-${x.lesson[0]}-complete`) === '1').map(x => x.lesson[0])))
+  const [completed, setCompleted] = useState(() => new Set(lessonIds.filter(id => localStorage.getItem(`uth-lesson-${id}-complete`) === '1')))
   const sync = useLearningSync({ lessonIds, completed, setCompleted, theme, setTheme })
   const saveNote = useCallback((id, note) => sync.saveLesson(id, { note }, { debounce: true }), [sync.saveLesson])
-  const progress = Math.round((completed.size / flatLessons.length) * 100)
-  const openLesson = (module = localizedModules[1], lesson = localizedModules[1].lessons[2], index = 2) => {
+  const trackCompleted = flatLessons.filter(item => completed.has(item.lesson[0])).length
+  const progress = Math.round((trackCompleted / flatLessons.length) * 100)
+  const openLesson = (module = localizedModules[trackId === 'world-models' ? 0 : 1], lesson = module.lessons[trackId === 'world-models' ? 0 : 2], index = trackId === 'world-models' ? 0 : 2, targetTrack = trackId) => {
+    if (targetTrack !== trackId) setTrackId(targetTrack)
     setLessonInfo({ module, lesson, index }); setView('lesson'); setSearch(false)
     const nextPath = lessonPath(lesson[0], locale)
     if (location.pathname !== nextPath) history.pushState({ lessonId: lesson[0] }, '', `${nextPath}${location.search}`)
     scrollTo(0, 0)
     sync.saveLesson(lesson[0], { last_opened_at: new Date().toISOString() })
     sync.saveProfile({ last_lesson_id: lesson[0] })
-    trackEvent('lesson_started', { lesson_id: lesson[0], module_id: module.id, locale })
+    trackEvent('lesson_started', { lesson_id: lesson[0], module_id: module.id, track_id: targetTrack, locale })
   }
   const closeLesson = () => {
     setView('path')
-    history.pushState({ view: 'path' }, '', `${homePath(locale)}${location.search}`)
+    history.pushState({ view: 'path', trackId }, '', `${trackPath(trackId, locale)}${location.search}`)
     scrollTo(0, 0)
   }
   const toggleLessonComplete = () => {
@@ -594,10 +636,21 @@ export default function App() {
     })
   }
   const navigateLesson = (delta) => {
-    const currentId = lessonInfo?.lesson?.[0] || '1.3'
+    const currentId = lessonInfo?.lesson?.[0] || (trackId === 'world-models' ? 'wm.0.1' : '1.3')
     const currentIndex = flatLessons.findIndex(x => x.lesson[0] === currentId)
     const target = flatLessons[Math.max(0, Math.min(flatLessons.length - 1, currentIndex + delta))]
     if (target) openLesson(target.module, target.lesson, target.index)
+  }
+  const changeTrack = (nextTrack) => {
+    if (nextTrack === trackId) return
+    setTrackId(nextTrack)
+    setModuleIndex(0)
+    setLessonInfo(null)
+    setView('home')
+    setMobileNav(false)
+    history.pushState({ view:'home', trackId:nextTrack }, '', `${trackPath(nextTrack, locale)}${location.search}`)
+    scrollTo(0, 0)
+    trackEvent('track_switched', { from:trackId, to:nextTrack, locale })
   }
   const toggleTheme = () => setTheme(x => x === 'dark' ? 'light' : 'dark')
   useEffect(() => {
@@ -616,7 +669,9 @@ export default function App() {
       if (targetRoute) {
         const routeLocale = matched.locale || locale
         setLocale(routeLocale)
-        setLessonInfo({ module: targetRoute.module, lesson: targetRoute.lesson, index: targetRoute.lessonIndex })
+        setTrackId(targetRoute.trackId)
+        const routeModules = trackModules(targetRoute.trackId, routeLocale)
+        setLessonInfo({ module: routeModules[targetRoute.moduleIndex], lesson: routeModules[targetRoute.moduleIndex].lessons[targetRoute.lessonIndex], index: targetRoute.lessonIndex })
         setModuleIndex(targetRoute.moduleIndex)
         setView('lesson')
         if (legacyId || matched.needsCanonical || location.hash) {
@@ -625,8 +680,10 @@ export default function App() {
         return
       }
 
-      if (matched.locale) setLocale(matched.locale)
-      else history.replaceState({ view: 'home' }, '', `${homePath(locale)}${location.search}`)
+      if (matched.locale) {
+        setLocale(matched.locale)
+        setTrackId(matched.trackId || 'llm')
+      } else history.replaceState({ view: 'home' }, '', `${trackPath(trackId, locale)}${location.search}`)
       setView('home')
       setLessonInfo(null)
     }
@@ -634,7 +691,7 @@ export default function App() {
     syncFromLocation()
     addEventListener('popstate', syncFromLocation)
     return () => removeEventListener('popstate', syncFromLocation)
-  }, [locale, setLocale])
+  }, [locale, setLocale, trackId])
   useEffect(() => {
     const fn = e => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setSearch(true) } }
     addEventListener('keydown', fn); return () => removeEventListener('keydown', fn)
@@ -652,30 +709,30 @@ export default function App() {
       const nextLocale = event.detail?.locale
       if (nextLocale !== 'zh' && nextLocale !== 'en') return
       const lessonId = lessonInfo?.lesson?.[0]
-      const nextPath = view === 'lesson' && lessonId ? lessonPath(lessonId, nextLocale) : homePath(nextLocale)
+      const nextPath = view === 'lesson' && lessonId ? lessonPath(lessonId, nextLocale) : trackPath(trackId, nextLocale)
       history.replaceState(history.state, '', `${nextPath}${location.search}`)
     }
     addEventListener('uth-locale-change', receive)
     return () => removeEventListener('uth-locale-change', receive)
-  }, [view, lessonInfo?.lesson?.[0]])
+  }, [view, lessonInfo?.lesson?.[0], trackId])
   useEffect(() => {
     const lessonId = lessonInfo?.lesson?.[0]
-    applyDocumentSeo(view === 'lesson' && lessonId ? getLessonSeo(lessonId, locale) : getHomeSeo(locale))
-  }, [view, locale, lessonInfo?.lesson?.[0]])
+    applyDocumentSeo(view === 'lesson' && lessonId ? getLessonSeo(lessonId, locale) : getHomeSeo(locale, trackId))
+  }, [view, locale, trackId, lessonInfo?.lesson?.[0]])
   useEffect(() => {
     trackEvent('view_changed', { view, locale })
   }, [view, locale])
-  const accountModal = accountOpen && <AccountModal onClose={() => setAccountOpen(false)} progress={progress} completedCount={completed.size} totalLessons={flatLessons.length} syncStatus={sync.status} lastSynced={sync.lastSynced} />
+  const accountModal = accountOpen && <AccountModal onClose={() => setAccountOpen(false)} progress={progress} completedCount={trackCompleted} totalLessons={flatLessons.length} syncStatus={sync.status} lastSynced={sync.lastSynced} />
   const currentLessonInfo = lessonInfo ? flatLessons.find(item => item.lesson[0] === lessonInfo.lesson[0]) || lessonInfo : null
   if (view === 'lesson') return <><LessonView info={currentLessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(currentLessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} onSaveNote={saveNote} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />{accountModal}</>
   return <div className="app-shell">
-    <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} theme={theme} toggleTheme={toggleTheme} />
+    <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} theme={theme} toggleTheme={toggleTheme} trackId={trackId} onTrack={changeTrack} />
     <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />
-      {view === 'home' && <Dashboard goLesson={() => openLesson()} setView={setView} />}
-      {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} />}
-      {view === 'labs' && <Labs goLesson={() => openLesson()} />}
-      {view === 'projects' && <Projects />}
-      {view === 'library' && <Library />}
+      {view === 'home' && <Dashboard goLesson={() => openLesson()} setView={setView} trackId={trackId} onTrack={changeTrack} />}
+      {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} trackId={trackId} />}
+      {view === 'labs' && <Labs goLesson={() => openLesson()} trackId={trackId} />}
+      {view === 'projects' && <Projects trackId={trackId} />}
+      {view === 'library' && <Library trackId={trackId} />}
     </div>
     {search && <SearchModal onClose={() => setSearch(false)} onOpen={openLesson} />}
     {accountModal}

@@ -156,6 +156,23 @@ export const modules = [
     mastery: ['能不用框架解释并实现 Agent 循环', '能对轨迹、工具和结果分层评测', '能把模型能力、安全边界与产品 SLO 放进同一设计'],
     sources: ['Karpathy · nanochat', 'Lilian Weng · LLM Agents', 'Hugging Face Agents Course', 'Anthropic · Building Effective Agents'],
   },
+  {
+    id: 'frontier-llm', no: '08', title: '前沿大模型系统', short: '2025–2026 前沿', weeks: '3 周', hours: 28,
+    summary: '把推理模型、稀疏架构、长上下文和新型解码放回可验证的原理与系统约束，而不是追逐模型榜单。',
+    question: '近两年的能力跃迁，分别来自架构、数据、后训练、测试时计算和服务系统中的哪一层？',
+    color: '#ffb86b',
+    lessons: [
+      ['8.1', 'MoE、MLA 与多 Token 预测', '研读', '150 分钟', 'Mixture-of-Experts、routing、load balance、MLA、multi-token prediction', '拆解 DeepSeek-V3 的激活参数、KV 压缩与训练目标'],
+      ['8.2', '推理模型与可验证奖励强化学习', '理论', '150 分钟', 'RLVR、GRPO、outcome reward、reasoning trace、test-time compute', '复现小模型在可验证任务上的推理 RL 实验'],
+      ['8.3', '长上下文不是一个数字', '诊断', '120 分钟', 'sparse attention、retrieval、position、context rot、needle与结构化评测', '建立从检索到多跳推理的分层长上下文评测'],
+      ['8.4', 'DSpark：投机解码的生成与调度', '系统', '160 分钟', 'parallel drafter、semi-autoregressive head、prefix survival、hardware-aware scheduling', '实现前缀存活调度器并模拟轻载与高并发'],
+      ['8.5', '扩散与块并行语言模型', '理论', '130 分钟', 'masked diffusion、parallel decoding、block diffusion、quality-speed trade-off', '比较自回归、并行草稿与扩散草稿的时延模型'],
+      ['8.6', '面向 Agent 的后训练', '工程', '150 分钟', 'tool-use trajectory、task synthesis、verifiable environment、process与outcome reward', '为工具型 Agent 设计可回放的训练与评测数据管线'],
+    ],
+    project: 'Frontier Systems Review：选择一个前沿方案，用复现实验、成本模型和失败案例判断它解决了哪一层问题。',
+    mastery: ['能把模型能力提升归因到具体技术层而非品牌', '能区分离线 benchmark、单用户速度与生产吞吐', '能审计推理、长上下文和 Agent 评测中的污染与代理指标'],
+    sources: ['DeepSeek-V3 / V3.2 / R1', 'DeepSeek · DSpark', 'Stanford CS336 · 2025–2026 materials'],
+  },
 ]
 
 export const resources = [
@@ -198,6 +215,11 @@ export const resources = [
   { author: 'Lilian Weng', title: 'LLM Powered Autonomous Agents', type: '博客', level: '必读', phase: 'Agent', url: 'https://lilianweng.github.io/posts/2023-06-23-agent/', note: '把规划、记忆、工具与反思组织成清晰的 Agent 心智模型。' },
   { author: 'Sebastian Raschka', title: 'LLMs from Scratch', type: '代码', level: '补强', phase: 'GPT / 微调', url: 'https://github.com/rasbt/LLMs-from-scratch', note: '另一条非常完整的可执行实现路线，用于交叉验证理解。' },
   { author: 'ARENA', title: 'ARENA 3.0 Curriculum', type: '课程', level: '高级', phase: 'Transformer / RL / MI', url: 'https://github.com/callummcdougall/ARENA_3.0', note: '高质量练习驱动课程，适合模型实现、RL 与可解释性进阶。' },
+  { author: 'DeepSeek-AI', title: 'DeepSeek-V3 Technical Report', type: '研究', level: '前沿主线', phase: 'MoE / MLA / MTP', url: 'https://arxiv.org/abs/2412.19437', note: '系统理解专家路由、MLA、无辅助损失负载均衡、FP8 训练与多 Token 预测。' },
+  { author: 'DeepSeek-AI', title: 'DeepSeek-R1', type: '研究', level: '前沿主线', phase: '推理 / RLVR', url: 'https://arxiv.org/abs/2501.12948', note: '研究可验证奖励、GRPO、推理行为涌现与蒸馏，同时审计其适用边界。' },
+  { author: 'DeepSeek-AI', title: 'DeepSeek-V3.2', type: '研究', level: '前沿', phase: '稀疏注意力 / Agent', url: 'https://arxiv.org/abs/2512.02556', note: '把稀疏注意力、可扩展 RL 和 Agent 任务合成放在同一系统中分析。' },
+  { author: 'DeepSeek-AI', title: 'DSpark: Confidence-Scheduled Speculative Decoding', type: '研究', level: '2026 新增', phase: '投机解码', url: 'https://arxiv.org/abs/2607.05147', note: '重点学习半自回归草稿、前缀存活概率和硬件感知验证调度，而非只记速度数字。' },
+  { author: 'DFlash authors', title: 'DFlash: Block Diffusion for Flash Speculative Decoding', type: '研究', level: '2026 新增', phase: '扩散草稿', url: 'https://arxiv.org/abs/2602.06036', note: '理解块扩散如何作为并行 drafter，并与自回归解码保持质量—速度对照。' },
 ]
 
 export const sourceTypes = ['全部', '课程', '视频', '博客', '代码', '文档', '研究', '动态']

@@ -14,6 +14,7 @@
     "qa:promotion": "node scripts/promotion-check.mjs",
     "qa:seo": "node scripts/seo-check.mjs",
     "qa:routes": "node scripts/route-check.mjs",
+    "qa:world": "node scripts/world-model-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"
   },
   "dependencies": {

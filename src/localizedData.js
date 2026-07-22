@@ -70,6 +70,12 @@ const lessonEn = {
   '7.6':['Production boundaries: permissions, safety, human oversight','least privilege, approvals, sandboxes, and audit','Threat-model a high-risk tool'],
   '7.7':['nanochat: understand a complete chat system','tokenizer, pretraining, midtraining, SFT, RL, and UI','Draw the repository’s end-to-end dependency graph'],
   '7.8':['Mastery Gate 7: final defense','unify model principles, training, deployment, and system design','Live demo, fault injection, technical defense, and reproducibility review'],
+  '8.1':['MoE, MLA, and multi-token prediction','Mixture-of-Experts, routing, load balancing, MLA, and multi-token prediction','Dissect DeepSeek-V3 activation, KV compression, and objectives'],
+  '8.2':['Reasoning models and reinforcement learning with verifiable rewards','RLVR, GRPO, outcome rewards, reasoning traces, and test-time compute','Reproduce reasoning RL on a verifiable task with a small model'],
+  '8.3':['Long context is not one number','sparse attention, retrieval, positions, context rot, needles, and structured evaluation','Build a layered evaluation from retrieval to multi-hop reasoning'],
+  '8.4':['DSpark: speculative generation and scheduling','parallel drafting, semi-autoregressive heads, prefix survival, and hardware-aware scheduling','Implement a prefix-survival scheduler under light and heavy load'],
+  '8.5':['Diffusion and block-parallel language models','masked diffusion, parallel decoding, block diffusion, and quality-speed tradeoffs','Compare latency models for autoregressive, parallel, and diffusion drafting'],
+  '8.6':['Post-training for agents','tool-use trajectories, task synthesis, verifiable environments, and process/outcome rewards','Design a replayable training and evaluation pipeline for a tool-using agent'],
 }
 
 const moduleEn = {
@@ -81,6 +87,7 @@ const moduleEn = {
   alignment:{ title:'Make the Model an Assistant', short:'Post-training', summary:'Connect SFT, preference learning, RL, evaluation, safety, and interpretability.', question:'How do we shape behavior without confusing proxy metrics for the goal?', project:'Post-training Design Review: defend a complete data, algorithm, evaluation, and safety plan.', mastery:['Explain SFT, DPO, and RL tradeoffs','Build a minimal evaluation harness','Identify reward and safety failure modes'] },
   inference:{ title:'Make Models Respond Fast and Reliably', short:'Inference', summary:'Understand prefill, decode, caches, quantization, serving, and production reliability.', question:'How do latency, throughput, memory, quality, and reliability trade off?', project:'Dual Deployment Benchmark: local and server inference under matched quality and load.', mastery:['Model KV-cache memory','Benchmark under realistic load','Design reliable serving capacity'] },
   agents:{ title:'From Models to Intelligent Systems', short:'Agents', summary:'Build auditable tool loops, memory, planning, evaluation, and production permission boundaries.', question:'How do we turn generation into a controlled, testable execution loop?', project:'Auditable Agent: replayable traces, safe tools, regression tasks, and a final defense.', mastery:['Implement an agent loop without a framework','Audit tools and trajectories','Defend a production system design'] },
+  'frontier-llm':{ title:'Frontier LLM Systems', short:'2025–2026 Frontiers', summary:'Place reasoning models, sparse architectures, long context, and new decoding methods inside verifiable principles and system constraints.', question:'Which layer—architecture, data, post-training, test-time compute, or serving—caused each recent capability jump?', project:'Frontier Systems Review: reproduce one mechanism and judge it with a cost model and preserved failures.', mastery:['Attribute capability gains to a technical layer rather than a brand','Separate offline scores, single-user speed, and production throughput','Audit proxy metrics and contamination in reasoning, context, and agent evaluations'] },
 }
 
 const durationEn = value => value.replace('分钟',' min').replace('小时',' hours').replace('周',' weeks').replace('选看','Optional')
