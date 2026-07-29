@@ -178,7 +178,7 @@ const biliSources = {
 }
 
 const bili = (source, details = {}) => ({ ...biliSources[source], ...details })
-const part = (page, label) => ({ page, label })
+const part = (page, label, labelEn) => ({ page, label, ...(labelEn ? { labelEn } : {}) })
 const videoPart = (id, label) => ({ id, label })
 const karpathy = (id, title, duration, page, details = {}) => {
   const { cn: cnDetails, ...rest } = details
@@ -279,9 +279,10 @@ const lessonMedia = {
   'p.1': {
     ...bili('cs50p', {
       title:'CS50P · 函数、条件与循环',
+      titleEn:'CS50P · Functions, Conditionals, and Loops',
       duration:'精选 3 讲',
       page:2,
-      parts:[part(2,'函数与变量'), part(3,'条件句'), part(4,'循环')],
+      parts:[part(2,'函数与变量','Functions & Variables'), part(3,'条件句','Conditionals'), part(4,'循环','Loops')],
     }),
     global:{
       platform:'YouTube', id:'JP7ITIXGpHk', title:'CS50P · Functions, Conditionals, and Loops', author:'Harvard CS50',
@@ -299,9 +300,10 @@ const lessonMedia = {
   'p.2': {
     ...bili('cs50p', {
       title:'CS50P · 异常、库、单元测试与文件 I/O',
+      titleEn:'CS50P · Exceptions, Libraries, Unit Tests, and File I/O',
       duration:'精选 4 讲',
       page:5,
-      parts:[part(5,'异常'), part(6,'库'), part(7,'单元测试'), part(8,'文件 I/O')],
+      parts:[part(5,'异常','Exceptions'), part(6,'库','Libraries'), part(7,'单元测试','Unit Tests'), part(8,'文件 I/O','File I/O')],
     }),
     global:{
       platform:'YouTube', id:'LW7g1169v7w', title:'CS50P · Exceptions, Libraries, Unit Tests, and File I/O', author:'Harvard CS50',
@@ -320,9 +322,10 @@ const lessonMedia = {
   'p.3': {
     ...bili('d2lData', {
       title:'数据操作、Tensor 与预处理',
+      titleEn:'Data Operations, Tensors, and Preprocessing',
       duration:'精选 3 讲',
       page:1,
-      parts:[part(1,'数据操作'), part(2,'数据操作实现'), part(3,'数据预处理实现')],
+      parts:[part(1,'数据操作','Data Operations'), part(2,'数据操作实现','Data Operations in Code'), part(3,'数据预处理实现','Data Preprocessing in Code')],
     }),
     global:{
       platform:'YouTube', id:'ZB7BZMhfPgk', title:'Introduction to Numerical Computing with NumPy', author:'Alex Chabot-Leclerc · Enthought',
@@ -335,9 +338,10 @@ const lessonMedia = {
   'p.4': {
     ...bili('d2lRegression', {
       title:'从自动求导到第一条训练循环',
+      titleEn:'From Autograd to a First Training Loop',
       duration:'精选 3 讲',
       page:2,
-      parts:[part(2,'基础优化算法'), part(3,'线性回归从零实现'), part(4,'线性回归简洁实现')],
+      parts:[part(2,'基础优化算法','Basic Optimization'), part(3,'线性回归从零实现','Linear Regression from Scratch'), part(4,'线性回归简洁实现','Concise Linear Regression')],
     }),
     global:{
       platform:'YouTube', id:'M0fX15_-xrY', title:'PyTorch · Autograd and Model Training', author:'PyTorch',
@@ -539,7 +543,7 @@ export function resolveMediaSource(media, network) {
   }
   if (media.platform === 'YouTube') return media
   if (media.global) {
-    const { parts: _domesticParts, page: _domesticPage, segmentTiming: _domesticTiming, ...shared } = media
+    const { parts: _domesticParts, page: _domesticPage, segmentTiming: _domesticTiming, titleEn: _domesticTitleEn, ...shared } = media
     return { ...shared, ...media.global }
   }
   const youtube = youtubeSourceFromUrl(media.originalUrl, media)

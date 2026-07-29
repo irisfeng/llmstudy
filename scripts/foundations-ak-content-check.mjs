@@ -44,19 +44,22 @@ for (const url of requiredResourceUrls) {
 }
 
 const prerequisiteMediaExpectations = [
-  ['p.1', 'BV1vZfBY9EGa', [2, 3, 4], 'community', ['JP7ITIXGpHk', '_b6NgY_pMdw', '-7xg8pGcP6w'], 'primary', 'https://cs50.harvard.edu/python/'],
-  ['p.2', 'BV1vZfBY9EGa', [5, 6, 7, 8], 'community', ['LW7g1169v7w', 'MztLZWibctI', 'tIrcxwLqzjQ', 'KD-Yoel6EVQ'], 'primary', 'https://docs.python.org/3/tutorial/'],
-  ['p.3', 'BV1CV411Y7i4', [1, 2, 3], 'original', ['ZB7BZMhfPgk'], 'community', 'https://numpy.org/doc/stable/user/absolute_beginners.html'],
-  ['p.4', 'BV1PX4y1g7KC', [2, 3, 4], 'original', ['M0fX15_-xrY', 'jF43_wj_DCQ'], 'primary', 'https://docs.pytorch.org/tutorials/beginner/basics/intro.html'],
+  ['p.1', 'BV1vZfBY9EGa', [2, 3, 4], 'community', ['JP7ITIXGpHk', '_b6NgY_pMdw', '-7xg8pGcP6w'], 'primary', 'CS50P · Functions, Conditionals, and Loops', 'https://cs50.harvard.edu/python/'],
+  ['p.2', 'BV1vZfBY9EGa', [5, 6, 7, 8], 'community', ['LW7g1169v7w', 'MztLZWibctI', 'tIrcxwLqzjQ', 'KD-Yoel6EVQ'], 'primary', 'CS50P · Exceptions, Libraries, Unit Tests, and File I/O', 'https://docs.python.org/3/tutorial/'],
+  ['p.3', 'BV1CV411Y7i4', [1, 2, 3], 'original', ['ZB7BZMhfPgk'], 'community', 'Introduction to Numerical Computing with NumPy', 'https://numpy.org/doc/stable/user/absolute_beginners.html'],
+  ['p.4', 'BV1PX4y1g7KC', [2, 3, 4], 'original', ['M0fX15_-xrY', 'jF43_wj_DCQ'], 'primary', 'PyTorch · Autograd and Model Training', 'https://docs.pytorch.org/tutorials/beginner/basics/intro.html'],
 ]
-for (const [id, bvid, pages, sourceType, globalVideoIds, globalSourceType, officialReference] of prerequisiteMediaExpectations) {
+for (const [id, bvid, pages, sourceType, globalVideoIds, globalSourceType, globalTitle, officialReference] of prerequisiteMediaExpectations) {
   const media = getLessonMedia(id)
   const domestic = resolveMediaSource(media, 'cn')
   const global = resolveMediaSource(media, 'global')
   check(domestic?.platform === 'Bilibili' && domestic?.id === bvid, `${id} domestic Bilibili source changed`)
   check(domestic?.sourceType === sourceType, `${id} domestic source provenance changed`)
   check(domestic?.parts?.map(item => item.page).join(',') === pages.join(','), `${id} selected Bilibili parts changed`)
+  check(Boolean(domestic?.titleEn) && domestic.parts.every(item => item.labelEn), `${id} domestic source lacks English navigation copy`)
+  check(!/[\u3400-\u9fff]/.test([domestic?.titleEn, ...domestic.parts.map(item => item.labelEn)].join(' ')), `${id} domestic English source copy contains Chinese`)
   check(global?.platform === 'YouTube' && global?.sourceType === globalSourceType, `${id} global video source or provenance changed`)
+  check(global?.title === globalTitle && !global?.titleEn, `${id} global title inherited domestic copy`)
   const actualGlobalIds = global?.parts?.map(item => item.id) || [global?.id]
   check(actualGlobalIds.join(',') === globalVideoIds.join(','), `${id} selected official YouTube videos changed`)
   check(global?.referenceUrl === officialReference, `${id} official reference changed`)
