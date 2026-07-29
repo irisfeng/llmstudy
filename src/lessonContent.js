@@ -1,4 +1,16 @@
 const profiles = {
+  prerequisites: {
+    journey: '把“照着敲能运行”升级为能解释控制流、读懂报错、用测试保护重构，并把列表计算迁移到数组与张量',
+    lens: '每一步都追踪值、类型、shape、输入输出与失败信号',
+    verify: '小输入手算、pytest、NumPy/PyTorch 对拍与固定随机种子',
+    transfer: '更换文本、shape、dtype 或异常输入后重新运行同一组测试',
+    code: `def count_bigrams(tokens):
+    pairs = zip(tokens, tokens[1:])
+    return Counter(pairs)
+
+def test_count_bigrams():
+    assert count_bigrams(["a", "b", "a"]) == {("a", "b"): 1, ("b", "a"): 1}`,
+  },
   foundations: {
     journey: '把抽象数学变成可观察的张量、数值与实验',
     lens: '始终追问变量是什么、shape 是什么、误差从哪里来',
@@ -171,8 +183,99 @@ const pairedWorldVideo = (cnSource, cnDetails, global, guidance = {}) => ({
   ...guidance,
 })
 
+export const karpathyDeepResource = {
+  id: '7xTGNNLPyMI',
+  title: 'Deep Dive into LLMs like ChatGPT',
+  author: 'Andrej Karpathy',
+  duration: '3h31m24s',
+  durationSeconds: 12684,
+  chapters: [
+    ['introduction', 0, 60, 'Introduction', '开场：文本框背后是什么'],
+    ['pretraining-data', 60, 467, 'Pretraining data', '预训练数据'],
+    ['tokenization', 467, 867, 'Tokenization', 'Tokenization'],
+    ['neural-network-io', 867, 1211, 'Neural network I/O', '神经网络输入与输出'],
+    ['neural-network-internals', 1211, 1561, 'Neural network internals', '神经网络内部'],
+    ['inference', 1561, 1869, 'Inference', '自回归推理'],
+    ['gpt2-training-inference', 1869, 2572, 'GPT-2 training and inference', 'GPT-2 训练与推理'],
+    ['llama-base-inference', 2572, 3563, 'Llama 3.1 base model inference', 'Llama 3.1 基础模型推理'],
+    ['pretraining-to-posttraining', 3563, 3666, 'Pretraining to post-training', '从预训练到后训练'],
+    ['posttraining-conversations', 3666, 4832, 'Post-training conversations', '对话数据与后训练'],
+    ['hallucinations-tools-memory', 4832, 6106, 'Hallucinations, tools, and working memory', '幻觉、工具与工作记忆'],
+    ['knowledge-of-self', 6106, 6416, 'Knowledge of self', '模型对自身知识的判断'],
+    ['tokens-to-think', 6416, 7271, 'Models need tokens to think', '模型需要 token 来思考'],
+    ['tokenization-revisited', 7271, 7493, 'Tokenization revisited', '再次理解 Tokenization'],
+    ['jagged-intelligence', 7493, 7648, 'Jagged intelligence', '参差不齐的智能'],
+    ['sft-to-rl', 7648, 8082, 'SFT to RL', '从 SFT 到 RL'],
+    ['reinforcement-learning', 8082, 8867, 'Reinforcement learning', '强化学习'],
+    ['deepseek-r1', 8867, 9727, 'DeepSeek-R1', 'DeepSeek-R1'],
+    ['alphago', 9727, 10106, 'AlphaGo', 'AlphaGo'],
+    ['rlhf', 10106, 11379, 'RLHF', 'RLHF'],
+    ['things-to-come', 11379, 11715, 'Preview of things to come', '未来方向预览'],
+    ['tracking-llms', 11715, 11914, 'Keeping track of LLMs', '如何跟踪 LLM 进展'],
+    ['finding-llms', 11914, 12106, 'Where to find LLMs', '在哪里使用 LLM'],
+    ['grand-summary', 12106, 12684, 'Grand summary', '全片总结'],
+  ].map(([id, start, end, title, titleZh]) => ({ id, start, end, title, titleZh })),
+}
+
+const karpathyChapter = id => {
+  const chapter = karpathyDeepResource.chapters.find(item => item.id === id)
+  if (!chapter) throw new Error(`Unknown Karpathy chapter: ${id}`)
+  return chapter
+}
+
+const karpathySegment = (id, role, before, after, linksTo = [], pauseAt = null) => ({
+  ...karpathyChapter(id), role, before, after, linksTo, pauseAt,
+})
+
+const karpathyEnglishGuidance = {
+  introduction:{ before:'Without references, write what happens behind a chat box.', after:'Replace “the chat box” with at least three system nodes.' },
+  'pretraining-data':{ before:'Predict the steps between public web text and a training example.', after:'Add collection, filtering, deduplication, and mixing to your map.' },
+  tokenization:{ before:'Split one bilingual sentence into units using your current intuition.', after:'Record how a tokenizer change affects sequence length and vocabulary indices.' },
+  inference:{ before:'Predict whether one forward pass creates a full answer or one token.', after:'Draw logits → sampling → append → next forward.' },
+  'pretraining-to-posttraining':{ before:'Write which data could teach continuation versus assistant behavior.', after:'Draw the post-training boundary between base model and assistant.' },
+  'grand-summary':{ before:'Redraw the complete stack from memory and watch for missing links.', after:'Correct the map and label parameter, runtime-state, and tool-observation flows.' },
+  'llama-base-inference':{ before:'Predict why a base model may continue a webpage instead of answering directly.', after:'Classify the output by training distribution instead of “intelligence”.' },
+  'posttraining-conversations':{ before:'Predict how a chat template changes the input token sequence.', after:'Save a paired table of base/instruct encodings and outputs.' },
+}
+
+const karpathyMedia = ({ segments, requiredDuration, activityDuration, activityDurationEn }) => ({
+  resourceId: karpathyDeepResource.id,
+  platform:'YouTube',
+  id:karpathyDeepResource.id,
+  title:karpathyDeepResource.title,
+  author:karpathyDeepResource.author,
+  duration:karpathyDeepResource.duration,
+  resourceDuration:karpathyDeepResource.duration,
+  requiredDuration,
+  activityDuration,
+  activityDurationEn,
+  segments,
+  cnQuery:'Karpathy 大语言模型 深入 中文',
+  cn:bili('karpathyDeep', {
+    title:'深入探索像 ChatGPT 这样的大语言模型',
+    duration:karpathyDeepResource.duration,
+    resourceId:karpathyDeepResource.id,
+  }),
+})
+
 const lessonMedia = {
-  '0.1': bili('karpathyDeep', { title:'深入探索像 ChatGPT 这样的大语言模型', duration:'3h31m' }),
+  'p.1': { platform:'Official course', title:'CS50’s Introduction to Programming with Python', author:'Harvard CS50', duration:'按需选学', url:'https://cs50.harvard.edu/python/', sourceType:'primary', sourceLabel:'大学公开课', sourceNote:'面向零基础的完整免费课程；本节聚焦函数、控制流、容器和错误信息。' },
+  'p.2': { platform:'Official docs', title:'The Python Tutorial', author:'Python Software Foundation', duration:'按需查阅', url:'https://docs.python.org/3/tutorial/', sourceType:'primary', sourceLabel:'官方文档', sourceNote:'用作语义核对和补漏；课程实践以本节的小项目与 pytest 为完成条件。' },
+  'p.3': { platform:'Official docs', title:'NumPy: the absolute basics for beginners', author:'NumPy', duration:'按需选学', url:'https://numpy.org/doc/stable/user/absolute_beginners.html', sourceType:'primary', sourceLabel:'官方入门指南', sourceNote:'从 ndarray、shape、axis、dtype 与广播进入张量思维。' },
+  'p.4': { platform:'Official course', title:'PyTorch Learn the Basics', author:'PyTorch', duration:'按需选学', url:'https://docs.pytorch.org/tutorials/beginner/basics/intro.html', sourceType:'primary', sourceLabel:'官方教程', sourceNote:'覆盖完整机器学习工作流；本节只要求跑通并解释一个最小参数更新。' },
+  '0.1': karpathyMedia({
+    requiredDuration:'30:56',
+    activityDuration:'约 14 分钟',
+    activityDurationEn:'about 14 minutes',
+    segments:[
+      karpathySegment('introduction', 'required', '不查资料写下：聊天框背后依次发生了什么？', '把“文本框”改写成至少三个系统节点。', ['0.1']),
+      karpathySegment('pretraining-data', 'required', '预测预训练数据从公开网页到训练样本要经过哪些处理。', '在地图上标出收集、过滤、去重与混合。', ['4.2']),
+      karpathySegment('tokenization', 'required', '先把一句中英混合文本按自己的直觉切成单元。', '记录 tokenizer 改变后序列长度和词表索引如何变化。', ['2.7', '2.8']),
+      karpathySegment('inference', 'required', '预测模型一次前向会生成整个回答还是一个 token。', '画出 logits → sampling → append → next forward 的循环。', ['3.7', '6.1']),
+      karpathySegment('pretraining-to-posttraining', 'required', '先写下“会续写”和“会当助手”可能来自哪两类数据。', '在 base model 与 assistant 之间画出后训练边界。', ['5.1', '5.2']),
+      karpathySegment('grand-summary', 'required', '闭卷重画全栈地图，再带着缺口看总结。', '修正地图并分别标出参数更新流、请求状态流与工具结果。', ['2.1', '3.1', '5.1', '6.1', '7.1']),
+    ],
+  }),
   '0.5': bili('calculus', { title:'直观理解链式法则和乘积法则', duration:'16m52s', page:4 }),
   '0.7': bili('raschka', { title:'从零训练一个大语言模型', duration:'27m04s', page:28 }),
 
@@ -213,7 +316,16 @@ const lessonMedia = {
   '4.9': bili('liMuRun', { title:'Llama 3.1 · 模型训练过程', duration:'10m42s' }),
   '4.10': bili('cs336', { title:'从 PyTorch LLM 到并行训练', duration:'2h34m', page:2, parts:[part(2,'PyTorch 手把手搭建 LLM'), part(8,'并行训练实战')] }),
 
-  '5.1': { platform:'YouTube', id:'7xTGNNLPyMI', title:'Deep Dive into LLMs like ChatGPT', author:'Andrej Karpathy', duration:'3h31m', cnQuery:'Karpathy 大语言模型 深入 中文', cn:bili('karpathyDeep', { title:'深入探索像 ChatGPT 这样的大语言模型', duration:'3h31m' }) },
+  '5.1': karpathyMedia({
+    requiredDuration:'37:40',
+    activityDuration:'25–30 分钟',
+    activityDurationEn:'25–30 minutes',
+    segments:[
+      karpathySegment('llama-base-inference', 'required', '预测基础模型面对问题时为什么可能继续网页而不是直接回答。', '记录输出更像哪类预训练文本分布，而不是只评判“聪不聪明”。', ['5.1']),
+      karpathySegment('pretraining-to-posttraining', 'required', '写下参数是否改变，以及训练数据目标如何改变。', '用一条因果链解释 base → assistant 的分界。', ['5.1', '5.2']),
+      karpathySegment('posttraining-conversations', 'required', '预测 chat template 会怎样改变输入 token 序列。', '保存同一 prompt 的 base/instruct 编码与输出对照表。', ['5.2']),
+    ],
+  }),
   '5.2': bili('raschka', { title:'指令数据、批处理与 SFT', duration:'1h01m', page:41, parts:[part(41,'准备指令数据集'), part(42,'组织训练批次'), part(43,'创建数据加载器'), part(44,'加载预训练模型'), part(45,'指令微调')] }),
   '5.3': bili('cs336', { title:'对齐：SFT 与人类反馈强化学习', duration:'1h14m', page:15 }),
   '5.4': bili('dpo', { title:'DPO 的目标、缺陷与变体', duration:'31m25s' }),
@@ -334,7 +446,8 @@ function youtubeSourceFromUrl(url, media) {
 export function resolveMediaSource(media, network) {
   if (network === 'cn') {
     if (media.cn) return { ...media, ...media.cn }
-    return media.platform === 'Bilibili' ? media : null
+    if (media.platform === 'Bilibili') return media
+    return media.url && media.sourceType === 'primary' ? media : null
   }
   if (media.platform === 'YouTube') return media
   if (media.global) return { ...media, ...media.global }
@@ -427,6 +540,354 @@ function explainConcept(name, moduleId, index) {
 
 function splitTheory(text) {
   return text.split(/[、，,；;]/).map(x => x.trim()).filter(Boolean)
+}
+
+const prerequisiteCode = {
+  'p.1': `from collections import Counter
+
+def tokenize(text):
+    return [token.lower() for token in text.split() if token.strip()]
+
+def bigram_counts(tokens):
+    return Counter(zip(tokens, tokens[1:]))
+
+def test_bigram_counts():
+    assert bigram_counts(["a", "b", "a"]) == {
+        ("a", "b"): 1,
+        ("b", "a"): 1,
+    }`,
+  'p.2': `# src/text_stats.py
+from pathlib import Path
+
+def load_text(path):
+    path = Path(path)
+    if path.suffix != ".txt":
+        raise ValueError("expected a .txt file")
+    return path.read_text(encoding="utf-8")
+
+# tests/test_text_stats.py
+def test_load_text_rejects_wrong_suffix(tmp_path):
+    path = tmp_path / "data.csv"
+    path.write_text("a,b", encoding="utf-8")
+    with pytest.raises(ValueError):
+        load_text(path)`,
+  'p.3': `import numpy as np
+import torch
+
+ids = np.array([0, 1, 0, 2])
+counts_np = np.zeros((3, 3), dtype=np.int64)
+np.add.at(counts_np, (ids[:-1], ids[1:]), 1)
+
+ids_t = torch.tensor(ids)
+counts_t = torch.zeros((3, 3), dtype=torch.int64)
+counts_t.index_put_((ids_t[:-1], ids_t[1:]),
+                    torch.ones(3, dtype=torch.int64),
+                    accumulate=True)
+assert np.array_equal(counts_np, counts_t.numpy())`,
+  'p.4': `import torch
+
+torch.manual_seed(7)
+x = torch.tensor([[1.0, 0.0], [0.0, 1.0]])
+y = torch.tensor([0, 1])
+w = torch.zeros((2, 2), requires_grad=True)
+
+logits = x @ w
+loss = torch.nn.functional.cross_entropy(logits, y)
+loss.backward()
+with torch.no_grad():
+    w -= 0.1 * w.grad
+    w.grad.zero_()
+
+assert torch.isfinite(loss)
+assert w.shape == (2, 2)`,
+}
+
+const stackMapCode = `flowchart LR
+  DATA[Internet text] --> TOKENS[Tokenizer]
+  TOKENS --> TRAIN[Next-token training]
+  TRAIN --> BASE[Base model]
+  BASE --> POST[Post-training]
+  POST --> ASSISTANT[Assistant]
+  USER[User message] --> CONTEXT[Runtime context]
+  CONTEXT --> ASSISTANT
+  ASSISTANT --> DECODE[Sample one token]
+  DECODE --> CONTEXT
+  TOOLS[Tool results] --> CONTEXT`
+
+const baseAssistantCode = `prompts = [
+    "What is the capital of France?",
+    "Return exactly three JSON keys.",
+    "Continue this webpage: <title>Model release",
+]
+
+for prompt in prompts:
+    base_input = tokenizer(prompt, add_special_tokens=False)
+    chat_input = tokenizer.apply_chat_template(
+        [{"role": "user", "content": prompt}],
+        add_generation_prompt=True,
+        tokenize=True,
+    )
+    compare(prompt, base_input, chat_input,
+            base_model.generate(base_input),
+            instruct_model.generate(chat_input))`
+
+const specialLessonCopy = {
+  zh: {
+    'p.1': {
+      objectives:['能从上到下追踪一段 Python 的值、类型与控制流。','能把重复逻辑抽成有明确输入和返回值的函数。','能从 traceback 最后一行定位错误类型，再沿调用栈找到自己的代码。','能为纯函数写至少三个包含边界输入的断言。'],
+      opening:['零基础最容易掉进两个坑：只背语法，或只复制能运行的代码。本节把语法压缩到一个可测试的文本统计器里，每学一个结构都立即产生可检查的输出。','CS50P 提供完整零基础主线；本站不复制十周课程，而是选择进入 LLM 实验真正需要的函数、容器、控制流、异常与测试能力。'],
+      concepts:[
+        {name:'值、变量与类型',note:'变量名绑定到对象，而不是装值的固定盒子。先用 type、repr 和小输入观察值，再判断字符串、整数、列表与字典支持哪些操作。'},
+        {name:'分支与循环',note:'控制流决定哪条语句执行以及执行多少次。每个循环都写清初始化、更新和停止条件，并用空输入、单元素和重复元素检查边界。'},
+        {name:'函数契约',note:'函数应有明确输入、返回值和失败方式。把打印与返回分开，纯计算函数才能被测试、复用，并在后续迁移到 NumPy 或 PyTorch。'},
+        {name:'容器选择',note:'list 保留顺序，dict 按键查找，set 去重，tuple 适合不可变记录。选择容器要能解释访问模式与复杂度，而不是凭语法熟悉度。'},
+        {name:'traceback',note:'先读最后一行的异常类型和消息，再向上找到第一处属于自己文件的调用位置。报错是程序状态的证据，不应在未理解原因时用 try/except 全部吞掉。'},
+      ],
+      workflow:['手算一个三词输入','写最小函数契约','实现并打印中间值','用边界断言固定行为'],
+      practice:{task:'实现并测试一个纯 Python 文本统计器',steps:['从三词文本手写期望 token、词频和 bigram 结果。','实现 tokenize 与 bigram_counts，每个函数只做一件事并返回值。','加入空字符串、单词、重复词和中英混合文本测试。','故意制造 TypeError 与 KeyError，记录 traceback 中真正指向修复位置的两行。'],evidence:['可直接运行的 text_stats.py','至少 6 个通过的断言或 pytest 用例','两条错误现场与修复解释','一段说明 list/dict/tuple 选择依据的 README']},
+      worked:{title:'从 “a b a” 推到两个 bigram',steps:['tokenize 返回 ["a","b","a"]，顺序必须保留。','zip(tokens, tokens[1:]) 形成 (a,b) 与 (b,a)，不会凭空产生跨边界 pair。','Counter 聚合重复 pair；测试同时验证键和值，避免只看打印结果。'],question:'如果输入只有一个 token，结果应为空、报错还是保留占位？先写契约，再写测试。'},
+      code:prerequisiteCode['p.1'],codeLabel:'text_stats.py',
+      misconception:'“代码没有报错”只证明这一条路径能跑，不证明函数对空输入、重复元素或错误类型有定义清楚的行为。',
+      quiz:{question:'哪项最能证明你已经掌握 Python 基础，而不是只会照抄？',options:['换一组输入后先预测结果，再独立写函数和边界测试并解释 traceback','完整看完一门视频课并记住所有语法名词','复制示例代码后得到同样的三行输出'],explanation:'可迁移的预测、实现、测试与诊断才是掌握证据。'},
+      mastery:['闭卷写出 tokenize 与 bigram_counts。','解释 list、dict、set、tuple 的选择差异。','在两分钟内从 traceback 定位一处故意错误。','为一个未见过的纯函数补齐正常、边界和失败测试。'],
+      references:['Harvard CS50P · Weeks 0–4','Python Tutorial · Control Flow Tools','Python Tutorial · Data Structures'],
+    },
+    'p.2': {
+      objectives:['能创建隔离环境并记录 Python 与依赖版本。','能把脚本拆成可导入模块、命令入口与测试。','能为文件编码、路径与输入错误设计明确失败方式。','能用 pytest 的 arrange–act–assert 结构保护重构。'],
+      opening:['LLM 学习中的许多“模型问题”其实是环境、路径、编码或数据文件问题。把一次性 notebook 变成可复现小项目，是进入训练实验前必须补上的工程地基。','目标不是学完整软件工程，而是建立四个最低限度：环境可重建、输入可验证、行为可测试、失败可定位。'],
+      concepts:[
+        {name:'虚拟环境与依赖',note:'项目环境要隔离，并记录解释器与关键包版本。能在新目录重建环境，比“我电脑上能跑”更接近可复现证据。'},
+        {name:'模块与入口',note:'计算逻辑放在可导入函数中，命令行入口只负责解析参数和调用。这样同一逻辑既能被测试，也能被 notebook 和后续训练脚本复用。'},
+        {name:'Path 与 UTF-8',note:'路径不是普通字符串拼接问题。使用 pathlib，明确输入文件后缀和 UTF-8 编码，并用临时目录测试，避免依赖当前工作目录。'},
+        {name:'异常与断言',note:'异常用于外部输入或运行条件不满足，断言用于内部不变量。捕获异常时要缩小范围，并保留足够上下文，而不是 except Exception 后静默继续。'},
+        {name:'pytest 回归',note:'每个测试固定输入、执行一个行为、检查明确输出。回归测试的价值是让重构和向量化有安全网，而不是追求测试数量。'},
+      ],
+      workflow:['冻结当前可运行行为','拆分纯逻辑与副作用','为边界和失败补测试','在空环境复现'],
+      practice:{task:'把一次性文本脚本改造成可复现小项目',steps:['建立 src、tests、README 与依赖清单，记录 Python 版本。','把读文件、tokenize、计数和输出拆为独立函数。','用 tmp_path 测试 UTF-8 文件、空文件、错误后缀和不存在路径。','删除环境后按 README 重建并运行 pytest，记录命令与结果。'],evidence:['清晰的目录树和启动命令','至少 8 个 pytest 用例','一个预期失败且消息明确的输入案例','从空环境重建成功的记录']},
+      worked:{title:'让文件错误在边界处失败',steps:['load_text 接收 Path，而不是依赖脚本所在目录。','先检查后缀与存在性，再以 UTF-8 读取；失败信息包含目标路径。','测试使用 tmp_path 创建真实临时文件，不污染仓库也不依赖个人目录。'],question:'如果捕获 UnicodeDecodeError 后返回空字符串，后续计数会给出什么误导性结果？'},
+      code:prerequisiteCode['p.2'],codeLabel:'src/text_stats.py + tests/',
+      misconception:'把所有代码放进 notebook 并成功运行一次，不等于项目可复现；隐藏状态、执行顺序和本机路径都可能成为未记录依赖。',
+      quiz:{question:'哪种项目结构最支持后续把 Python 循环替换成 NumPy？',options:['纯计算函数可导入，文件 I/O 在边界，重构前已有行为测试','所有逻辑写在一个从上到下执行的 notebook 单元','用 try/except 包住整个脚本，任何错误都返回空结果'],explanation:'分离纯逻辑、副作用和测试，才能安全比较重构前后的行为。'},
+      mastery:['在新目录重建环境并运行测试。','解释异常与断言的不同职责。','用 tmp_path 测试一个 UTF-8 文件流程。','把一段全局脚本重构为可导入函数和入口。'],
+      references:['Harvard CS50P · Exceptions, Libraries, Unit Tests, File I/O','Python Tutorial · Modules','pytest Documentation · Getting Started'],
+    },
+    'p.3': {
+      objectives:['能用 ndim、shape、axis、size 与 dtype 描述数组。','能预测 broadcasting 是否成立并写出结果 shape。','能区分切片 view 与显式 copy 对原数组的影响。','能让 NumPy 与 PyTorch 在同一小输入上得到一致结果。'],
+      opening:['从 Python list 进入模型代码，真正的门槛不是 API 数量，而是“一个操作同时作用于整块同类型数据”的数组心智。shape、axis 和 dtype 是后续每节模型课的共同语言。','NumPy 官方入门先建立数组规则，PyTorch 再加入 device 与 autograd。不要把两个库当成两套完全无关的语法。'],
+      concepts:[
+        {name:'ndarray 与同质数据',note:'ndarray 用固定 dtype 和矩形 shape 表示 N 维数据。限制换来紧凑内存和批量运算；Python 嵌套 list 的灵活性不能直接推断为张量行为。'},
+        {name:'shape、axis 与 reduce',note:'shape 描述每个轴的长度，axis 指定沿哪一维聚合。任何 sum、mean、softmax 前都先写输入与输出 shape，避免靠运行后猜。'},
+        {name:'broadcast',note:'从末尾轴向前比较，维度相等或其中一个为 1 才能广播。广播是逻辑扩展，不应误以为一定复制了完整数据。'},
+        {name:'view 与 copy',note:'NumPy 基本切片通常返回共享数据的 view，修改切片可能改变原数组。跨库转换也可能共享内存；需要独立数据时显式 copy 或 clone。'},
+        {name:'NumPy → PyTorch',note:'两者共享许多 shape 与广播规则，但 PyTorch tensor 还涉及 device、requires_grad 和计算图。先做数值对拍，再引入梯度。'},
+      ],
+      workflow:['为小数组标轴','手算索引和广播','向量化替换循环','跨库逐元素对拍'],
+      practice:{task:'把循环版 bigram 计数向量化并与 PyTorch 对拍',steps:['用 4 个 token 手算 3×3 计数矩阵，写出每个 pair 的落点。','分别用 Python 循环、np.add.at 与 torch.index_put_ 实现。','断言 shape、dtype、总计数与逐元素结果完全一致。','更换词表大小、重复 pair 和空序列，记录失败边界。'],evidence:['三种实现及相同输入','shape/dtype/axis 台账','逐元素一致性断言','一个 view/copy 共享内存反例']},
+      worked:{title:'把 [0,1,0,2] 写进计数矩阵',steps:['源索引是 [0,1,0]，目标索引是 [1,0,2]。','重复索引必须累加，因此普通高级索引赋值可能丢失重复；np.add.at 明确累加语义。','PyTorch index_put_(accumulate=True) 对齐同一契约，再用 array_equal 验证。'],question:'如果 ids 为空或只含一个元素，输出 shape 与总计数应该是什么？'},
+      code:prerequisiteCode['p.3'],codeLabel:'vectorize_bigrams.py',
+      misconception:'“没有写 for”不自动等于向量化正确或更快；先证明索引、累加、shape 和 dtype 等价，再测性能。',
+      quiz:{question:'对 shape=(4,1,8) 与 shape=(3,8) 的两个数组，广播结果是什么？',options:['(4,3,8)，因为从末轴比较时 8 匹配，1 可扩展为 3','不能广播，因为两个数组维数不同','(3,4,8)，总是把较短 shape 放在最前面'],explanation:'广播从末尾轴对齐；缺失的前导轴按 1 处理。'},
+      mastery:['看到数组表达式先写出输入与输出 shape。','解释 axis=0 与 axis=-1 的不同聚合对象。','演示 view 修改原数组的反例。','让 NumPy 与 PyTorch 在三组边界输入上对拍。'],
+      references:['NumPy · Absolute Basics for Beginners','NumPy · Broadcasting','PyTorch Learn the Basics · Tensors'],
+    },
+    'p.4': {
+      objectives:['能按数据→前向→损失→反向→更新顺序解释训练循环。','能区分参数值、梯度和优化器更新的职责。','能用 shape、有限性与 loss 变化设置最低限度断言。','能在固定随机种子下复现实验并保存失败现场。'],
+      opening:['先修掌握门不要求你理解 Transformer，而是检查编程、数组和测试能否连成一次真实参数更新。若不能闭卷解释每一行，就回到对应先修课，而不是带着断层进入 micrograd。','完成标准不是“loss 打印出来了”，而是能预测一次更新方向、验证梯度存在，并在破坏一个条件后定位失败。'],
+      concepts:[
+        {name:'数据与参数',note:'输入和标签是观测数据，参数是优化器要改变的状态。两者 shape 可能相似，但生命周期和 requires_grad 完全不同。'},
+        {name:'前向与 logits',note:'前向计算把输入和参数变成未归一化分数。先断言 batch、类别维和有限性，再交给损失函数。'},
+        {name:'loss 标量',note:'交叉熵把一批预测压成可优化标量。标量变小只说明当前数据与目标下的拟合改善，不自动证明泛化。'},
+        {name:'backward 与 grad',note:'backward 沿计算图累积每个叶子参数对 loss 的梯度。重复调用前必须理解梯度是否清零，否则累积可能是意图也可能是 bug。'},
+        {name:'参数更新',note:'更新要在 no_grad 下执行，随后清零梯度。学习率决定沿负梯度移动的步长；一次更新可用新 loss 与手算方向共同检查。'},
+      ],
+      workflow:['冻结两样本问题','预测梯度方向','执行一次更新','破坏条件并诊断'],
+      practice:{task:'从文本计数走到一个可测试的单步梯度更新',steps:['固定两条 one-hot 输入、标签、初始权重与随机种子，手算初始 logits。','运行 forward、cross_entropy、backward 和一次 SGD 更新，记录每个张量 shape。','断言 loss 有限、grad 非空、参数发生变化，并再次计算 loss。','依次破坏标签范围、dtype、grad 清零和 shape，保存报错或异常曲线。'],evidence:['一条可重复运行的训练脚本','初始/更新后参数与 loss 记录','至少 6 个自动断言','四个故障注入及诊断表']},
+      worked:{title:'验证一次 SGD 不是黑箱',steps:['零权重让两个类别初始 logits 相同，交叉熵有可预测基线。','backward 产生与分类错误方向对应的 w.grad；参数更新应沿 -grad。','更新后重新前向，若 loss 未按预期变化，先检查标签、学习率、清零和 no_grad 边界。'],question:'若第二次 backward 前不清零梯度，参数更新代表两个 batch 的累积还是意外重复？你需要什么记录才能判断？'},
+      code:prerequisiteCode['p.4'],codeLabel:'first_update.py',
+      misconception:'训练循环能运行不等于训练正确；错误标签、错误维度、梯度累积和数据泄漏都可能得到看似正常的 loss。',
+      quiz:{question:'一次参数更新后，哪组证据最有诊断价值？',options:['固定输入与种子下的 shape、loss、grad、参数差值和断言','只截取最后一行 loss 数字','只确认 GPU 利用率不为零'],explanation:'训练正确性需要沿数据、计算图和更新边界逐层可观察。'},
+      mastery:['闭卷重写最小训练循环。','逐行说出哪些对象会被修改。','注入一次未清零梯度并解释结果。','在新输入上复现实验并通过全部测试。'],
+      references:['PyTorch Learn the Basics · Tensors and Autograd','PyTorch Learn the Basics · Optimization Loop','本站 0.6 · PyTorch 张量与可复现实验'],
+    },
+    '0.1': {
+      objectives:['区分训练时改变的参数与请求时改变的状态。','画出数据→token→训练→base model→后训练→assistant→推理/工具主链。','把 2.x–7.x 课程准确挂到主链。','解释为什么“会续写”不等于“会当助手”。'],
+      opening:['这不是一节把所有术语讲完的总论，而是一张后续主线反复回看的导航图。你只看六段，共 30:56；剩余 14 分钟必须用于闭卷画图和检索练习。','训练流改变权重，请求流改变上下文、KV cache 与工具结果。把两条流混在一起，是理解 RAG、Agent、微调和推理参数时最常见的根错误。'],
+      concepts:[
+        {name:'数据与 token',note:'互联网文本先经过收集、过滤、去重与混合，再由固定 tokenizer 变成离散 id。更换 tokenizer 会改变词表、序列长度、embedding 对齐和所有下游权重接口。'},
+        {name:'预训练与参数',note:'next-token objective 通过梯度更新模型参数，把训练分布压进权重。用户发一条新消息不会立即重训参数；它只改变本次请求可见的状态。'},
+        {name:'Base model',note:'基础模型学习延续训练文本的条件分布，因此遇到问题句可能继续网页、论坛或问答格式。行为像续写不是“坏掉”，而是目标与数据分布的直接结果。'},
+        {name:'后训练与 Assistant',note:'SFT、偏好与 RL 等后训练把示范、反馈和任务奖励写入参数，使模型更常遵循角色、格式和停止规则。具体算法在 5.x 展开。'},
+        {name:'推理状态',note:'prompt、生成 token、KV cache、采样参数都属于请求时状态。temperature 会重标解码分布，但不会新增参数知识或修改模型权重。'},
+        {name:'工具与外部事实',note:'检索、代码执行或 API 返回结果进入工作上下文，模型据此继续生成。工具结果更接近可验证的环境观察，不应伪装成参数记忆。'},
+      ],
+      workflow:['闭卷画初始地图','按六段修正节点','分开参数流与状态流','把后续课程挂回主链'],
+      practice:{task:'在 45 分钟内重建一张可用的 LLM 全栈地图',steps:['0–3 分钟：不查资料画出 ChatGPT 请求链。','3–34 分钟：观看六个 required 片段，每段只回答卡片中的一个问题。','34–41 分钟：重画数据流、参数更新流和请求状态流，并在箭头旁写动词。','41–45 分钟：闭卷回答四题，标出 2.x、3.x、5.x、6.x、7.x 的落点。'],evidence:['观看前与观看后两版地图','三种不同颜色的流向与箭头动词','四道检索题及因果理由','至少一个幻觉位置和一个可验证工具结果']},
+      worked:{title:'把一次用户请求放回训练后的系统',steps:['权重在服务启动前已经由预训练与后训练得到，用户消息不会直接改写它。','tokenizer 把消息变成 id；模型产生 logits，采样一个 token，追加上下文后循环。','若调用搜索，返回文本进入上下文；它改变后续输出，却不自动进入长期参数。'],question:'换 tokenizer、加入检索结果、调整 temperature，分别会改变参数、输入表示、请求状态还是解码分布？'},
+      code:stackMapCode,codeLabel:'llm-stack-map.mmd',
+      misconception:'把“模型在本次对话里看到新事实”说成“模型学会并更新了参数”，会同时误解 RAG、上下文、记忆与微调。',
+      quiz:{question:'用户在对话中加入一条检索结果后，最先改变的是什么？',options:['请求上下文与后续 token 的条件分布','模型的全部预训练参数','tokenizer 的词表与 embedding 大小'],explanation:'工具结果进入工作上下文；除非另行启动训练，它不会更新参数或重建 tokenizer。'},
+      mastery:['5 分钟内闭卷连出完整主链。','分别指出参数更新流、请求状态流和外部工具流。','解释 base model 与 assistant 的行为差异。','把 2.x、3.x、5.x、6.x、7.x 放到正确节点。'],
+      references:['Andrej Karpathy · Deep Dive into LLMs like ChatGPT','本站 LLM 系统课路线图','2.x–7.x 对应专题索引'],
+    },
+    '5.1': {
+      objectives:['用训练分布解释 base 与 instruct 输出差异。','说明 chat template 如何改变输入 token 序列与角色边界。','把 SFT 的行为塑形与“增加知识”区分开。','用六类 prompt 建立可审计的配对观察表。'],
+      opening:['本节只回答一个问题：同一套 Transformer 能力，为什么基础模型更像续写器，而后训练模型更像助手？必看视频止于 1:20:32，偏好优化公式留到后续专题。','不要用“哪个更聪明”给输出打分。记录它更像哪种训练分布、是否遵循角色、何时停止、是否承认不确定，以及模板实际加入了哪些 token。'],
+      concepts:[
+        {name:'预训练分布',note:'基础模型优化互联网文本中的 next-token likelihood。问题、答案、网页、代码和对话都可能出现，但没有统一的助手角色或服务协议。'},
+        {name:'Base model 行为',note:'面对 “法国首都是什么？” 时，模型可能回答，也可能继续一段问答网页或重复问题。输出形式是训练分布与 prompt 前缀共同决定的，不应直接等同于知识能力。'},
+        {name:'Chat template',note:'模板把 system、user、assistant 角色和特殊 token 编码进序列。权重正确但模板错配时，模型可能乱码、串角色或不停生成，应先核对 tokenizer 与模板。'},
+        {name:'SFT 示范',note:'监督微调用高质量对话示范增加“看到这类用户输入后产生这类助手回复”的概率。它重塑行为先验，但不会保证事实正确、拒答校准或所有格式约束。'},
+        {name:'Assistant 行为',note:'后训练后的停止、格式、语气与工具协议是数据和目标塑形的结果。它仍基于 next-token generation，只是条件分布被重新组织。'},
+        {name:'配对诊断',note:'同一 prompt、相同解码设置、各自正确模板下比较 base/instruct，才能把行为差异与采样噪声、模板错误和模型能力分开。'},
+      ],
+      workflow:['固定六类 prompt','保存两种真实编码','控制相同解码参数','按训练分布解释差异'],
+      practice:{task:'完成 base / instruct 六类 prompt 配对实验',steps:['选择事实问答、格式约束、多轮、不确定性、指令遵循和网页续写六类 prompt。','分别保存 raw base token 与 apply_chat_template 后的 token 序列。','固定 temperature、top-p、seed 与最大长度，记录输出、停止方式和角色边界。','逐行解释更像哪类训练分布；模板错误案例单独标记，不归因于模型能力。'],evidence:['六类 prompt × 两模型对照表','至少两组真实 token 编码差异','统一解码参数与模型版本','一个模板错配故障及修复']},
+      worked:{title:'诊断“基础模型不回答问题”',steps:['先确认基础模型收到的是普通文本前缀，而不是它未训练过的聊天模板。','观察输出是否像网页、问答语料或文档续写；这说明它在执行预训练目标。','再用 instruct 权重与匹配模板比较，若角色和停止改变，差异来自后训练分布而非简单能力开关。'],question:'如果 instruct 模型输出乱码，为什么应先检查 tokenizer 与 chat template，而不是直接判定 SFT 失败？'},
+      code:baseAssistantCode,codeLabel:'base_vs_instruct.py',
+      misconception:'Base model 不直接回答不等于它缺少相关知识；instruct 模型回答流畅也不证明答案事实正确。',
+      quiz:{question:'对同一 instruct 权重，哪项最可能导致串角色或不停生成？',options:['使用了不匹配的 tokenizer 或 chat template','没有实现后续偏好优化专题中的损失','没有把 temperature 固定为 0.7'],explanation:'角色边界依赖训练时约定的特殊 token 与模板；本节只诊断基础模型、对话模板与监督示范。'},
+      mastery:['闭卷解释 base → assistant 的数据与目标变化。','展示一组 raw prompt 与 chat template token 差异。','用训练分布解释六类 prompt 中至少四类差异。','定位一个权重、tokenizer、模板或采样设置故障。'],
+      references:['Karpathy · 00:42:52–01:20:32','Hugging Face · Chat Templates','本站 5.2 · SFT 与对话模板'],
+    },
+  },
+}
+
+specialLessonCopy.en = {
+  'p.1': { ...specialLessonCopy.zh['p.1'],
+    objectives:['Trace values, types, and control flow through a Python program.','Extract repeated logic into functions with explicit inputs and returns.','Read the final traceback line, then find the first relevant frame in your code.','Write normal, boundary, and failure tests for a pure function.'],
+    opening:['Do not learn Python as a vocabulary list. Build one testable text-statistics tool so every language construct produces an observable result.','CS50P is the complete beginner path. This sprint selects the functions, control flow, containers, exceptions, and testing skills needed before tensor work.'],
+    concepts:[
+      {name:'Values, names, and types',note:'A name refers to an object; it is not a permanently typed box. Inspect type and repr on tiny inputs before assuming which operations a string, number, list, or dictionary supports.'},
+      {name:'Branches and loops',note:'Control flow determines which statement runs and how often. State initialization, update, and termination explicitly, then test empty, singleton, and repeated inputs.'},
+      {name:'Function contracts',note:'A function needs explicit inputs, a return value, and a defined failure mode. Separate printing from returning so pure computation can be tested and later ported to NumPy or PyTorch.'},
+      {name:'Container choice',note:'Lists preserve order, dictionaries support keyed lookup, sets remove duplicates, and tuples represent fixed records. Choose from the access pattern and complexity, not familiarity.'},
+      {name:'Tracebacks',note:'Read the exception type and message at the bottom, then move upward to the first frame in your own file. Do not hide an unexplained error behind a broad try/except.'},
+    ],
+    workflow:['Hand-check a three-token input','Write the smallest function contract','Implement with visible intermediate values','Lock behavior with boundary tests'],
+    practice:{task:'Implement and test a pure-Python text statistics tool',steps:['Write the expected tokens, word counts, and bigrams for a three-word input.','Implement tokenize and bigram_counts as single-purpose functions that return values.','Test empty, singleton, repeated, and bilingual text.','Trigger TypeError and KeyError deliberately and record the traceback lines that identify the fix.'],evidence:['A runnable text_stats.py','At least six assertions or pytest tests','Two preserved error cases with explanations','A README explaining container choices']},
+    worked:{title:'Derive two bigrams from “a b a”',steps:['Tokenization returns ["a","b","a"] and preserves order.','zip(tokens, tokens[1:]) produces (a,b) and (b,a) without crossing boundaries.','Counter aggregates repeated pairs; the test checks keys and values, not a printed screenshot.'],question:'For a one-token input, should the contract return an empty counter, raise, or create a placeholder? Decide before coding.'},
+    misconception:'Code that does not crash has only exercised one path; it has not defined behavior for empty, repeated, or invalid input.',
+    quiz:{question:'Which evidence shows Python mastery rather than copying?',options:['Predict on new input, independently implement the function and boundary tests, and explain a traceback','Watch every lecture and recognize all syntax names','Copy the sample and reproduce three output lines'],explanation:'Transferable prediction, implementation, tests, and diagnosis are the evidence.'},
+    mastery:['Rewrite tokenize and bigram_counts without a reference.','Explain when to choose list, dict, set, and tuple.','Locate a deliberate error from its traceback in two minutes.','Add normal, boundary, and failure tests to an unseen pure function.'],
+    references:['Harvard CS50P · Weeks 0–4','Python Tutorial · Control Flow Tools','Python Tutorial · Data Structures'],
+  },
+  'p.2': { ...specialLessonCopy.zh['p.2'],
+    objectives:['Create an isolated environment and record interpreter and dependency versions.','Separate importable logic, command entry points, and tests.','Define failures for file encoding, paths, and invalid input.','Protect refactors with arrange–act–assert pytest tests.'],
+    opening:['Many apparent model failures are environment, path, encoding, or data-file failures. Turning a one-off script into a reproducible project is a prerequisite for credible training experiments.','The minimum bar is reconstructable environments, validated inputs, tested behavior, and diagnosable failures.'],
+    concepts:[
+      {name:'Environment and dependencies',note:'Isolate the project and record the interpreter and key package versions. Rebuilding it in a fresh directory is stronger evidence than “it runs on my laptop”.'},
+      {name:'Modules and entry points',note:'Put computation in importable functions and keep argument parsing at the boundary. The same logic can then be tested and reused from notebooks or training scripts.'},
+      {name:'Path and UTF-8',note:'Use pathlib, explicit UTF-8, and temporary directories. String concatenation and the current working directory are hidden dependencies.'},
+      {name:'Exceptions and assertions',note:'Use exceptions for invalid external inputs and assertions for internal invariants. Catch narrowly and retain context; never silently convert every failure into an empty result.'},
+      {name:'pytest regression',note:'Fix inputs, execute one behavior, and assert an explicit result. Tests are a safety net for refactoring and vectorization, not a count competition.'},
+    ],
+    workflow:['Freeze current behavior','Separate pure logic from side effects','Add boundary and failure tests','Reproduce in a clean environment'],
+    practice:{task:'Turn a one-off text script into a reproducible project',steps:['Create src, tests, README, and dependency metadata; record Python version.','Split file loading, tokenization, counting, and output.','Use tmp_path to test UTF-8, empty files, wrong suffixes, and missing paths.','Rebuild from the README and run pytest.'],evidence:['A clear directory tree and startup command','At least eight pytest cases','One expected failure with a useful message','A clean-environment reconstruction record']},
+    worked:{title:'Fail at the file boundary',steps:['Accept Path rather than relying on script location.','Validate suffix and existence, then read UTF-8 with the target path in any error.','Use tmp_path for real temporary files without polluting the repository.'],question:'What misleading downstream result appears if UnicodeDecodeError is converted into an empty string?'},
+    misconception:'A notebook that ran once is not a reproducible project; cell order, hidden state, and local paths are undeclared dependencies.',
+    quiz:{question:'Which structure best supports replacing a Python loop with NumPy?',options:['Importable pure logic, I/O at the boundary, and behavior tests before the refactor','All logic in one top-to-bottom notebook cell','A broad try/except that returns an empty result'],explanation:'Separated logic, side effects, and tests make behavioral equivalence auditable.'},
+    mastery:['Rebuild the environment and run tests in a fresh directory.','Explain the distinct roles of exceptions and assertions.','Test a UTF-8 file flow with tmp_path.','Refactor global script logic into importable functions and an entry point.'],
+    references:['Harvard CS50P · Exceptions, Libraries, Unit Tests, File I/O','Python Tutorial · Modules','pytest Documentation · Getting Started'],
+  },
+  'p.3': { ...specialLessonCopy.zh['p.3'],
+    objectives:['Describe arrays with ndim, shape, axis, size, and dtype.','Predict whether broadcasting is valid and write the output shape.','Distinguish a slicing view from an explicit copy.','Match NumPy and PyTorch results on the same tiny input.'],
+    opening:['The bridge from Python lists to model code is an array mental model: one operation transforms a homogeneous block of data. Shape, axis, and dtype are the shared language of every later model lesson.','Learn the array rules in NumPy, then add device and autograd in PyTorch; these are connected layers, not unrelated APIs.'],
+    concepts:[
+      {name:'ndarray and homogeneous data',note:'An ndarray has a fixed dtype and rectangular shape. Those constraints enable compact storage and batch operations; nested-list behavior cannot be assumed to transfer.'},
+      {name:'shape, axis, and reduction',note:'Shape gives each axis length; axis selects which dimension is reduced. Write input and output shapes before sum, mean, or softmax.'},
+      {name:'Broadcasting',note:'Compare axes from the end: sizes must match or one must be 1. Broadcasting is a logical expansion and does not necessarily materialize a full copy.'},
+      {name:'Views and copies',note:'Basic NumPy slices usually share data. Cross-library conversions may also share memory; use copy or clone when independent storage is required.'},
+      {name:'NumPy to PyTorch',note:'The libraries share many shape and broadcasting rules, while PyTorch adds device, requires_grad, and a computation graph. Establish numeric parity before gradients.'},
+    ],
+    workflow:['Label axes on a tiny array','Hand-check indexing and broadcasting','Replace loops with array operations','Compare every element across libraries'],
+    practice:{task:'Vectorize bigram counts and compare NumPy with PyTorch',steps:['Hand-build a 3×3 count matrix from four token IDs.','Implement a loop, np.add.at, and torch.index_put_.','Assert shape, dtype, total count, and elementwise equality.','Change vocabulary size, repeated pairs, and empty inputs.'],evidence:['Three implementations on identical inputs','A shape/dtype/axis ledger','Elementwise parity assertions','One view/copy aliasing counterexample']},
+    worked:{title:'Write [0,1,0,2] into a count matrix',steps:['Source indices are [0,1,0] and targets are [1,0,2].','Repeated indices require accumulation; np.add.at states that contract explicitly.','Match it with index_put_(accumulate=True), then verify with array_equal.'],question:'For zero or one token, what output shape and total count should the contract guarantee?'},
+    misconception:'Removing a for loop does not prove correctness or speed. Prove indexing, accumulation, shape, and dtype equivalence before benchmarking.',
+    quiz:{question:'What is the broadcast result of shapes (4,1,8) and (3,8)?',options:['(4,3,8): 8 matches and 1 expands to 3','Invalid because ranks differ','(3,4,8): shorter shapes always go first'],explanation:'Broadcasting aligns from the final axis and treats missing leading axes as 1.'},
+    mastery:['Write input and output shapes before evaluating an expression.','Explain axis=0 versus axis=-1.','Demonstrate a view mutating its base array.','Match NumPy and PyTorch on three boundary inputs.'],
+    references:['NumPy · Absolute Basics for Beginners','NumPy · Broadcasting','PyTorch Learn the Basics · Tensors'],
+  },
+  'p.4': { ...specialLessonCopy.zh['p.4'],
+    objectives:['Explain data → forward → loss → backward → update.','Separate parameter values, gradients, and optimizer updates.','Assert shapes, finiteness, and expected loss movement.','Reproduce the experiment with a fixed seed and preserved failures.'],
+    opening:['This gate checks whether programming, arrays, and tests form one real parameter update. If you cannot explain every line without a reference, return to the corresponding prerequisite.','A printed loss is not completion. Predict the update direction, verify gradients, and diagnose one deliberately broken condition.'],
+    concepts:[
+      {name:'Data and parameters',note:'Inputs and labels are observations; parameters are state the optimizer changes. Similar shapes do not imply the same lifetime or requires_grad behavior.'},
+      {name:'Forward pass and logits',note:'The forward pass maps inputs and parameters to unnormalized scores. Assert batch, class dimension, and finiteness before computing loss.'},
+      {name:'Scalar loss',note:'Cross-entropy reduces batch predictions to an optimization scalar. A lower training loss is not evidence of generalization.'},
+      {name:'Backward and grad',note:'Backward accumulates each leaf parameter’s derivative. Understand whether repeated calls intentionally accumulate before clearing gradients.'},
+      {name:'Parameter update',note:'Update under no_grad, then clear gradients. The learning rate scales movement along the negative gradient; check both direction and new loss.'},
+    ],
+    workflow:['Freeze a two-example problem','Predict gradient direction','Execute one update','Break a condition and diagnose it'],
+    practice:{task:'Move from text counts to one tested gradient update',steps:['Fix two one-hot inputs, labels, initial weights, and seed; hand-check initial logits.','Run forward, cross-entropy, backward, and one SGD update with a shape ledger.','Assert finite loss, nonempty gradients, and changed parameters; recompute loss.','Break label range, dtype, gradient clearing, and shape one at a time.'],evidence:['A reproducible training script','Before/after parameters and losses','At least six automatic assertions','Four fault-injection diagnoses']},
+    worked:{title:'Verify one SGD step without treating it as magic',steps:['Zero weights produce equal initial logits and a predictable cross-entropy baseline.','Backward produces w.grad; the update must move along -grad.','If the next loss surprises you, inspect labels, learning rate, clearing, and no_grad boundaries.'],question:'Without clearing gradients, is the next update an intended multi-batch accumulation or an accidental duplicate? What record distinguishes them?'},
+    misconception:'A runnable loop can still have invalid labels, wrong dimensions, unintended accumulation, or data leakage.',
+    quiz:{question:'Which evidence is most diagnostic after one update?',options:['Shapes, loss, gradients, parameter delta, and assertions under fixed inputs and seed','A screenshot of the final loss','Nonzero GPU utilization'],explanation:'Correctness must be observable across data, graph, and update boundaries.'},
+    mastery:['Rewrite the minimal training loop closed-book.','Name every object that is mutated.','Inject uncleared gradients and explain the result.','Reproduce on new input with all tests passing.'],
+    references:['PyTorch Learn the Basics · Tensors and Autograd','PyTorch Learn the Basics · Optimization Loop','Lesson 0.6 · PyTorch tensors and reproducible experiments'],
+  },
+  '0.1': { ...specialLessonCopy.zh['0.1'],
+    objectives:['Separate parameters changed during training from state changed during a request.','Draw data → tokens → training → base model → post-training → assistant → inference/tools.','Attach lessons 2.x–7.x to the correct links.','Explain why continuation ability is not assistant behavior.'],
+    opening:['This is a reusable map, not a survey of every term. Watch only six segments totaling 30:56; spend the remaining fourteen minutes drawing and retrieving from memory.','Training changes weights. Requests change context, KV cache, and tool observations. Mixing these flows causes persistent confusion about RAG, agents, fine-tuning, and decoding.'],
+    concepts:[
+      {name:'Data and tokens',note:'Collected text is filtered, deduplicated, mixed, and encoded with a fixed tokenizer. Changing the tokenizer changes sequence lengths, vocabulary indices, embeddings, and downstream interfaces.'},
+      {name:'Pretraining and parameters',note:'The next-token objective updates weights with gradients. A new user message changes request state; it does not immediately retrain the model.'},
+      {name:'Base model',note:'A base model continues the conditional distribution of its training text. A question may become a webpage or forum continuation rather than a direct service response.'},
+      {name:'Post-training and assistant',note:'Demonstrations, preferences, and task rewards reshape role, format, and stopping behavior in the weights. Later lessons separate the algorithms.'},
+      {name:'Inference state',note:'Prompt tokens, generated tokens, KV cache, and sampling settings belong to runtime state. Temperature reshapes decoding probabilities; it does not add knowledge.'},
+      {name:'Tools and external facts',note:'Search or code results enter working context as observations. They can change the next output without becoming parameter memory.'},
+    ],
+    workflow:['Draw the initial map closed-book','Correct one node per segment','Separate parameter and runtime flows','Attach later lessons to the chain'],
+    practice:{task:'Rebuild a usable LLM stack map in 45 minutes',steps:['Minutes 0–3: draw the request path without references.','Minutes 3–34: watch six required segments and answer one card question per segment.','Minutes 34–41: redraw data, parameter-update, and runtime-state flows with verbs on arrows.','Minutes 41–45: answer four retrieval questions and place 2.x–7.x.'],evidence:['Before and after maps','Three distinct flow colors with verbs','Four retrieval answers with causal reasons','One hallucination point and one verifiable tool observation']},
+    worked:{title:'Place one user request in the trained system',steps:['Weights already came from pretraining and post-training before service starts.','The tokenizer encodes the message; the model emits logits, samples one token, appends it, and repeats.','A search result enters context and changes later output without automatically entering long-term weights.'],question:'For a tokenizer change, retrieved evidence, and temperature change, identify which interface or state changes first.'},
+    misconception:'Seeing a new fact in a conversation is not the same as learning it into parameters.',
+    quiz:{question:'After adding a retrieved passage, what changes first?',options:['Request context and the conditional distribution of later tokens','All pretrained weights','Tokenizer vocabulary and embedding size'],explanation:'Tool output enters working context unless a separate training process updates parameters.'},
+    mastery:['Connect the full chain from memory in five minutes.','Identify parameter, runtime-state, and tool-observation flows.','Explain base versus assistant behavior.','Place lessons 2.x–7.x on the correct nodes.'],
+    references:['Andrej Karpathy · Deep Dive into LLMs like ChatGPT','LLM Study roadmap','Lessons 2.x–7.x'],
+  },
+  '5.1': { ...specialLessonCopy.zh['5.1'],
+    objectives:['Explain base versus instruct outputs through training distributions.','Show how a chat template changes token sequences and role boundaries.','Separate SFT behavior shaping from adding factual knowledge.','Build an auditable paired comparison across six prompt types.'],
+    opening:['This lesson asks one question: why does the same Transformer family behave like a continuation engine before post-training and an assistant after it? Required video ends at 1:20:32; preference-objective formulas stay in later lessons.','Do not score “which is smarter”. Record distributional style, role boundaries, stopping, uncertainty, and the actual tokens introduced by the template.'],
+    concepts:[
+      {name:'Pretraining distribution',note:'A base model optimizes next-token likelihood over web text. Questions, answers, code, and dialogue may appear without one universal assistant protocol.'},
+      {name:'Base-model behavior',note:'A question can be answered or continued as a webpage. The form follows the training distribution and prompt prefix; it is not a direct knowledge-capability switch.'},
+      {name:'Chat template',note:'Templates encode system, user, and assistant roles with special tokens. A tokenizer/template mismatch can cause role leakage, gibberish, or nontermination.'},
+      {name:'SFT demonstrations',note:'SFT raises the probability of demonstrated assistant responses. It shapes behavior but does not guarantee factuality, calibrated refusal, or every format constraint.'},
+      {name:'Assistant behavior',note:'Stopping, tone, format, and tool protocols are learned behaviors layered on next-token generation.'},
+      {name:'Paired diagnosis',note:'Use the same prompt and decoding controls with each model’s correct encoding to separate behavior shaping from sampling noise and template errors.'},
+    ],
+    workflow:['Fix six prompt classes','Save both real encodings','Control decoding settings','Explain differences through training data'],
+    practice:{task:'Run a six-class base/instruct paired experiment',steps:['Choose factual, format, multi-turn, uncertainty, instruction-following, and webpage-continuation prompts.','Save raw base tokens and apply_chat_template tokens.','Fix temperature, top-p, seed, and length; record output, stopping, and roles.','Explain each row by training distribution; label template failures separately.'],evidence:['Six prompts × two models','At least two token-encoding comparisons','Pinned decoding and model versions','One template-mismatch failure and repair']},
+    worked:{title:'Diagnose a base model that does not answer',steps:['Confirm that the base model receives plain text, not an unfamiliar chat template.','Classify whether output resembles a webpage, QA corpus, or document continuation.','Compare matched instruct weights and template; changed roles and stopping indicate post-training behavior shaping.'],question:'If an instruct model emits gibberish, why inspect tokenizer and template before blaming SFT?'},
+    misconception:'A base model that does not directly answer may still contain relevant knowledge; fluent assistant behavior does not prove factual correctness.',
+    quiz:{question:'What most directly causes role leakage or nontermination with valid instruct weights?',options:['A mismatched tokenizer or chat template','A missing loss from a later preference-optimization lesson','Temperature not fixed at exactly 0.7'],explanation:'Role boundaries depend on the special tokens and template used during training; this lesson diagnoses base models, templates, and supervised demonstrations.'},
+    mastery:['Explain the data/objective transition from base to assistant.','Show one raw-prompt versus chat-template token difference.','Explain four of six prompt differences through training distributions.','Locate a weight, tokenizer, template, or sampling fault.'],
+    references:['Karpathy · 00:42:52–01:20:32','Hugging Face · Chat Templates','Lesson 5.2 · SFT and chat templates'],
+  },
+}
+
+function buildSpecialLessonMaterial(lesson, locale) {
+  const [id, title, type, duration] = lesson
+  const copy = specialLessonCopy[locale]?.[id]
+  if (!copy) return null
+  const media = lessonMedia[id]
+  const localizedMedia = media && locale === 'en' && media.segments ? {
+    ...media,
+    segments:media.segments.map(segment => ({
+      ...segment,
+      before:karpathyEnglishGuidance[segment.id]?.before || segment.before,
+      after:karpathyEnglishGuidance[segment.id]?.after || segment.after,
+    })),
+  } : media
+  return {
+    id, title, type, duration, ...copy,
+    media: localizedMedia ? {
+      ...localizedMedia,
+      globalTitle:title,
+      before:localizedMedia.before || (locale === 'en' ? 'Write a prediction before opening the source.' : '打开资料前先写下预测。'),
+      after:localizedMedia.after || (locale === 'en' ? 'Save the required artifact and one failed case.' : '保存本节要求的产物和一个失败案例。'),
+    } : null,
+    spotlight:null,
+  }
 }
 
 const kimiK3AuditCode = `total_params = 2.8e12
@@ -576,6 +1037,8 @@ function buildKimiK3ChineseMaterial(lesson) {
 
 function buildEnglishLessonMaterial(module, lesson) {
   const [id, title, type, duration, theory, practice] = lesson
+  const special = buildSpecialLessonMaterial(lesson, 'en')
+  if (special) return special
   if (id === '8.7') return buildKimiK3EnglishMaterial(lesson)
   const concepts = splitTheory(theory)
   const workflow = ['Define the smallest observable question', 'Build the minimal correct mechanism', 'Compare against a baseline or reference', 'Change one condition and explain the result']
@@ -628,6 +1091,8 @@ function buildEnglishLessonMaterial(module, lesson) {
 export function buildLessonMaterial(module, lesson, locale = 'zh') {
   if (locale === 'en') return buildEnglishLessonMaterial(module, lesson)
   const [id, title, type, duration, theory, practice] = lesson
+  const special = buildSpecialLessonMaterial(lesson, 'zh')
+  if (special) return special
   if (id === '8.7') return buildKimiK3ChineseMaterial(lesson)
   const profile = profiles[module.id] || profiles.foundations
   const workflow = typeGuides[type] || typeGuides['理论']

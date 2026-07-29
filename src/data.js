@@ -1,5 +1,20 @@
 export const modules = [
   {
+    id: 'prerequisites', no: 'PRE', title: '零基础先修加速带', short: '按需先修', weeks: '3 周', hours: 12,
+    summary: '为第一次写代码或还不熟悉科学计算的学习者补齐 Python、测试、NumPy 与 PyTorch 最小闭环；已有基础可直接通过诊断题跳过。',
+    question: '怎样从“能运行一段 Python”走到“能读懂、验证并修改一条张量训练循环”？',
+    color: '#f2b36f',
+    lessons: [
+      ['p.1', 'Python 零基础：从表达式到可测试函数', '代码', '180 分钟', '变量、类型、分支、循环、函数、容器与错误信息', '实现并测试一个纯 Python 文本统计器'],
+      ['p.2', 'Python 工程习惯：环境、文件、异常与 pytest', '工程', '150 分钟', '虚拟环境、模块、文件 I/O、异常、断言、单元测试与调试', '把一次性脚本改造成可复现的小项目'],
+      ['p.3', '从 NumPy 数组到 PyTorch 张量', '实验', '150 分钟', 'ndarray、shape、axis、broadcast、view/copy、dtype 与 tensor', '把循环版 bigram 计数向量化并与 PyTorch 对拍'],
+      ['p.4', '先修掌握门：跑通第一条训练循环', '验收', '180 分钟', '数据、张量、前向、损失、反向、更新、测试与复现', '从文本计数走到一个可测试的单步梯度更新'],
+    ],
+    project: 'Python-to-Tensor Starter：一个带 README、pytest、固定随机种子和 NumPy/PyTorch 对拍的最小仓库。',
+    mastery: ['能读懂常见 Python 语法与报错', '能用 shape、dtype 和 axis 解释数组操作', '能用测试证明重构前后结果一致', '能独立跑通并解释一次参数更新'],
+    sources: ['Harvard CS50P', 'Python 官方教程', 'NumPy Absolute Beginner’s Guide', 'PyTorch Learn the Basics'],
+  },
+  {
     id: 'foundations', no: '00', title: '进入模型之前', short: '地基', weeks: '2 周', hours: 18,
     summary: '把数学、Python 与张量补到“够用且能解释”的程度；建立实验、记录与复现习惯。',
     question: '一个模型到底在优化什么？数据、参数、损失和梯度如何连起来？',
@@ -177,6 +192,10 @@ export const modules = [
 ]
 
 export const resources = [
+  { author: 'Harvard CS50', title: 'CS50’s Introduction to Programming with Python', type: '课程', level: '零基础主线', phase: 'Python 先修', url: 'https://cs50.harvard.edu/python/', note: '面向没有编程经验的完整免费课；本站先修带只选取进入张量学习所需的函数、控制流、异常、库、测试与文件 I/O。' },
+  { author: 'Python Software Foundation', title: 'The Python Tutorial', type: '文档', level: '官方参考', phase: 'Python 先修', url: 'https://docs.python.org/3/tutorial/', note: '用于核对语言语义和标准写法；它更适合查阅与补漏，不替代练习驱动的入门路径。' },
+  { author: 'NumPy', title: 'NumPy: the absolute basics for beginners', type: '文档', level: '零基础桥梁', phase: '数组 / 向量化', url: 'https://numpy.org/doc/stable/user/absolute_beginners.html', note: '从 ndarray、shape、axis、dtype、索引和广播建立科学计算心智模型，直接衔接本站张量与线性代数课程。' },
+  { author: 'PyTorch', title: 'Learn the Basics', type: '课程', level: '官方实践', phase: '张量 / 训练循环', url: 'https://docs.pytorch.org/tutorials/beginner/basics/intro.html', note: '官方可运行教程，覆盖 tensor、DataLoader、模型、autograd、优化循环与保存加载；本站用更小实验先建立因果理解。' },
   { author: 'Andrej Karpathy', title: 'Neural Networks: Zero to Hero', type: '课程', level: '主线', phase: '地基 → GPT', url: 'https://karpathy.ai/zero-to-hero.html', note: '本课程的第一性原理主轴；不要只看，逐行复现并完成练习。' },
   { author: 'Andrej Karpathy', title: 'micrograd', type: '代码', level: '必做', phase: '反向传播', url: 'https://github.com/karpathy/micrograd', note: '约百行标量自动微分内核，是理解 autograd 的最佳切口。' },
   { author: 'Andrej Karpathy', title: 'makemore', type: '代码', level: '必做', phase: '语言模型', url: 'https://github.com/karpathy/makemore', note: '从 bigram 到 Transformer 的自回归字符模型演化。' },

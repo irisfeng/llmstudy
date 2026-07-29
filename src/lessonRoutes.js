@@ -59,7 +59,7 @@ export function matchSitePath(pathname = '/') {
     const route = routeByTrackSlug.get(`${trackId}:${lessonMatch[2]}`)
     if (route) return { type: 'lesson', locale: lessonMatch[1], route, trackId }
 
-    const idMatch = lessonMatch[2].match(trackId === 'world-models' ? /^(wm)-(\d+)-(\d+)/ : /^(\d+)-(\d+)/)
+    const idMatch = lessonMatch[2].match(trackId === 'world-models' ? /^(wm)-(\d+)-(\d+)/ : /^([a-z0-9]+)-(\d+)/)
     const fallbackId = trackId === 'world-models'
       ? idMatch && `wm.${idMatch[2]}.${idMatch[3]}`
       : idMatch && `${idMatch[1]}.${idMatch[2]}`

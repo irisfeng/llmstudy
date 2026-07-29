@@ -80,7 +80,7 @@ function staticHomeContent(meta) {
   return `<main class="seo-fallback" data-seo-fallback>
     <h1>${isWorld ? (isZh ? '从状态、预测到空间智能' : 'From state and prediction to spatial intelligence') : (isZh ? '从第一性原理掌握大模型' : 'Build large language models from first principles')}</h1>
     <p>${escapeHtml(meta.description)}</p>
-    <p>${isWorld ? (isZh ? '12节深度课，覆盖POMDP、隐空间动力学、JEPA、Genie、空间智能与Physical AI。' : '12 lessons spanning POMDPs, latent dynamics, JEPA, Genie, spatial intelligence, and physical AI.') : (isZh ? '76节深度课，覆盖反向传播、Transformer、推理模型、训练、对齐、推理部署、Agent与Kimi K3系统审计。' : '76 lessons spanning backpropagation, Transformers, reasoning models, training, post-training, inference, agents, and a Kimi K3 system audit.')}</p>
+    <p>${isWorld ? (isZh ? '12节深度课，覆盖POMDP、隐空间动力学、JEPA、Genie、空间智能与Physical AI。' : '12 lessons spanning POMDPs, latent dynamics, JEPA, Genie, spatial intelligence, and physical AI.') : (isZh ? '80节深度课，覆盖Python先修、反向传播、Transformer、推理模型、训练、对齐、推理部署、Agent与Kimi K3系统审计。' : '80 lessons spanning Python prerequisites, backpropagation, Transformers, reasoning models, training, post-training, inference, agents, and a Kimi K3 system audit.')}</p>
     <a href="${lessonPath(isWorld ? 'wm.0.1' : '0.1', meta.locale)}">${isZh ? '开始第一节' : 'Start lesson one'}</a>
   </main>`
 }
