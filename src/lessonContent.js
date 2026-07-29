@@ -4,7 +4,9 @@ const profiles = {
     lens: '每一步都追踪值、类型、shape、输入输出与失败信号',
     verify: '小输入手算、pytest、NumPy/PyTorch 对拍与固定随机种子',
     transfer: '更换文本、shape、dtype 或异常输入后重新运行同一组测试',
-    code: `def count_bigrams(tokens):
+    code: `from collections import Counter
+
+def count_bigrams(tokens):
     pairs = zip(tokens, tokens[1:])
     return Counter(pairs)
 
@@ -135,7 +137,18 @@ const mechanismNotes = [
 
 const biliSources = {
   karpathy: { platform:'Bilibili', id:'BV1mqrTBvEaf', author:'常青藤中英字幕课程', sourceType:'community', sourceLabel:'社区精译', originalUrl:'https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ', sourceNote:'Andrej Karpathy 原课的中英字幕镜像；保留原课入口，镜像失效不影响正文学习。' },
-  karpathyDeep: { platform:'Bilibili', id:'BV16cNEeXEer', author:'KrillinAI小林', sourceType:'community', sourceLabel:'社区双语', originalUrl:'https://www.youtube.com/watch?v=7xTGNNLPyMI', sourceNote:'Andrej Karpathy 原讲座的中英双语镜像。' },
+  karpathyDeep: {
+    platform:'Bilibili', id:'BV16cNEeXEer', author:'KrillinAI小林', sourceType:'community', sourceLabel:'社区双语',
+    originalUrl:'https://www.youtube.com/watch?v=7xTGNNLPyMI',
+    sourceNote:'Andrej Karpathy 原讲座的中英双语镜像。',
+    segmentTiming:{
+      offsetSeconds:0,
+      startSupported:true,
+      endSupported:false,
+      noteZh:'Bilibili 镜像按原讲座时间轴从片段起点打开，但播放器不会在片段结束时自动停止；需要严格限时请切换全球源。',
+      noteEn:'The Bilibili mirror opens at the mapped source start, but it cannot stop automatically at the segment end. Use the global source for bounded playback.',
+    },
+  },
   raschka: { platform:'Bilibili', id:'BV1RpwzzoErr', author:'脑袋要有光', sourceType:'community', sourceLabel:'作者配套中配', originalUrl:'https://github.com/rasbt/LLMs-from-scratch', sourceNote:'Sebastian Raschka 书籍配套视频的中文配音与字幕版本。' },
   cs336: { platform:'Bilibili', id:'BV1Ect2zjEHR', author:'大模型项目实战教学', sourceType:'community', sourceLabel:'课程字幕镜像', originalUrl:'https://stanford-cs336.github.io/spring2025/', sourceNote:'Stanford CS336 课程镜像；关键结论仍以课程主页、讲义和作业为准。' },
   calculus: { platform:'Bilibili', id:'BV1qW411N7FU', author:'3Blue1Brown', sourceType:'official', sourceLabel:'官方双语', originalUrl:'https://www.youtube.com/watch?v=YG15m2VwSjA', sourceNote:'3Blue1Brown 官方账号发布。' },
@@ -566,6 +579,8 @@ def load_text(path):
     return path.read_text(encoding="utf-8")
 
 # tests/test_text_stats.py
+import pytest
+
 def test_load_text_rejects_wrong_suffix(tmp_path):
     path = tmp_path / "data.csv"
     path.write_text("a,b", encoding="utf-8")
@@ -870,13 +885,17 @@ function buildSpecialLessonMaterial(lesson, locale) {
   const copy = specialLessonCopy[locale]?.[id]
   if (!copy) return null
   const media = lessonMedia[id]
+  const englishGuidanceFor = segment => {
+    const guidance = karpathyEnglishGuidance[segment.id]
+    if (!guidance?.before || !guidance?.after) throw new Error(`Missing English Karpathy guidance: ${segment.id}`)
+    return guidance
+  }
   const localizedMedia = media && locale === 'en' && media.segments ? {
     ...media,
-    segments:media.segments.map(segment => ({
-      ...segment,
-      before:karpathyEnglishGuidance[segment.id]?.before || segment.before,
-      after:karpathyEnglishGuidance[segment.id]?.after || segment.after,
-    })),
+    segments:media.segments.map(segment => {
+      const guidance = englishGuidanceFor(segment)
+      return { ...segment, before:guidance.before, after:guidance.after }
+    }),
   } : media
   return {
     id, title, type, duration, ...copy,

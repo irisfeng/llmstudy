@@ -160,11 +160,12 @@ function Roadmap({ modulesData = modules, trackId = 'llm' }) {
   const { pick } = useI18n()
   const isWorld = trackId === 'world-models'
   const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
+  const currentIndex = isWorld ? 0 : modulesData.findIndex(module => module.id === 'autograd')
   return <section className="roadmap-block">
     <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '32 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '262–302'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {mediaLessons} {pick('节视频研讨','video seminars')}</p></div>
     <div className="roadmap-rail">
-      {modulesData.map((m, i) => <div className={`road-stop ${i === 2 ? 'current' : ''} ${i < 2 ? 'done' : ''}`} key={m.id}>
-        <span>{i === 0 ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
+      {modulesData.map((m, i) => <div className={`road-stop ${i === currentIndex ? 'current' : ''} ${i < currentIndex ? 'done' : ''}`} key={m.id}>
+        <span>{i < currentIndex ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
       </div>)}
     </div>
   </section>
@@ -385,12 +386,16 @@ function LessonMedia({ media }) {
   const selectedPart = parts.find(item => item.page === selectedPage)
   const start = selectedSegment?.start || 0
   const end = selectedSegment?.end || null
+  const segmentTiming = source.segmentTiming || {}
+  const sourceStart = Math.max(0, start + (segmentTiming.offsetSeconds || 0))
+  const sourceCanStartAtSegment = isYouTube || segmentTiming.startSupported
+  const sourceStopsAtSegmentEnd = isYouTube || segmentTiming.endSupported
   const embed = isYouTube
     ? `https://www.youtube-nocookie.com/embed/${source.id}?rel=0${start ? `&start=${start}` : ''}${end ? `&end=${end}` : ''}`
-    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0${start ? `&t=${start}` : ''}` : ''
+    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : ''
   const external = isYouTube
     ? `https://www.youtube.com/watch?v=${source.id}${start ? `&t=${start}s` : ''}`
-    : isBilibili ? `https://www.bilibili.com/video/${source.id}?p=${selectedPage}${start ? `&t=${start}` : ''}` : source.url
+    : isBilibili ? `https://www.bilibili.com/video/${source.id}?p=${selectedPage}${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : source.url
   const changeNetwork = value => {
     setNetwork(value)
     setActive(false)
@@ -432,18 +437,19 @@ function LessonMedia({ media }) {
         <span><b>{pick('原始资源','Full source')}</b>{media.resourceDuration || media.duration}</span>
       </div>
       <div className="segment-list">{segments.map((segment, index) => <article key={segment.id} className={`${segment.id === selectedSegment?.id ? 'active' : ''} ${segmentProgress[segment.id] ? 'complete' : ''}`}>
-        <button className="segment-select" onClick={() => changeSegment(segment.id)}>
+        <button className="segment-select" aria-current={segment.id === selectedSegment?.id ? 'true' : undefined} onClick={() => changeSegment(segment.id)}>
           <span>{String(index + 1).padStart(2, '0')} · {segment.role.toUpperCase()}</span>
           <b>{locale === 'en' ? segment.title : segment.titleZh}</b>
           <small>{formatTime(segment.start)}–{formatTime(segment.end)} · {formatTime(segment.end - segment.start)}</small>
         </button>
-        <button className="segment-check" aria-label={pick('切换片段完成状态','Toggle segment completion')} onClick={() => toggleSegment(segment.id)}>{segmentProgress[segment.id] ? <CheckCircle weight="fill" /> : <Circle />}</button>
+        <button className="segment-check" aria-label={pick('切换片段完成状态','Toggle segment completion')} aria-pressed={Boolean(segmentProgress[segment.id])} onClick={() => toggleSegment(segment.id)}>{segmentProgress[segment.id] ? <CheckCircle weight="fill" /> : <Circle />}</button>
       </article>)}</div>
+      {selectedSegment && isBilibili && !sourceStopsAtSegmentEnd && <p className="segment-source-note">{locale === 'en' ? segmentTiming.noteEn : segmentTiming.noteZh}</p>}
     </div>}
     <div className="media-frame">
       {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{t('globalOriginal')}</b><p>{resolvedSource ? t('noGlobalEmbed') : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
-    <div className="media-meta"><div><span>{source.author} · {selectedSegment ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
+    <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
     <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{selectedSegment?.before || media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{selectedSegment?.after || media.after}</p></article></div>
   </section>
 }

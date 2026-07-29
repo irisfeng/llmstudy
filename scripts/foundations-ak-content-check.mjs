@@ -53,7 +53,17 @@ const visibleMaterial = material => ({
   quiz:material.quiz,
   mastery:material.mastery,
   references:material.references,
+  media:material.media ? {
+    before:material.media.before,
+    after:material.media.after,
+    segments:material.media.segments?.map(segment => ({
+      title:segment.title,
+      before:segment.before,
+      after:segment.after,
+    })),
+  } : null,
 })
+const hasChinese = value => /[\u3000-\u303f\uff00-\uffef\u3400-\u4dbf\u4e00-\u9fff]/.test(JSON.stringify(value))
 
 for (let index = 0; index < (prerequisite?.lessons.length || 0); index += 1) {
   const lesson = prerequisite.lessons[index]
@@ -63,7 +73,7 @@ for (let index = 0; index < (prerequisite?.lessons.length || 0); index += 1) {
   check(zh.concepts.length >= 5 && en.concepts.length >= 5, `${lesson[0]} lacks detailed bilingual concepts`)
   check(zh.practice.evidence.length >= 4 && en.practice.evidence.length >= 4, `${lesson[0]} lacks auditable evidence`)
   check(zh.mastery.length >= 4 && en.mastery.length >= 4, `${lesson[0]} lacks a real mastery gate`)
-  check(!/[\u3400-\u9fff]/.test(JSON.stringify(visibleMaterial(en))), `${lesson[0]} English material contains Chinese text`)
+  check(!hasChinese(visibleMaterial(en)), `${lesson[0]} English material contains Chinese text`)
 }
 
 const chapters = karpathyDeepResource.chapters
@@ -98,6 +108,10 @@ check(mapMedia.segments.length === 6, '0.1 must use six required segments')
 check(durationOf(mapMedia.segments) === 1856, `0.1 required duration must be 30:56, found ${durationOf(mapMedia.segments)} seconds`)
 check(durationOf(mapMedia.segments) <= 1920, '0.1 required video exceeds 32 minutes')
 check(mapMedia.requiredDuration === '30:56' && mapMedia.activityDuration.includes('14'), '0.1 does not separate video and activity duration')
+check(
+  mapMedia.cn?.segmentTiming?.startSupported && mapMedia.cn?.segmentTiming?.endSupported === false,
+  'Bilibili mirror must declare start-only segment timing',
+)
 check(mapMaterial.code.includes('flowchart LR') && !mapMaterial.code.includes('x @ w'), '0.1 still uses the generic tensor-multiply exercise')
 check(alignmentMedia.segments.length === 3, '5.1 must use three relevant segments')
 check(durationOf(alignmentMedia.segments) === 2260, `5.1 required duration must be 37:40, found ${durationOf(alignmentMedia.segments)} seconds`)
@@ -107,8 +121,8 @@ for (const [id, material] of [['5.1 zh', alignmentMaterial], ['5.1 en', alignmen
   const text = JSON.stringify(visibleMaterial(material))
   check(!/DPO|chosen_logp|rejected_logp/i.test(text), `${id} leaks the later DPO lesson`)
 }
-check(!/[\u3400-\u9fff]/.test(JSON.stringify(visibleMaterial(mapEnglish))), '0.1 English material contains Chinese text')
-check(!/[\u3400-\u9fff]/.test(JSON.stringify(visibleMaterial(alignmentEnglish))), '5.1 English material contains Chinese text')
+check(!hasChinese(visibleMaterial(mapEnglish)), '0.1 English material contains Chinese text')
+check(!hasChinese(visibleMaterial(alignmentEnglish)), '5.1 English material contains Chinese text')
 
 for (const media of [mapMedia, alignmentMedia]) {
   for (const segment of media.segments) {
@@ -126,6 +140,9 @@ for (const implementationMarker of [
   '&start=${start}',
   '&end=${end}',
   'data-media-segments',
+  'aria-current=',
+  'aria-pressed=',
+  'sourceStopsAtSegmentEnd',
 ]) {
   check(appSource.includes(implementationMarker), `Segment player is missing ${implementationMarker}`)
 }
