@@ -157,7 +157,7 @@ export const modules = [
     sources: ['Karpathy · nanochat', 'Lilian Weng · LLM Agents', 'Hugging Face Agents Course', 'Anthropic · Building Effective Agents'],
   },
   {
-    id: 'frontier-llm', no: '08', title: '前沿大模型系统', short: '2025–2026 前沿', weeks: '3 周', hours: 28,
+    id: 'frontier-llm', no: '08', title: '前沿大模型系统', short: '2025–2026 前沿', weeks: '4 周', hours: 32,
     summary: '把推理模型、稀疏架构、长上下文和新型解码放回可验证的原理与系统约束，而不是追逐模型榜单。',
     question: '近两年的能力跃迁，分别来自架构、数据、后训练、测试时计算和服务系统中的哪一层？',
     color: '#ffb86b',
@@ -168,10 +168,11 @@ export const modules = [
       ['8.4', 'DSpark：投机解码的生成与调度', '系统', '160 分钟', 'parallel drafter、semi-autoregressive head、prefix survival、hardware-aware scheduling', '实现前缀存活调度器并模拟轻载与高并发'],
       ['8.5', '扩散与块并行语言模型', '理论', '130 分钟', 'masked diffusion、parallel decoding、block diffusion、quality-speed trade-off', '比较自回归、并行草稿与扩散草稿的时延模型'],
       ['8.6', '面向 Agent 的后训练', '工程', '150 分钟', 'tool-use trajectory、task synthesis、verifiable environment、process与outcome reward', '为工具型 Agent 设计可回放的训练与评测数据管线'],
+      ['8.7', 'Kimi K3：3T 级开放权重系统审计', '研读', '180 分钟', 'KDA、AttnRes、Stable LatentMoE、MXFP4 QAT、million-token agentic RL、Kimi K3 License', '建立架构—训练—推理—评测—许可证五层审计矩阵'],
     ],
     project: 'Frontier Systems Review：选择一个前沿方案，用复现实验、成本模型和失败案例判断它解决了哪一层问题。',
     mastery: ['能把模型能力提升归因到具体技术层而非品牌', '能区分离线 benchmark、单用户速度与生产吞吐', '能审计推理、长上下文和 Agent 评测中的污染与代理指标'],
-    sources: ['DeepSeek-V3 / V3.2 / R1', 'DeepSeek · DSpark', 'Stanford CS336 · 2025–2026 materials'],
+    sources: ['DeepSeek-V3 / V3.2 / R1', 'DeepSeek · DSpark', 'Kimi K3 Technical Report / Repository / License', 'Stanford CS336 · 2025–2026 materials'],
   },
 ]
 
@@ -220,6 +221,9 @@ export const resources = [
   { author: 'DeepSeek-AI', title: 'DeepSeek-V3.2', type: '研究', level: '前沿', phase: '稀疏注意力 / Agent', url: 'https://arxiv.org/abs/2512.02556', note: '把稀疏注意力、可扩展 RL 和 Agent 任务合成放在同一系统中分析。' },
   { author: 'DeepSeek-AI', title: 'DSpark: Confidence-Scheduled Speculative Decoding', type: '研究', level: '2026 新增', phase: '投机解码', url: 'https://arxiv.org/abs/2607.05147', note: '重点学习半自回归草稿、前缀存活概率和硬件感知验证调度，而非只记速度数字。' },
   { author: 'DFlash authors', title: 'DFlash: Block Diffusion for Flash Speculative Decoding', type: '研究', level: '2026 新增', phase: '扩散草稿', url: 'https://arxiv.org/abs/2602.06036', note: '理解块扩散如何作为并行 drafter，并与自回归解码保持质量—速度对照。' },
+  { author: 'Moonshot AI', title: 'Kimi K3 Technical Report', type: '研究', level: '2026 新增', phase: '开放权重系统审计', url: 'https://arxiv.org/abs/2607.24653', note: '从架构、预训练、后训练、推理基础设施和评测协议审计 Kimi K3；官方报告中的结果需与独立复现区分。' },
+  { author: 'Moonshot AI', title: 'Kimi K3 Official Repository', type: '代码', level: '2026 新增', phase: '开放权重系统审计', url: 'https://github.com/MoonshotAI/Kimi-K3', note: '核对模型配置、权重入口、推理框架和部署约束；开放权重不等于低资源可部署。' },
+  { author: 'Moonshot AI', title: 'Kimi K3 License', type: '文档', level: '商用必读', phase: '许可证', url: 'https://github.com/MoonshotAI/Kimi-K3/blob/main/LICENSE', note: '在商用前核对 MaaS 收入门槛、品牌展示条件和豁免条款；课程说明不构成法律意见。' },
 ]
 
 export const sourceTypes = ['全部', '课程', '视频', '博客', '代码', '文档', '研究', '动态']

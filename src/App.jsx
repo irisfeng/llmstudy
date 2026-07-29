@@ -113,7 +113,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
-          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('75 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','75 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
+          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('76 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','76 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
         </div>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <div className="signal-line" />
@@ -123,7 +123,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
       <CurrentLesson goLesson={goLesson} trackId={trackId} />
     </section>
     <section className="track-chooser" aria-label={pick('两条学习路线','Two learning tracks')}>
-      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>75 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>76 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
       <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
     </section>
     <Roadmap modulesData={localized} trackId={trackId} />
@@ -480,9 +480,9 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         </section>
 
         {material.spotlight && <section className="paper-spotlight">
-          <span className="section-no">RESEARCH BRIDGE · DSPARK</span><h2>{material.spotlight.title}</h2><p>{material.spotlight.body}</p>
+          <span className="section-no">{material.spotlight.kicker || 'RESEARCH BRIDGE · DSPARK'}</span><h2>{material.spotlight.title}</h2><p>{material.spotlight.body}</p>
           <ul>{material.spotlight.points.map(x => <li key={x}><Check />{x}</li>)}</ul>
-          <small>{pick('基于用户提供的 DSpark 论文整理；速度数字需连同硬件、负载和匹配吞吐条件阅读。','Based on the supplied DSpark paper. Read speed claims together with hardware, load, and matched-throughput conditions.')}</small>
+          <small>{material.spotlight.note || pick('基于用户提供的 DSpark 论文整理；速度数字需连同硬件、负载和匹配吞吐条件阅读。','Based on the supplied DSpark paper. Read speed claims together with hardware, load, and matched-throughput conditions.')}</small>
         </section>}
 
         <section id="study-2" className="study-section">
