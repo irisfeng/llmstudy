@@ -51,17 +51,26 @@ const requiredUrls = [
 ]
 for (const url of requiredUrls) check(resources.some(resource => resource.url === url), `Missing official Kimi K3 resource: ${url}`)
 
-const countFiles = [
-  'README.md',
-  'src/App.jsx',
-  'src/auth.jsx',
-  'src/seo.js',
-  'scripts/prerender-seo.mjs',
-  'docs/free-promotion-plan.md',
-  'promotion/ready-to-post.md',
-  'public/og-cover.svg',
-]
-const countText = countFiles.map(file => fs.readFileSync(path.join(root, file), 'utf8')).join('\n')
+const countExpectations = {
+  'README.md': ['LLM 9 个阶段、76 节', '88 节课程'],
+  'src/App.jsx': ['76 节中英双语课程', '<small>76 '],
+  'src/auth.jsx': ['88 节课', 'all 88 lessons'],
+  'src/seo.js': ['76节系统课程', 'A 76-lesson path'],
+  'scripts/prerender-seo.mjs': ['76节深度课', '76 lessons spanning'],
+  'docs/free-promotion-plan.md': ['88 节双路线'],
+  'promotion/ready-to-post.md': ['88 节 AI 系统课', '目前有 88 节课', '88 节中英双语课'],
+  'public/og-cover.svg': ['88 LESSONS'],
+}
+const countFileText = Object.fromEntries(Object.keys(countExpectations).map(file => [
+  file,
+  fs.readFileSync(path.join(root, file), 'utf8'),
+]))
+for (const [file, expectedCopies] of Object.entries(countExpectations)) {
+  for (const expected of expectedCopies) {
+    check(countFileText[file].includes(expected), `${file} is missing intended course-count copy: ${expected}`)
+  }
+}
+const countText = Object.values(countFileText).join('\n')
 for (const stale of ['75节', '75 节', '75 lessons', '87节', '87 节', '87 lessons', '69 LESSONS']) {
   check(!countText.includes(stale), `Stale course count remains: ${stale}`)
 }
