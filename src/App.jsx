@@ -382,8 +382,11 @@ function LessonMedia({ media }) {
   const isBilibili = source.platform === 'Bilibili'
   const isEmbeddable = isYouTube || isBilibili
   const parts = source.parts || []
-  const selectedPage = partByNetwork[network] || source.page || parts[0]?.page || 1
-  const selectedPart = parts.find(item => item.page === selectedPage)
+  const partKey = item => item?.id || item?.page
+  const selectedPartKey = partByNetwork[network] || source.partId || source.page || partKey(parts[0])
+  const selectedPart = parts.find(item => partKey(item) === selectedPartKey)
+  const selectedSourceId = selectedPart?.id || source.id
+  const selectedPage = selectedPart?.page || source.page || 1
   const start = selectedSegment?.start || 0
   const end = selectedSegment?.end || null
   const segmentTiming = source.segmentTiming || {}
@@ -391,11 +394,11 @@ function LessonMedia({ media }) {
   const sourceCanStartAtSegment = isYouTube || segmentTiming.startSupported
   const sourceStopsAtSegmentEnd = isYouTube || segmentTiming.endSupported
   const embed = isYouTube
-    ? `https://www.youtube-nocookie.com/embed/${source.id}?rel=0${start ? `&start=${start}` : ''}${end ? `&end=${end}` : ''}`
-    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : ''
+    ? `https://www.youtube-nocookie.com/embed/${selectedSourceId}?rel=0${start ? `&start=${start}` : ''}${end ? `&end=${end}` : ''}`
+    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${selectedSourceId}&page=${selectedPage}&high_quality=1&danmaku=0${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : ''
   const external = isYouTube
-    ? `https://www.youtube.com/watch?v=${source.id}${start ? `&t=${start}s` : ''}`
-    : isBilibili ? `https://www.bilibili.com/video/${source.id}?p=${selectedPage}${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : source.url
+    ? `https://www.youtube.com/watch?v=${selectedSourceId}${start ? `&t=${start}s` : ''}`
+    : isBilibili ? `https://www.bilibili.com/video/${selectedSourceId}?p=${selectedPage}${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : source.url
   const changeNetwork = value => {
     setNetwork(value)
     setActive(false)
@@ -408,7 +411,7 @@ function LessonMedia({ media }) {
     addEventListener('uth-network-change', receive)
     return () => removeEventListener('uth-network-change', receive)
   }, [])
-  const changePart = page => { setPartByNetwork(current => ({ ...current, [network]: page })); setActive(false) }
+  const changePart = key => { setPartByNetwork(current => ({ ...current, [network]: key })); setActive(false) }
   const changeSegment = id => { setSegmentId(id); setActive(false) }
   const toggleSegment = id => {
     const complete = !segmentProgress[id]
@@ -423,13 +426,14 @@ function LessonMedia({ media }) {
     return `${hours ? `${hours}:` : ''}${hours ? String(minutes).padStart(2, '0') : minutes}:${String(rest).padStart(2, '0')}`
   }
   return <section className="lesson-media">
-    <div className="media-heading"><div><span className="section-no">VIDEO SEMINAR · {source.platform}</span><h2>{t('watchThenBuild')}</h2></div><div className="network-switch" aria-label={t('videoMode')}><button className={network === 'cn' ? 'active' : ''} onClick={() => changeNetwork('cn')}>{t('domestic')}</button><button className={network === 'global' ? 'active' : ''} onClick={() => changeNetwork('global')}>{t('global')}</button></div></div>
+    <div className="media-heading"><div><span className="section-no">VIDEO SEMINAR · {source.platform}</span><h2>{t('watchThenBuild')}</h2></div><div className="network-switch" aria-label={t('videoMode')}><button className={network === 'cn' ? 'active' : ''} aria-pressed={network === 'cn'} onClick={() => changeNetwork('cn')}>{t('domestic')}</button><button className={network === 'global' ? 'active' : ''} aria-pressed={network === 'global'} onClick={() => changeNetwork('global')}>{t('global')}</button></div></div>
     <div className="media-source-line">
-      <span className={`source-badge ${source.sourceType || 'primary'}`}>{network === 'global' ? t('globalOriginal') : (locale === 'en' ? t('curatedVideo') : (source.sourceLabel || t('curatedVideo')))}</span>
+      <span className={`source-badge ${source.sourceType || 'primary'}`}>{network === 'global' ? ((locale === 'en' ? source.sourceLabelEn : source.sourceLabel) || t('globalOriginal')) : (locale === 'en' ? t('curatedVideo') : (source.sourceLabel || t('curatedVideo')))}</span>
       <p>{locale === 'en' ? t('sourceDefault') : (source.sourceNote || t('sourceDefault'))}</p>
       {source.originalUrl && network === 'cn' && <a href={source.originalUrl} target="_blank" rel="noreferrer">{t('originalSource')} <ArrowRight /></a>}
+      {source.referenceUrl && <a href={source.referenceUrl} target="_blank" rel="noreferrer">{t('officialReference')} <ArrowRight /></a>}
     </div>
-    {parts.length > 0 && <div className="media-parts" aria-label={t('selectedParts')}><span>{t('selectedParts')}</span><div>{parts.map(item => <button key={item.page} className={selectedPage === item.page ? 'active' : ''} onClick={() => changePart(item.page)}><b>P{item.page}</b>{item.label}</button>)}</div></div>}
+    {parts.length > 0 && <div className="media-parts" aria-label={t('selectedParts')}><span>{t('selectedParts')}</span><div>{parts.map((item, index) => <button key={partKey(item)} className={selectedPartKey === partKey(item) ? 'active' : ''} onClick={() => changePart(partKey(item))}><b>{item.page ? `P${item.page}` : `V${index + 1}`}</b>{locale === 'en' ? (item.labelEn || item.label) : item.label}</button>)}</div></div>}
     {segments.length > 0 && <div className="media-segments" data-media-segments>
       <div className="segment-summary">
         <span><b>{pick('本节必看','Required')}</b>{media.requiredDuration}</span>
@@ -447,9 +451,9 @@ function LessonMedia({ media }) {
       {selectedSegment && isBilibili && !sourceStopsAtSegmentEnd && <p className="segment-source-note">{locale === 'en' ? segmentTiming.noteEn : segmentTiming.noteZh}</p>}
     </div>}
     <div className="media-frame">
-      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{t('globalOriginal')}</b><p>{resolvedSource ? t('noGlobalEmbed') : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
+      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{network === 'global' ? t('globalOriginal') : t('domesticOriginal')}</b><p>{resolvedSource ? (network === 'global' ? t('noGlobalEmbed') : t('noDomesticEmbed')) : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={locale === 'en' ? (source.titleEn || source.title) : source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
-    <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
+    <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${locale === 'en' ? (selectedPart.labelEn || selectedPart.label) : selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (source.titleEn || source.title || media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
     <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{selectedSegment?.before || media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{selectedSegment?.after || media.after}</p></article></div>
   </section>
 }

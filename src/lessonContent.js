@@ -136,6 +136,9 @@ const mechanismNotes = [
 ]
 
 const biliSources = {
+  cs50p: { platform:'Bilibili', id:'BV1vZfBY9EGa', author:'Futric芯火相传', sourceType:'community', sourceLabel:'社区双语镜像', originalUrl:'https://cs50.harvard.edu/python/', sourceNote:'Harvard CS50P 的完整中英双语社区镜像；按本节精选分P学习，课程要求与勘误仍以 Harvard 官方课程为准。' },
+  d2lData: { platform:'Bilibili', id:'BV1CV411Y7i4', author:'跟李沐学AI', sourceType:'original', sourceLabel:'中文原创课程', originalUrl:'https://courses.d2l.ai/zh-v2/', sourceNote:'李沐《动手学深度学习》官方中文课程的数据操作与预处理章节；用于建立 tensor、shape 和 axis 直觉，NumPy 特有规则仍回到官方指南核对。' },
+  d2lRegression: { platform:'Bilibili', id:'BV1PX4y1g7KC', author:'跟李沐学AI', sourceType:'original', sourceLabel:'中文原创课程', originalUrl:'https://courses.d2l.ai/zh-v2/', sourceNote:'李沐《动手学深度学习》官方中文课程的优化与线性回归实现；观看后必须在本站最小实验中解释 forward、loss、backward 与 update。' },
   karpathy: { platform:'Bilibili', id:'BV1mqrTBvEaf', author:'常青藤中英字幕课程', sourceType:'community', sourceLabel:'社区精译', originalUrl:'https://www.youtube.com/playlist?list=PLAqhIrjkxbuWI23v9cThsA9GvCAUhRvKZ', sourceNote:'Andrej Karpathy 原课的中英字幕镜像；保留原课入口，镜像失效不影响正文学习。' },
   karpathyDeep: {
     platform:'Bilibili', id:'BV16cNEeXEer', author:'KrillinAI小林', sourceType:'community', sourceLabel:'社区双语',
@@ -175,7 +178,8 @@ const biliSources = {
 }
 
 const bili = (source, details = {}) => ({ ...biliSources[source], ...details })
-const part = (page, label) => ({ page, label })
+const part = (page, label, labelEn) => ({ page, label, ...(labelEn ? { labelEn } : {}) })
+const videoPart = (id, label) => ({ id, label })
 const karpathy = (id, title, duration, page, details = {}) => {
   const { cn: cnDetails, ...rest } = details
   return {
@@ -272,10 +276,85 @@ const karpathyMedia = ({ segments, requiredDuration, activityDuration, activityD
 })
 
 const lessonMedia = {
-  'p.1': { platform:'Official course', title:'CS50’s Introduction to Programming with Python', author:'Harvard CS50', duration:'按需选学', url:'https://cs50.harvard.edu/python/', sourceType:'primary', sourceLabel:'大学公开课', sourceNote:'面向零基础的完整免费课程；本节聚焦函数、控制流、容器和错误信息。' },
-  'p.2': { platform:'Official docs', title:'The Python Tutorial', author:'Python Software Foundation', duration:'按需查阅', url:'https://docs.python.org/3/tutorial/', sourceType:'primary', sourceLabel:'官方文档', sourceNote:'用作语义核对和补漏；课程实践以本节的小项目与 pytest 为完成条件。' },
-  'p.3': { platform:'Official docs', title:'NumPy: the absolute basics for beginners', author:'NumPy', duration:'按需选学', url:'https://numpy.org/doc/stable/user/absolute_beginners.html', sourceType:'primary', sourceLabel:'官方入门指南', sourceNote:'从 ndarray、shape、axis、dtype 与广播进入张量思维。' },
-  'p.4': { platform:'Official course', title:'PyTorch Learn the Basics', author:'PyTorch', duration:'按需选学', url:'https://docs.pytorch.org/tutorials/beginner/basics/intro.html', sourceType:'primary', sourceLabel:'官方教程', sourceNote:'覆盖完整机器学习工作流；本节只要求跑通并解释一个最小参数更新。' },
+  'p.1': {
+    ...bili('cs50p', {
+      title:'CS50P · 函数、条件与循环',
+      titleEn:'CS50P · Functions, Conditionals, and Loops',
+      duration:'精选 3 讲',
+      page:2,
+      parts:[part(2,'函数与变量','Functions & Variables'), part(3,'条件句','Conditionals'), part(4,'循环','Loops')],
+    }),
+    global:{
+      platform:'YouTube', id:'JP7ITIXGpHk', title:'CS50P · Functions, Conditionals, and Loops', author:'Harvard CS50',
+      duration:'3 selected lectures', sourceType:'primary', sourceLabel:'Official video',
+      sourceNote:'Harvard CS50P 官方讲座；按本节精选 Functions、Conditionals 与 Loops 三讲。',
+      originalUrl:'https://cs50.harvard.edu/python/',
+      referenceUrl:'https://cs50.harvard.edu/python/',
+      parts:[
+        videoPart('JP7ITIXGpHk','Functions & Variables'),
+        videoPart('_b6NgY_pMdw','Conditionals'),
+        videoPart('-7xg8pGcP6w','Loops'),
+      ],
+    },
+  },
+  'p.2': {
+    ...bili('cs50p', {
+      title:'CS50P · 异常、库、单元测试与文件 I/O',
+      titleEn:'CS50P · Exceptions, Libraries, Unit Tests, and File I/O',
+      duration:'精选 4 讲',
+      page:5,
+      parts:[part(5,'异常','Exceptions'), part(6,'库','Libraries'), part(7,'单元测试','Unit Tests'), part(8,'文件 I/O','File I/O')],
+    }),
+    global:{
+      platform:'YouTube', id:'LW7g1169v7w', title:'CS50P · Exceptions, Libraries, Unit Tests, and File I/O', author:'Harvard CS50',
+      duration:'4 selected lectures', sourceType:'primary', sourceLabel:'Official video',
+      sourceNote:'Harvard CS50P 官方讲座；Python 语义仍以 Python 官方教程核对。',
+      originalUrl:'https://cs50.harvard.edu/python/',
+      referenceUrl:'https://docs.python.org/3/tutorial/',
+      parts:[
+        videoPart('LW7g1169v7w','Exceptions'),
+        videoPart('MztLZWibctI','Libraries'),
+        videoPart('tIrcxwLqzjQ','Unit Tests'),
+        videoPart('KD-Yoel6EVQ','File I/O'),
+      ],
+    },
+  },
+  'p.3': {
+    ...bili('d2lData', {
+      title:'数据操作、Tensor 与预处理',
+      titleEn:'Data Operations, Tensors, and Preprocessing',
+      duration:'精选 3 讲',
+      page:1,
+      parts:[part(1,'数据操作','Data Operations'), part(2,'数据操作实现','Data Operations in Code'), part(3,'数据预处理实现','Data Preprocessing in Code')],
+    }),
+    global:{
+      platform:'YouTube', id:'ZB7BZMhfPgk', title:'Introduction to Numerical Computing with NumPy', author:'Alex Chabot-Leclerc · Enthought',
+      duration:'Full tutorial', sourceType:'community', sourceLabel:'NumPy 官方精选', sourceLabelEn:'NumPy-vetted video',
+      sourceNote:'NumPy 官方 Learn 页面为初学者推荐的完整视频教程；ndarray、shape、axis、dtype、广播和 view/copy 规则仍以官方指南核对。',
+      originalUrl:'https://numpy.org/learn/',
+      referenceUrl:'https://numpy.org/doc/stable/user/absolute_beginners.html',
+    },
+  },
+  'p.4': {
+    ...bili('d2lRegression', {
+      title:'从自动求导到第一条训练循环',
+      titleEn:'From Autograd to a First Training Loop',
+      duration:'精选 3 讲',
+      page:2,
+      parts:[part(2,'基础优化算法','Basic Optimization'), part(3,'线性回归从零实现','Linear Regression from Scratch'), part(4,'线性回归简洁实现','Concise Linear Regression')],
+    }),
+    global:{
+      platform:'YouTube', id:'M0fX15_-xrY', title:'PyTorch · Autograd and Model Training', author:'PyTorch',
+      duration:'2 selected videos', sourceType:'primary', sourceLabel:'Official video',
+      sourceNote:'PyTorch 官方视频串联自动求导与完整训练循环；代码细节仍以 Learn the Basics 官方教程为准。',
+      originalUrl:'https://docs.pytorch.org/tutorials/beginner/introyt/autogradyt_tutorial.html',
+      referenceUrl:'https://docs.pytorch.org/tutorials/beginner/basics/intro.html',
+      parts:[
+        videoPart('M0fX15_-xrY','Autograd'),
+        videoPart('jF43_wj_DCQ','Model Training'),
+      ],
+    },
+  },
   '0.1': karpathyMedia({
     requiredDuration:'30:56',
     activityDuration:'约 14 分钟',
@@ -463,7 +542,10 @@ export function resolveMediaSource(media, network) {
     return media.url && media.sourceType === 'primary' ? media : null
   }
   if (media.platform === 'YouTube') return media
-  if (media.global) return { ...media, ...media.global }
+  if (media.global) {
+    const { parts: _domesticParts, page: _domesticPage, segmentTiming: _domesticTiming, titleEn: _domesticTitleEn, ...shared } = media
+    return { ...shared, ...media.global }
+  }
   const youtube = youtubeSourceFromUrl(media.originalUrl, media)
   if (youtube) return youtube
   return media.originalUrl ? {
