@@ -28,7 +28,7 @@
     <text y="144" font-size="23" font-family="Noto Sans SC, Arial, sans-serif" font-weight="700" fill="#a9c7bd">从 Token、Transformer 到训练、对齐、部署与 Agent</text>
   </g>
   <g transform="translate(82 500)" font-family="Arial, sans-serif" font-size="16" font-weight="700">
-    <rect width="150" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="75" y="29" text-anchor="middle" fill="#baf4df">69 LESSONS</text>
+    <rect width="150" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="75" y="29" text-anchor="middle" fill="#baf4df">88 LESSONS</text>
     <rect x="166" width="150" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="241" y="29" text-anchor="middle" fill="#baf4df">26 WEEKS</text>
     <rect x="332" width="190" height="46" rx="23" fill="#16352b" stroke="#2d6a55"/><text x="427" y="29" text-anchor="middle" fill="#baf4df">ZH / EN · FREE</text>
   </g>

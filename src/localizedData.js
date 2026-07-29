@@ -76,6 +76,7 @@ const lessonEn = {
   '8.4':['DSpark: speculative generation and scheduling','parallel drafting, semi-autoregressive heads, prefix survival, and hardware-aware scheduling','Implement a prefix-survival scheduler under light and heavy load'],
   '8.5':['Diffusion and block-parallel language models','masked diffusion, parallel decoding, block diffusion, and quality-speed tradeoffs','Compare latency models for autoregressive, parallel, and diffusion drafting'],
   '8.6':['Post-training for agents','tool-use trajectories, task synthesis, verifiable environments, and process/outcome rewards','Design a replayable training and evaluation pipeline for a tool-using agent'],
+  '8.7':['Kimi K3: audit a 3T-class open-weight system','KDA, AttnRes, Stable LatentMoE, MXFP4 QAT, million-token agentic RL, and the Kimi K3 License','Build a five-layer audit matrix spanning architecture, training, inference, evaluation, and licensing'],
 }
 
 const moduleEn = {

@@ -429,8 +429,154 @@ function splitTheory(text) {
   return text.split(/[、，,；;]/).map(x => x.trim()).filter(Boolean)
 }
 
+const kimiK3AuditCode = `total_params = 2.8e12
+active_params = 104e9
+routed_experts = 896
+selected_experts = 16
+
+print("total / active:", total_params / active_params)
+print("routed / selected experts:", routed_experts / selected_experts)
+print("hypothetical all-4bit lower bound (TB):", total_params * 4 / 8 / 1e12)
+
+# This is not the actual checkpoint or deployment-memory footprint.
+# K3 reports MXFP4 for MoE expert weights; other weights, scales,
+# activations, KV state, communication buffers and runtime overhead remain.`
+
+function buildKimiK3EnglishMaterial(lesson) {
+  const [id, title, type, duration] = lesson
+  return {
+    id, title, type, duration,
+    objectives: [
+      'Draw the sequence-, depth-, and width-wise information paths behind KDA, AttnRes, and Stable LatentMoE.',
+      'Separate 2.8T total parameters from 104B active parameters, then account for storage, communication, KV state, and runtime overhead.',
+      'Audit an evaluation claim by matching reasoning effort, agent harness, tool access, benchmark split, cost, and preserved failures.',
+      'Distinguish open weights from unrestricted open source and identify when the Kimi K3 License requires a separate commercial review.',
+    ],
+    opening: [
+      'Treat Kimi K3 as a coupled model–training–infrastructure–evaluation–license system, not as a brand scorecard. Every headline number needs a measurement boundary.',
+      'The official report and repository are primary evidence for what Moonshot AI reports. They are not independent reproduction evidence, and released weights do not disclose every training input or operational detail.',
+    ],
+    concepts: [
+      { name:'KDA', note:'Kimi Delta Attention supplies linear recurrent attention for most layers, while periodic Gated MLA layers restore global content-based access. Audit the 3:1 pattern and the final global-attention layer rather than reducing the design to “linear attention”.' },
+      { name:'AttnRes', note:'Attention Residuals let a block selectively read earlier block outputs and embeddings. Track which depth-wise paths are available and what extra state or communication they require.' },
+      { name:'Stable LatentMoE', note:'The model routes through 896 experts and selects 16 per token in a compact latent expert space. RMSNorm, SiTU-GLU, and quantile balancing are stabilization mechanisms, not optional footnotes.' },
+      { name:'MXFP4 QAT', note:'Quantization-aware training begins during post-training and targets MXFP4 expert weights with MXFP8 activations. Do not infer that the entire checkpoint or serving stack occupies four bits per parameter.' },
+      { name:'Million-token agentic RL', note:'The post-training stack combines SFT, long-horizon agentic RL, preserved thinking history, and multiple effort levels. A one-million-token window is capacity; usable long-horizon behavior still needs trajectory and compaction tests.' },
+      { name:'Kimi K3 License', note:'The custom license grants broad rights but includes commercial thresholds and display conditions. “Open weight” describes access to weights; it does not erase license obligations or make the release OSI-approved.' },
+    ],
+    workflow: ['Build an architecture ledger with sequence, depth, and width paths', 'Calculate resource lower bounds and list every excluded runtime term', 'Create an evaluation replay card with matched harness, tools, effort, cost, and failures', 'Run the license decision tree before making a deployment recommendation'],
+    practice: {
+      task: 'Build a five-layer audit matrix spanning architecture, training, inference, evaluation, and licensing',
+      steps: [
+        'Predict: write what 2.8T total, 104B active, 896 routed, 16 selected, and a one-million-token context do—and do not—imply.',
+        'Build: give every claim a source, evidence class, measurement boundary, dependency, and falsification test.',
+        'Verify: cross-check the technical report, official repository, and exact license text; label official claims separately from independent evidence.',
+        'Transfer: apply the same matrix to another open-weight model and record which fields cannot be compared directly.',
+      ],
+      evidence: ['A completed five-layer audit matrix', 'One checked resource calculation with explicit exclusions', 'One benchmark replay card with harness and cost controls', 'A license-boundary note plus one claim marked uncertain or falsified'],
+    },
+    worked: {
+      title:'Audit the headline numbers before comparing scores',
+      steps: [
+        '2.8T / 104B is about 26.9×, while 896 / 16 is 56×; these ratios describe different boundaries and must not be substituted for each other.',
+        'An imaginary all-4-bit lower bound is 1.4 TB, but it is not the checkpoint size or deployment-memory requirement because only expert weights are reported as MXFP4 and runtime state remains.',
+        'Re-score one benchmark only after matching reasoning effort, agent harness, tools, public/private split, sampling, and cost; otherwise mark the comparison non-equivalent.',
+      ],
+      question:'Which conclusion changes first if the harness, tool access, or context-compaction policy differs from the official evaluation?',
+    },
+    code: kimiK3AuditCode,
+    misconception:'“2.8T parameters” does not mean every token computes a dense 2.8T model, and “weights are downloadable” does not mean unrestricted open source or laptop-scale deployment.',
+    quiz: {
+      question:'Which package of evidence supports a defensible Kimi K3 deployment recommendation?',
+      options: [
+        'Matched model config, harness, tools, effort, cost, failure cases, infrastructure assumptions, and license review',
+        'One official benchmark score and the maximum context-window number',
+        'The active-parameter count and a screenshot of a successful prompt',
+      ],
+      explanation:'A system recommendation needs comparable evaluation, realistic resource accounting, preserved failures, and license boundaries—not a single headline metric.',
+    },
+    mastery: ['Explain the three architectural axes without a diagram key.', 'Reproduce the parameter and storage-bound calculations with explicit caveats.', 'Turn an official benchmark row into a replayable evaluation card.', 'Decide whether a proposed use requires commercial-license review and explain why.'],
+    references: ['Kimi K3 Technical Report · arXiv:2607.24653', 'MoonshotAI/Kimi-K3 · official repository', 'Kimi K3 License · exact repository text'],
+    media: null,
+    spotlight: {
+      kicker:'SYSTEM CASE STUDY · KIMI K3',
+      title:'Open weights are not unconditional open source',
+      body:'The Kimi K3 License allows broad use but sets special commercial conditions. A Model-as-a-Service business above US$20M aggregate revenue over a consecutive 12-month period needs a separate agreement before commercial use; very large commercial products or services also face a prominent “Kimi K3” display condition, subject to the license’s stated exemptions.',
+      points:['Released weights do not make the complete training process reproducible.','Official benchmark claims and independent reproduction are different evidence classes.','Commercial thresholds, attribution, branding, and exemptions must be checked against the exact current license.'],
+      note:'Course summary only; not legal advice. Read the exact license before commercial deployment.',
+    },
+  }
+}
+
+function buildKimiK3ChineseMaterial(lesson) {
+  const [id, title, type, duration] = lesson
+  return {
+    id, title, type, duration,
+    objectives: [
+      '画出序列、深度、宽度三条信息流，解释 KDA、AttnRes 与 Stable LatentMoE 分别改变了什么。',
+      '区分 2.8T 总参数与 104B 激活参数，并把存储、通信、KV 状态和运行时开销分别核算。',
+      '按推理强度、Agent harness、工具权限、公开/私有题集、成本和失败样本审计评测声明。',
+      '区分开放权重与无条件开源，识别 Kimi K3 License 何时需要单独商用审查。',
+    ],
+    opening: [
+      '把 Kimi K3 当作模型—训练—基础设施—评测—许可证五个耦合系统，而不是品牌榜单。2.8T、1M context、前沿成绩和“开源”都必须补上测量边界。',
+      '技术报告与官方仓库是一手资料，能证明 Moonshot AI 公布了什么，但不等于第三方已经独立复现；权重可下载也不代表训练数据、训练过程和生产基础设施全部公开。',
+    ],
+    concepts: [
+      { name:'KDA', note:'大部分层用线性递归式的 Kimi Delta Attention，并周期性插入 Gated MLA 恢复全局内容寻址。审计时要核对 3:1 结构和最后的全局注意力层，不能只写“线性注意力”。' },
+      { name:'AttnRes', note:'Attention Residuals 让当前 block 有选择地读取更早 block 和 embedding。要画清深度方向的可访问路径，并核算额外状态与通信。' },
+      { name:'Stable LatentMoE', note:'模型有 896 个路由专家、每 token 选择 16 个，在紧凑 latent expert space 中工作；RMSNorm、SiTU-GLU 和 Quantile Balancing 都是稳定训练的一部分。' },
+      { name:'MXFP4 QAT', note:'量化感知训练从后训练阶段开始，目标是 MXFP4 专家权重与 MXFP8 激活。不能由此推断整个 checkpoint 或服务栈都是每参数 4 bit。' },
+      { name:'Million-token agentic RL', note:'后训练组合 SFT、长时程 Agent RL、保留 thinking history 与多档推理强度。百万 token 是容量上限，真正的长期任务能力仍需轨迹、压缩和恢复测试。' },
+      { name:'Kimi K3 License', note:'这是包含商用门槛和展示条件的定制许可证。“开放权重”描述权重访问方式，不会自动消除许可义务，也不等同于 OSI 意义上的开源。' },
+    ],
+    workflow: ['建立序列—深度—宽度三轴架构台账', '计算资源下界并逐项列出未计入的运行时开销', '制作包含 harness、工具、推理强度、成本与失败样本的评测复现卡', '部署建议进入决策前先走完许可证判断树'],
+    practice: {
+      task:'建立架构—训练—推理—评测—许可证五层审计矩阵',
+      steps: [
+        '预测：先写下 2.8T 总参数、104B 激活参数、896/16 专家路由与百万上下文分别能说明什么、不能说明什么。',
+        '构建：为每条声明补齐来源、证据等级、测量边界、依赖条件和可证伪实验。',
+        '验证：交叉核对技术报告、官方仓库与许可证原文；把官方声明和独立证据分栏记录。',
+        '迁移：把同一矩阵用于另一个开放权重模型，标出无法直接横向比较的字段。',
+      ],
+      evidence:['一份完成的五层审计矩阵', '一项写清排除项的资源手算', '一张包含 harness 与成本控制的评测复现卡', '一份许可证边界说明，以及至少一条“不确定或被推翻”的声明'],
+    },
+    worked: {
+      title:'先审计头条数字，再讨论榜单',
+      steps: [
+        '2.8T / 104B 约为 26.9 倍，896 / 16 为 56 倍；两者边界不同，不能互相替代。',
+        '假设全部参数都是 4 bit，理论存储下界是 1.4 TB；但官方只说明专家权重使用 MXFP4，其他权重、scale、激活、KV、通信 buffer 和运行时仍需另算。',
+        '只有当推理强度、Agent harness、工具、公开/私有题集、采样和成本匹配时，benchmark 才能直接比较；否则应标为非等价证据。',
+      ],
+      question:'如果 harness、工具权限或上下文压缩策略变化，原评测结论中哪一项会最先失效？',
+    },
+    code: kimiK3AuditCode,
+    misconception:'“2.8T 参数”不等于每个 token 都进行 2.8T 稠密计算；“权重可下载”也不等于无条件开源或个人电脑可部署。',
+    quiz: {
+      question:'哪组证据足以支持一份可辩护的 Kimi K3 部署建议？',
+      options:[
+        '匹配的模型配置、harness、工具、推理强度、成本、失败样本、基础设施假设与许可证审查',
+        '一项官方 benchmark 分数和最大上下文数字',
+        '激活参数量和一次成功对话截图',
+      ],
+      explanation:'系统级建议必须同时具备可比评测、真实资源账、失败证据与许可证边界，不能依赖单个头条指标。',
+    },
+    mastery:['闭卷解释三条架构轴及其耦合关系。', '复算参数与存储下界，并明确所有限定条件。', '把一行官方 benchmark 改写为可复现评测卡。', '判断一个拟议用途是否需要商用许可复核，并说明依据。'],
+    references:['Kimi K3 Technical Report · arXiv:2607.24653', 'MoonshotAI/Kimi-K3 · 官方仓库', 'Kimi K3 License · 仓库许可证原文'],
+    media:null,
+    spotlight:{
+      kicker:'SYSTEM CASE STUDY · KIMI K3',
+      title:'开放权重不是无条件开源',
+      body:'Kimi K3 License 给予广泛使用权，但包含特殊商用条件：连续 12 个月累计收入超过 2,000 万美元的 Model-as-a-Service 业务，在商用前需要另行协议；超大规模商业产品或服务还可能触发显著展示“Kimi K3”的条件，并以许可证列出的豁免为准。',
+      points:['发布权重不等于完整训练过程可复现。', '官方 benchmark 声明与第三方独立复现是不同证据等级。', '商用门槛、署名、品牌展示和豁免都必须回到当前许可证原文核对。'],
+      note:'本节是学习性摘要，不构成法律意见；商用部署前请阅读许可证原文并进行专业审查。',
+    },
+  }
+}
+
 function buildEnglishLessonMaterial(module, lesson) {
   const [id, title, type, duration, theory, practice] = lesson
+  if (id === '8.7') return buildKimiK3EnglishMaterial(lesson)
   const concepts = splitTheory(theory)
   const workflow = ['Define the smallest observable question', 'Build the minimal correct mechanism', 'Compare against a baseline or reference', 'Change one condition and explain the result']
   const media = lessonMedia[id]
@@ -482,6 +628,7 @@ function buildEnglishLessonMaterial(module, lesson) {
 export function buildLessonMaterial(module, lesson, locale = 'zh') {
   if (locale === 'en') return buildEnglishLessonMaterial(module, lesson)
   const [id, title, type, duration, theory, practice] = lesson
+  if (id === '8.7') return buildKimiK3ChineseMaterial(lesson)
   const profile = profiles[module.id] || profiles.foundations
   const workflow = typeGuides[type] || typeGuides['理论']
   const concepts = splitTheory(theory)

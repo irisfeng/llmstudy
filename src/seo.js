@@ -17,7 +17,7 @@ export function getHomeSeo(locale = 'zh', trackId = 'llm') {
       : (isZh ? 'LLM Study · 从原理到系统的大模型课程' : 'LLM Study · Build Large Language Models from First Principles'),
     description: isWorld
       ? (isZh ? '12节世界模型系统课：POMDP、隐空间动力学、Dreamer、MuZero、JEPA、Genie、Marble、Cosmos与评测。' : 'A 12-lesson world-model path through POMDPs, latent dynamics, Dreamer, MuZero, JEPA, Genie, Marble, Cosmos, and evaluation.')
-      : (isZh ? '75节系统课程，从Token、反向传播和Transformer，到推理模型、训练、对齐、部署与Agent。' : 'A 75-lesson path from tokens, backpropagation, and Transformers to reasoning models, training, post-training, inference, and agents.'),
+      : (isZh ? '76节系统课程，从Token、反向传播和Transformer，到推理模型、训练、对齐、部署、Agent与Kimi K3系统审计。' : 'A 76-lesson path from tokens, backpropagation, and Transformers to reasoning models, training, post-training, inference, agents, and a Kimi K3 system audit.'),
     canonical: absolute(trackPath(trackId, locale)),
     alternates: { zh: absolute(trackPath(trackId, 'zh')), en: absolute(trackPath(trackId, 'en')) },
     type: 'website',

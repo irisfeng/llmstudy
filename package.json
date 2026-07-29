@@ -15,6 +15,7 @@
     "qa:seo": "node scripts/seo-check.mjs",
     "qa:routes": "node scripts/route-check.mjs",
     "qa:world": "node scripts/world-model-check.mjs",
+    "qa:kimi-k3": "node scripts/kimi-k3-content-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"
   },
   "dependencies": {
