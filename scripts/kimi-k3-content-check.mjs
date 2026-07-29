@@ -18,9 +18,9 @@ const lesson = frontier?.lessons.find(item => item[0] === '8.7')
 const englishFrontier = localizeModules(modules, 'en').find(module => module.id === 'frontier-llm')
 const englishLesson = englishFrontier?.lessons.find(item => item[0] === '8.7')
 
-check(llmLessons.length === 76, `Expected 76 LLM lessons, found ${llmLessons.length}`)
+check(llmLessons.length === 80, `Expected 80 LLM lessons, found ${llmLessons.length}`)
 check(worldLessons.length === 12, `Expected 12 World Models lessons, found ${worldLessons.length}`)
-check(lessonRoutes.length === 88, `Expected 88 total routes, found ${lessonRoutes.length}`)
+check(lessonRoutes.length === 92, `Expected 92 total routes, found ${lessonRoutes.length}`)
 check(frontier?.weeks === '4 周' && frontier?.hours === 32, 'Frontier module duration was not expanded to four weeks / 32 hours')
 check(frontier?.lessons.at(-1)?.[0] === '8.7', 'Kimi K3 lesson must be the final frontier lesson')
 check(Boolean(lesson) && Boolean(englishLesson), 'Kimi K3 lesson is missing in one locale')
@@ -52,14 +52,14 @@ const requiredUrls = [
 for (const url of requiredUrls) check(resources.some(resource => resource.url === url), `Missing official Kimi K3 resource: ${url}`)
 
 const countExpectations = {
-  'README.md': ['LLM 9 个阶段、76 节', '88 节课程'],
-  'src/App.jsx': ['76 节中英双语课程', '<small>76 '],
-  'src/auth.jsx': ['88 节课', 'all 88 lessons'],
-  'src/seo.js': ['76节系统课程', 'A 76-lesson path'],
-  'scripts/prerender-seo.mjs': ['76节深度课', '76 lessons spanning'],
-  'docs/free-promotion-plan.md': ['88 节双路线'],
-  'promotion/ready-to-post.md': ['88 节 AI 系统课', '目前有 88 节课', '88 节中英双语课'],
-  'public/og-cover.svg': ['88 LESSONS'],
+  'README.md': ['LLM 10 个阶段、80 节', '92 节课程'],
+  'src/App.jsx': ['80 节中英双语课程', '<small>80 '],
+  'src/auth.jsx': ['92 节课', 'all 92 lessons'],
+  'src/seo.js': ['80节系统课程', 'An 80-lesson path'],
+  'scripts/prerender-seo.mjs': ['80节深度课', '80 lessons spanning'],
+  'docs/free-promotion-plan.md': ['92 节双路线'],
+  'promotion/ready-to-post.md': ['92 节 AI 系统课', '目前有 92 节课', '92 节中英双语课'],
+  'public/og-cover.svg': ['92 LESSONS'],
 }
 const countFileText = Object.fromEntries(Object.keys(countExpectations).map(file => [
   file,
@@ -81,4 +81,4 @@ if (failures.length) {
   process.exit(1)
 }
 
-console.log('Kimi K3 content check passed: 76 LLM lessons, 88 total routes, bilingual audit material, official sources, and count consistency.')
+console.log('Kimi K3 content check passed: 80 LLM lessons, 92 total routes, bilingual audit material, official sources, and count consistency.')

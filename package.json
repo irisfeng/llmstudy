@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
-    "build": "vite build && node scripts/prerender-seo.mjs",
+    "build": "npm run qa:content && vite build && node scripts/prerender-seo.mjs && npm run qa:seo",
     "preview": "vite preview --host 0.0.0.0",
     "qa:i18n": "node scripts/i18n-media-check.mjs",
     "qa:geo": "node scripts/geo-content-check.mjs",
@@ -14,6 +14,8 @@
     "qa:promotion": "node scripts/promotion-check.mjs",
     "qa:seo": "node scripts/seo-check.mjs",
     "qa:routes": "node scripts/route-check.mjs",
+    "qa:curriculum": "node scripts/foundations-ak-content-check.mjs",
+    "qa:content": "npm run qa:curriculum && npm run qa:kimi-k3 && npm run qa:geo && npm run qa:promotion",
     "qa:world": "node scripts/world-model-check.mjs",
     "qa:kimi-k3": "node scripts/kimi-k3-content-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"

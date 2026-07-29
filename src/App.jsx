@@ -113,7 +113,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
-          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('76 节中英双语课程，从反向传播、Transformer 到推理模型、部署与 Agent。','76 bilingual lessons from backpropagation and Transformers to reasoning models, serving, and agents.')} />
+          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('80 节中英双语课程，从 Python 先修、反向传播、Transformer 到推理模型、部署与 Agent。','80 bilingual lessons from Python prerequisites and backpropagation to Transformers, reasoning models, serving, and agents.')} />
         </div>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <div className="signal-line" />
@@ -123,7 +123,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
       <CurrentLesson goLesson={goLesson} trackId={trackId} />
     </section>
     <section className="track-chooser" aria-label={pick('两条学习路线','Two learning tracks')}>
-      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>76 {pick('节','lessons')} · 9 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>80 {pick('节','lessons')} · 10 {pick('阶段','phases')}</small><ArrowRight /></button>
       <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
     </section>
     <Roadmap modulesData={localized} trackId={trackId} />
@@ -160,11 +160,12 @@ function Roadmap({ modulesData = modules, trackId = 'llm' }) {
   const { pick } = useI18n()
   const isWorld = trackId === 'world-models'
   const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
+  const currentIndex = isWorld ? 0 : modulesData.findIndex(module => module.id === 'autograd')
   return <section className="roadmap-block">
-    <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '29 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '250–290'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {mediaLessons} {pick('节视频研讨','video seminars')}</p></div>
+    <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '32 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '262–302'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {mediaLessons} {pick('节视频研讨','video seminars')}</p></div>
     <div className="roadmap-rail">
-      {modulesData.map((m, i) => <div className={`road-stop ${i === 1 ? 'current' : ''} ${i === 0 ? 'done' : ''}`} key={m.id}>
-        <span>{i === 0 ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
+      {modulesData.map((m, i) => <div className={`road-stop ${i === currentIndex ? 'current' : ''} ${i < currentIndex ? 'done' : ''}`} key={m.id}>
+        <span>{i < currentIndex ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
       </div>)}
     </div>
   </section>
@@ -209,7 +210,7 @@ function Curriculum({ selected, setSelected, goLesson, completed, trackId }) {
     <header className="page-lead">
       <span className="section-no">THE COMPLETE PATH</span>
       <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
-      <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('29 周不是速成承诺，而是一套持续更新、可验证的能力建造计划。每阶段都以作品和掌握门结束。','This is not a 29-week shortcut. It is an updated, verifiable capability-building plan; every phase ends with a project and a mastery gate.')}</p>
+      <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('32 周包含可跳过的 3 周零基础先修；主线仍是一套持续更新、可验证的能力建造计划，每阶段都以作品和掌握门结束。','The 32-week plan includes an optional three-week prerequisite sprint; every phase still ends with a project and mastery gate.')}</p>
       <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span><span><b>{mediaLessons}</b> {pick('视频研讨','video seminars')}</span><span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
     </header>
     <div className="curriculum-layout">
@@ -304,7 +305,7 @@ function LessonView({ info, onBack, onNavigate, theme, toggleTheme, complete, on
   const [tab, setTab] = useState('代码')
   const [ran, setRan] = useState(false)
   const localized = useMemo(() => localizeModules(modules, locale), [locale])
-  const fallbackModule = localized[1]
+  const fallbackModule = localized[2]
   const module = info?.module || fallbackModule
   const lesson = info?.lesson || fallbackModule.lessons[2]
   const lessonKey = `uth-lesson-${lesson[0]}`
@@ -368,6 +369,13 @@ function LessonMedia({ media }) {
   const [active, setActive] = useState(false)
   const [network, setNetwork] = useState(() => localStorage.getItem('uth-network') || ((navigator.language === 'zh-CN' || Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Shanghai') ? 'cn' : 'global'))
   const [partByNetwork, setPartByNetwork] = useState({})
+  const segments = media.segments || []
+  const [segmentId, setSegmentId] = useState(() => segments[0]?.id || null)
+  const [segmentProgress, setSegmentProgress] = useState(() => Object.fromEntries(segments.map(segment => [
+    segment.id,
+    localStorage.getItem(`mediaProgress:${media.resourceId || media.id}:${segment.id}`) === 'complete',
+  ])))
+  const selectedSegment = segments.find(segment => segment.id === segmentId) || segments[0] || null
   const resolvedSource = resolveMediaSource(media, network)
   const source = resolvedSource || { platform:'Original', title:media.title, author:media.author, duration:media.duration }
   const isYouTube = source.platform === 'YouTube'
@@ -376,10 +384,18 @@ function LessonMedia({ media }) {
   const parts = source.parts || []
   const selectedPage = partByNetwork[network] || source.page || parts[0]?.page || 1
   const selectedPart = parts.find(item => item.page === selectedPage)
+  const start = selectedSegment?.start || 0
+  const end = selectedSegment?.end || null
+  const segmentTiming = source.segmentTiming || {}
+  const sourceStart = Math.max(0, start + (segmentTiming.offsetSeconds || 0))
+  const sourceCanStartAtSegment = isYouTube || segmentTiming.startSupported
+  const sourceStopsAtSegmentEnd = isYouTube || segmentTiming.endSupported
   const embed = isYouTube
-    ? `https://www.youtube-nocookie.com/embed/${source.id}?rel=0`
-    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0` : ''
-  const external = isYouTube ? `https://www.youtube.com/watch?v=${source.id}` : isBilibili ? `https://www.bilibili.com/video/${source.id}?p=${selectedPage}` : source.url
+    ? `https://www.youtube-nocookie.com/embed/${source.id}?rel=0${start ? `&start=${start}` : ''}${end ? `&end=${end}` : ''}`
+    : isBilibili ? `https://player.bilibili.com/player.html?bvid=${source.id}&page=${selectedPage}&high_quality=1&danmaku=0${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : ''
+  const external = isYouTube
+    ? `https://www.youtube.com/watch?v=${source.id}${start ? `&t=${start}s` : ''}`
+    : isBilibili ? `https://www.bilibili.com/video/${source.id}?p=${selectedPage}${sourceCanStartAtSegment && sourceStart ? `&t=${sourceStart}` : ''}` : source.url
   const changeNetwork = value => {
     setNetwork(value)
     setActive(false)
@@ -393,6 +409,19 @@ function LessonMedia({ media }) {
     return () => removeEventListener('uth-network-change', receive)
   }, [])
   const changePart = page => { setPartByNetwork(current => ({ ...current, [network]: page })); setActive(false) }
+  const changeSegment = id => { setSegmentId(id); setActive(false) }
+  const toggleSegment = id => {
+    const complete = !segmentProgress[id]
+    localStorage.setItem(`mediaProgress:${media.resourceId || media.id}:${id}`, complete ? 'complete' : 'pending')
+    setSegmentProgress(current => ({ ...current, [id]:complete }))
+    trackEvent('video_segment_progressed', { resource_id:media.resourceId || media.id, segment_id:id, complete })
+  }
+  const formatTime = seconds => {
+    const hours = Math.floor(seconds / 3600)
+    const minutes = Math.floor((seconds % 3600) / 60)
+    const rest = seconds % 60
+    return `${hours ? `${hours}:` : ''}${hours ? String(minutes).padStart(2, '0') : minutes}:${String(rest).padStart(2, '0')}`
+  }
   return <section className="lesson-media">
     <div className="media-heading"><div><span className="section-no">VIDEO SEMINAR · {source.platform}</span><h2>{t('watchThenBuild')}</h2></div><div className="network-switch" aria-label={t('videoMode')}><button className={network === 'cn' ? 'active' : ''} onClick={() => changeNetwork('cn')}>{t('domestic')}</button><button className={network === 'global' ? 'active' : ''} onClick={() => changeNetwork('global')}>{t('global')}</button></div></div>
     <div className="media-source-line">
@@ -401,11 +430,27 @@ function LessonMedia({ media }) {
       {source.originalUrl && network === 'cn' && <a href={source.originalUrl} target="_blank" rel="noreferrer">{t('originalSource')} <ArrowRight /></a>}
     </div>
     {parts.length > 0 && <div className="media-parts" aria-label={t('selectedParts')}><span>{t('selectedParts')}</span><div>{parts.map(item => <button key={item.page} className={selectedPage === item.page ? 'active' : ''} onClick={() => changePart(item.page)}><b>P{item.page}</b>{item.label}</button>)}</div></div>}
+    {segments.length > 0 && <div className="media-segments" data-media-segments>
+      <div className="segment-summary">
+        <span><b>{pick('本节必看','Required')}</b>{media.requiredDuration}</span>
+        <span><b>{pick('本节活动','Activities')}</b>{locale === 'en' ? (media.activityDurationEn || media.activityDuration) : media.activityDuration}</span>
+        <span><b>{pick('原始资源','Full source')}</b>{media.resourceDuration || media.duration}</span>
+      </div>
+      <div className="segment-list">{segments.map((segment, index) => <article key={segment.id} className={`${segment.id === selectedSegment?.id ? 'active' : ''} ${segmentProgress[segment.id] ? 'complete' : ''}`}>
+        <button className="segment-select" aria-current={segment.id === selectedSegment?.id ? 'true' : undefined} onClick={() => changeSegment(segment.id)}>
+          <span>{String(index + 1).padStart(2, '0')} · {segment.role.toUpperCase()}</span>
+          <b>{locale === 'en' ? segment.title : segment.titleZh}</b>
+          <small>{formatTime(segment.start)}–{formatTime(segment.end)} · {formatTime(segment.end - segment.start)}</small>
+        </button>
+        <button className="segment-check" aria-label={pick('切换片段完成状态','Toggle segment completion')} aria-pressed={Boolean(segmentProgress[segment.id])} onClick={() => toggleSegment(segment.id)}>{segmentProgress[segment.id] ? <CheckCircle weight="fill" /> : <Circle />}</button>
+      </article>)}</div>
+      {selectedSegment && isBilibili && !sourceStopsAtSegmentEnd && <p className="segment-source-note">{locale === 'en' ? segmentTiming.noteEn : segmentTiming.noteZh}</p>}
+    </div>}
     <div className="media-frame">
       {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{t('globalOriginal')}</b><p>{resolvedSource ? t('noGlobalEmbed') : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
-    <div className="media-meta"><div><span>{source.author} · {source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{locale === 'en' ? (media.globalTitle || media.title) : source.title}</h3></div>{isEmbeddable && external && <a href={external} target="_blank" rel="noreferrer">{t('openExternal')} <ArrowRight /></a>}</div>
-    <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{media.after}</p></article></div>
+    <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
+    <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{selectedSegment?.before || media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{selectedSegment?.after || media.after}</p></article></div>
   </section>
 }
 
@@ -488,7 +533,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <section id="study-2" className="study-section">
           <span className="section-no">03 · BUILD & VERIFY</span><h2>{material.practice.task}</h2>
           <div className="practice-steps">{material.practice.steps.map((x, i) => <article key={x}><span>{i + 1}</span><p>{x}</p></article>)}</div>
-          <div className="study-code"><div><span>minimal_experiment.py</span><em>{t('copyable')}</em></div><pre><code>{material.code}</code></pre></div>
+          <div className="study-code"><div><span>{material.codeLabel || 'minimal_experiment.py'}</span><em>{t('copyable')}</em></div><pre><code>{material.code}</code></pre></div>
           <div className="evidence-box"><div><span className="section-no">EVIDENCE PACK</span><h3>{t('evidencePack')}</h3></div><ul>{material.practice.evidence.map(x => <li key={x}><CheckCircle />{x}</li>)}</ul></div>
         </section>
 
@@ -567,7 +612,7 @@ export default function App() {
   const localizedModules = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const flatLessons = useMemo(() => flattenLessons(localizedModules), [localizedModules])
   const [view, setView] = useState('home')
-  const [moduleIndex, setModuleIndex] = useState(1)
+  const [moduleIndex, setModuleIndex] = useState(2)
   const [lessonInfo, setLessonInfo] = useState(null)
   const [mobileNav, setMobileNav] = useState(false)
   const [search, setSearch] = useState(false)
@@ -578,7 +623,7 @@ export default function App() {
   const saveNote = useCallback((id, note) => sync.saveLesson(id, { note }, { debounce: true }), [sync.saveLesson])
   const trackCompleted = flatLessons.filter(item => completed.has(item.lesson[0])).length
   const progress = Math.round((trackCompleted / flatLessons.length) * 100)
-  const openLesson = (module = localizedModules[trackId === 'world-models' ? 0 : 1], lesson = module.lessons[trackId === 'world-models' ? 0 : 2], index = trackId === 'world-models' ? 0 : 2, targetTrack = trackId) => {
+  const openLesson = (module = localizedModules[trackId === 'world-models' ? 0 : 2], lesson = module.lessons[trackId === 'world-models' ? 0 : 2], index = trackId === 'world-models' ? 0 : 2, targetTrack = trackId) => {
     if (targetTrack !== trackId) setTrackId(targetTrack)
     setLessonInfo({ module, lesson, index }); setView('lesson'); setSearch(false)
     const nextPath = lessonPath(lesson[0], locale)
