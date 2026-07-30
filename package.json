@@ -16,13 +16,16 @@
     "qa:routes": "node scripts/route-check.mjs",
     "qa:curriculum": "node scripts/foundations-ak-content-check.mjs",
     "qa:content": "npm run qa:curriculum && npm run qa:kimi-k3 && npm run qa:geo && npm run qa:promotion",
-    "qa:world": "node scripts/world-model-check.mjs",
     "qa:kimi-k3": "node scripts/kimi-k3-content-check.mjs",
+    "qa:world-content": "node scripts/world-content-check.mjs",
+    "qa:world": "npm run qa:world-content && node scripts/world-model-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"
   },
   "dependencies": {
+    "@fontsource/caveat": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@fontsource/noto-sans-sc": "^5.2.9",
+    "@fontsource/zhi-mang-xing": "^5.3.0",
     "@phosphor-icons/react": "^2.1.10",
     "@supabase/supabase-js": "^2.57.4",
     "@vercel/analytics": "^2.0.1",

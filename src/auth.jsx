@@ -197,6 +197,9 @@ export function useLearningSync({ lessonIds, completed, setCompleted, theme, set
       setCompleted(mergedCompleted)
       if (profile?.theme === 'dark' || profile?.theme === 'light') setTheme(profile.theme)
       if (profile?.network_mode) localStorage.setItem('uth-network', profile.network_mode)
+      if (profile?.last_lesson_id && !localStorage.getItem('uth-last-lesson')) {
+        localStorage.setItem('uth-last-lesson', JSON.stringify({ id: profile.last_lesson_id, trackId: profile.last_lesson_id.startsWith('wm.') ? 'world-models' : 'llm', at: Date.now() }))
+      }
 
       if (imports.length) {
         const { error } = await supabase.from('lesson_state').upsert(imports, { onConflict: 'user_id,lesson_id' })

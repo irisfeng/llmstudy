@@ -16,11 +16,31 @@ import { legacyLessonId, lessonPath, matchSitePath, trackPath } from './lessonRo
 import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
 import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
 import { ShareButton } from './ShareDialog.jsx'
+import {
+  DoodleArrow, DoodleBook, DoodleCheck, DoodleCircle, DoodleFlask, DoodleLoop,
+  DoodleNetwork, DoodleRail, DoodleRocket, DoodleSpark, DoodleStar, DoodleTape,
+  DoodleTarget, DoodleUnderline, DoodleWarn, DoodleWorld,
+} from './doodles.jsx'
 
 const flattenLessons = data => data.flatMap((m) => m.lessons.map((l, i) => ({ module: m, lesson: l, index: i })))
 const lessonIds = [...flattenLessons(modules), ...flattenLessons(worldModules)].map(x => x.lesson[0])
 const trackModules = (trackId, locale) => trackId === 'world-models' ? localizeWorldModules(locale) : localizeModules(modules, locale)
 const trackResources = trackId => trackId === 'world-models' ? worldResources : resources
+
+const LAST_LESSON_KEY = 'uth-last-lesson'
+const readLastLesson = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(LAST_LESSON_KEY) || 'null')
+    return parsed && lessonIds.includes(parsed.id) ? parsed : null
+  } catch { return null }
+}
+const resolveLastLesson = (locale) => {
+  const last = readLastLesson()
+  if (!last) return null
+  const trackId = last.trackId === 'world-models' ? 'world-models' : 'llm'
+  const found = flattenLessons(trackModules(trackId, locale)).find(x => x.lesson[0] === last.id)
+  return found ? { ...found, trackId } : null
+}
 
 const navItems = [
   ['home', 'overview', House], ['path', 'path', Rows], ['labs', 'labs', Flask],
@@ -98,41 +118,46 @@ function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, use
   </header>
 }
 
-function Dashboard({ goLesson, setView, trackId, onTrack }) {
+function Dashboard({ goLesson, setView, trackId, onTrack, completed = new Set(), notesCount = 0, resume = null }) {
   const { pick, locale } = useI18n()
   const localized = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const isWorld = trackId === 'world-models'
+  const flat = flattenLessons(localized)
+  const trackResume = resume?.trackId === trackId ? resume : null
+  const currentModule = localized.find(m => !m.lessons.every(l => completed.has(l[0])))
   return <main className="page dashboard-page">
     <section className="hero-grid">
       <div className="hero-copy">
         <span className="hero-track-label">{isWorld ? 'WORLD MODELS COURSE' : 'LLM SYSTEMS COURSE'}</span>
-        <h1>{isWorld ? pick('别只生成画面。','Don’t just generate frames.') : pick('别只会调用模型。','Don’t just call a model.')}<br /><em>{isWorld ? pick('学会预测世界。','Learn to predict worlds.') : pick('亲手造一个。','Build one yourself.')}</em></h1>
+        <h1>{isWorld ? pick('别只生成画面。','Don’t just generate frames.') : pick('别只会调用模型。','Don’t just call a model.')}<br /><em>{isWorld ? pick('学会预测世界。','Learn to predict worlds.') : pick('亲手造一个。','Build one yourself.')}<DoodleUnderline className="em-swash" /></em></h1>
         <p>{isWorld
           ? pick('从状态、动作与隐空间动力学，到 JEPA、Genie、空间智能与 Physical AI。判断一个模型是否真的能理解、预测和规划。','From state, action, and latent dynamics to JEPA, Genie, spatial intelligence, and physical AI. Learn when a model can truly predict and plan.')
           : pick('从 0 到 1 拆开大模型：推导、实现、训练、推理、对齐、部署，并补入 2025-2026 前沿系统。','Take an LLM apart from first principles, then connect it to 2025-2026 advances in reasoning, sparse architecture, and serving.')}</p>
         <div className="hero-actions">
-          <button className="primary" onClick={goLesson}>{pick('继续学习','Continue learning')} <ArrowRight weight="bold" /></button>
+          <button className="primary" onClick={goLesson}>{resume ? pick('继续学习','Continue learning') : pick('开始学习','Start learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
           <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('80 节中英双语课程，从 Python 先修、反向传播、Transformer 到推理模型、部署与 Agent。','80 bilingual lessons from Python prerequisites and backpropagation to Transformers, reasoning models, serving, and agents.')} />
         </div>
+        <p className="hero-note"><DoodleArrow className="hero-note-arrow" /><span className="hand">{pick('不用注册，点开就学','No sign-up — just start')}</span></p>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
-          <div className="signal-line" />
+          <DoodleRail className="signal-doodle" />
+          <DoodleStar className="signal-star" />
           {(isWorld ? ['STATE', 'DYNAMICS', 'JEPA', 'WORLDS', 'PHYSICAL AI'] : ['TOKENS', 'BACKPROP', 'GPT', 'REASONING', 'AGENTS']).map((x, i) => <span key={x} style={{ left: `${i * 24.5}%`, top: i % 2 ? 57 : 26 }}>{x}</span>)}
         </div>
       </div>
-      <CurrentLesson goLesson={goLesson} trackId={trackId} />
+      <CurrentLesson goLesson={goLesson} trackId={trackId} resume={trackResume} completed={completed} />
     </section>
     <section className="track-chooser" aria-label={pick('两条学习路线','Two learning tracks')}>
-      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>80 {pick('节','lessons')} · 10 {pick('阶段','phases')}</small><ArrowRight /></button>
-      <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><span>WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'llm' ? 'active' : ''} onClick={() => onTrack('llm')}><DoodleNetwork className="track-doodle" /><span>LLM</span><strong>{pick('语言模型系统课','Language Model Systems')}</strong><small>80 {pick('节','lessons')} · 10 {pick('阶段','phases')}</small><ArrowRight /></button>
+      <button className={trackId === 'world-models' ? 'active' : ''} onClick={() => onTrack('world-models')}><DoodleWorld className="track-doodle" /><span>WORLD MODELS</span><strong>{pick('从预测到空间智能','From Prediction to Spatial AI')}</strong><small>12 {pick('节','lessons')} · 5 {pick('阶段','phases')}</small><ArrowRight /></button>
     </section>
-    <Roadmap modulesData={localized} trackId={trackId} />
+    <Roadmap modulesData={localized} trackId={trackId} completed={completed} />
     <section className="dashboard-lower">
       <Today goLesson={goLesson} />
-      <MasteryPanel />
+      <MasteryPanel completedCount={flat.filter(x => completed.has(x.lesson[0])).length} total={flat.length} notesCount={notesCount} currentShort={currentModule?.short} />
     </section>
     <section className="method-strip">
-      <div><span className="section-no">LEARNING LOOP</span><h2>{pick('80% 掌握，靠四次经过同一知识','Reach 80% mastery by revisiting each idea four ways')}</h2></div>
+      <div><span className="section-no">LEARNING LOOP</span><h2>{pick('80% 掌握，靠四次经过同一知识','Reach 80% mastery by revisiting each idea four ways')}</h2><DoodleLoop className="loop-doodle" /></div>
       <div className="loop-steps">
         {(locale === 'zh' ? ['建立直觉', '推导公式', '从零实现', '诊断迁移'] : ['Build intuition', 'Derive it', 'Implement it', 'Diagnose & transfer']).map((x, i) => <div key={x}><span>0{i + 1}</span><strong>{x}</strong></div>)}
       </div>
@@ -140,9 +165,23 @@ function Dashboard({ goLesson, setView, trackId, onTrack }) {
   </main>
 }
 
-function CurrentLesson({ goLesson, trackId }) {
+function CurrentLesson({ goLesson, trackId, resume = null, completed = new Set() }) {
   const { pick } = useI18n()
   const isWorld = trackId === 'world-models'
+  if (resume) {
+    const doneCount = resume.module.lessons.filter(l => completed.has(l[0])).length
+    return <article className="current-lesson">
+      <div className="current-meta"><span><i /> {pick('接着上次','CONTINUE')}</span><span>{resume.lesson[3]}</span></div>
+      <span className="chapter-code">{resume.module.no} · {resume.module.title}</span>
+      <h2>{resume.lesson[1]}</h2>
+      <p>{resume.lesson[4]}</p>
+      <div className="resume-box">
+        <div className="resume-rail">{resume.module.lessons.map(l => <span key={l[0]} className={completed.has(l[0]) ? 'done' : l[0] === resume.lesson[0] ? 'now' : ''} />)}</div>
+        <small>{doneCount} / {resume.module.lessons.length} · {pick('本阶段已完成','done in this phase')}</small>
+      </div>
+      <button className="lesson-continue" onClick={goLesson}>{pick('继续这一节','Resume this lesson')} <ArrowRight /></button>
+    </article>
+  }
   return <article className="current-lesson">
     <div className="current-meta"><span><i /> {pick('推荐起点','START HERE')}</span><span>{isWorld ? 'W0 · 01' : '01 · 03'}</span></div>
     <span className="chapter-code">{isWorld ? pick('W0 · 定义与状态','W0 · DEFINITIONS & STATE') : pick('01 · 神经网络地基','01 · NEURAL FOUNDATIONS')}</span>
@@ -156,16 +195,18 @@ function CurrentLesson({ goLesson, trackId }) {
   </article>
 }
 
-function Roadmap({ modulesData = modules, trackId = 'llm' }) {
+function Roadmap({ modulesData = modules, trackId = 'llm', completed = new Set() }) {
   const { pick } = useI18n()
   const isWorld = trackId === 'world-models'
   const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
-  const currentIndex = isWorld ? 0 : modulesData.findIndex(module => module.id === 'autograd')
+  const firstOpen = modulesData.findIndex(m => !m.lessons.every(l => completed.has(l[0])))
+  const isDone = i => firstOpen === -1 || i < firstOpen
   return <section className="roadmap-block">
     <div className="section-title-row"><div><span className="section-no">ROADMAP · {isWorld ? '12 WEEKS' : '32 WEEKS'}</span><h2>{isWorld ? pick('从状态到可行动的世界','From state to actionable worlds') : pick('从字符到智能系统','From characters to intelligent systems')}</h2></div><p>{isWorld ? '70–85' : '262–302'} {pick('小时','hours')} · {flattenLessons(modulesData).length} {pick('节深度课','deep lessons')} · {mediaLessons} {pick('节视频研讨','video seminars')}</p></div>
     <div className="roadmap-rail">
-      {modulesData.map((m, i) => <div className={`road-stop ${i === currentIndex ? 'current' : ''} ${i < currentIndex ? 'done' : ''}`} key={m.id}>
-        <span>{i < currentIndex ? <Check /> : m.no}</span><strong>{m.short}</strong><small>{m.weeks}</small>
+      <DoodleRail className="rail-doodle" />
+      {modulesData.map((m, i) => <div className={`road-stop ${i === firstOpen ? 'current' : ''} ${isDone(i) ? 'done' : ''}`} key={m.id}>
+        <span>{isDone(i) ? <DoodleCheck className="stop-check" /> : m.no}{i === firstOpen && <DoodleCircle className="stop-scribble" />}</span><strong>{m.short}</strong><small>{m.weeks}</small>
       </div>)}
     </div>
   </section>
@@ -174,29 +215,31 @@ function Roadmap({ modulesData = modules, trackId = 'llm' }) {
 function Today({ goLesson }) {
   const { pick, locale } = useI18n()
   const tasks = locale === 'zh' ? [
-    ['读', '链式法则与计算图', '15 分钟', true],
-    ['造', '实现 Value.__add__', '30 分钟', true],
-    ['验', '有限差分梯度检查', '25 分钟', false],
-    ['讲', '为什么需要拓扑排序？', '10 分钟', false],
-  ] : [['READ','Chain rule and computation graph','15 min',true],['BUILD','Implement Value.__add__','30 min',true],['TEST','Finite-difference gradient check','25 min',false],['TEACH','Why topological ordering?','10 min',false]]
+    ['读', '链式法则与计算图', '15 分钟'],
+    ['造', '实现 Value.__add__', '30 分钟'],
+    ['验', '有限差分梯度检查', '25 分钟'],
+    ['讲', '为什么需要拓扑排序？', '10 分钟'],
+  ] : [['READ','Chain rule and computation graph','15 min'],['BUILD','Implement Value.__add__','30 min'],['TEST','Finite-difference gradient check','25 min'],['TEACH','Why topological ordering?','10 min']]
   return <section className="today-panel">
-    <div className="panel-heading"><div><span className="section-no">TODAY · 80 MIN</span><h2>{pick('今天要做','Today’s work')}</h2></div><Clock size={21} /></div>
+    <div className="panel-heading"><div><span className="section-no">TODAY · 80 MIN</span><h2>{pick('今天要做','Today’s work')}</h2><span className="suggested-tag">{pick('建议节奏','SUGGESTED RHYTHM')}</span></div><Clock size={21} /></div>
     <div className="task-list">
-      {tasks.map(([tag, title, time, done], i) => <button key={title} className={i === 2 ? 'now' : ''} onClick={!done ? goLesson : undefined}>
-        <span className={`task-check ${done ? 'done' : ''}`}>{done ? <Check /> : ''}</span><b>{tag}</b><strong>{title}</strong><small>{time}</small>{i === 2 && <em>{pick('开始','Start')}</em>}
+      {tasks.map(([tag, title, time], i) => <button key={title} className={i === 0 ? 'now' : ''} onClick={goLesson}>
+        <span className="task-check" /><b>{tag}</b><strong>{title}</strong><small>{time}</small>{i === 0 && <em>{pick('开始','Start')}</em>}
       </button>)}
     </div>
   </section>
 }
 
-function MasteryPanel() {
-  const { pick, locale } = useI18n()
+function MasteryPanel({ completedCount = 0, total = 75, notesCount = 0, currentShort = '' }) {
+  const { pick } = useI18n()
   return <section className="mastery-panel">
-    <div className="panel-heading"><div><span className="section-no">MASTERY GATE</span><h2>{pick('不是完成，是掌握','Completion is not mastery')}</h2></div><Gauge size={22} /></div>
-    <div className="mastery-bars">
-      {(locale === 'zh' ? [['解释',72],['实现',48],['诊断',31],['迁移',18]] : [['Explain',72],['Implement',48],['Diagnose',31],['Transfer',18]]).map(([k, v]) => <div key={k}><span>{k}<b>{v}%</b></span><i><em style={{ width: `${v}%` }} /></i></div>)}
+    <div className="panel-heading"><div><span className="section-no">PROOF SO FAR</span><h2>{pick('不是完成，是掌握','Completion is not mastery')}</h2></div><Gauge size={22} /></div>
+    <div className="proof-stats">
+      <div><DoodleCheck /><div><b>{completedCount}<small> / {total}</small></b><span>{pick('已完成课程','lessons completed')}</span></div></div>
+      <div><DoodleSpark /><div><b>{notesCount}</b><span>{pick('篇学习笔记','field notes written')}</span></div></div>
+      <div><DoodleStar /><div><b>{currentShort || pick('全部完成','all done')}</b><span>{pick('当前阶段','current phase')}</span></div></div>
     </div>
-    <p>{pick('下一道门：闭卷重写 micrograd，并对三个错误梯度进行定位。','Next gate: rewrite micrograd closed-book and diagnose three incorrect gradients.')}</p>
+    <p>{pick('下一道门：合上资料，向一个不了解的人讲清当前阶段的核心机制。','Next gate: explain this phase’s core mechanism to a beginner without opening your notes.')}</p>
   </section>
 }
 
@@ -212,6 +255,7 @@ function Curriculum({ selected, setSelected, goLesson, completed, trackId }) {
       <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
       <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('32 周包含可跳过的 3 周零基础先修；主线仍是一套持续更新、可验证的能力建造计划，每阶段都以作品和掌握门结束。','The 32-week plan includes an optional three-week prerequisite sprint; every phase still ends with a project and mastery gate.')}</p>
       <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span><span><b>{mediaLessons}</b> {pick('视频研讨','video seminars')}</span><span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
+      {isWorld ? <DoodleWorld className="page-lead-doodle" /> : <DoodleNetwork className="page-lead-doodle" />}
     </header>
     <div className="curriculum-layout">
       <aside className="module-index">
@@ -262,7 +306,7 @@ function Labs({ goLesson, trackId }) {
     ['06', 'Agent 轨迹审计', '从工具调用轨迹判断规划、权限和终止条件是否可靠。', 'Agent', '60 min'],
   ] : [['01','Gradient Microscope','Drag inputs and weights to observe local derivatives accumulate through a graph.','Backprop','35 min'],['02','Tokenizer Pathology Lab','Compare BPE splits and compression for language, numbers, and code.','Tokens','45 min'],['03','Attention Dissection','Inspect QK similarity, masks, softmax, and value aggregation cell by cell.','Transformer','55 min'],['04','Training ER','Diagnose loss spikes, NaNs, OOMs, and overfitting.','Training','70 min'],['05','Sampling Wind Tunnel','Map temperature, top-k, and top-p to diversity and quality.','Inference','40 min'],['06','Agent Trace Audit','Judge planning, permissions, and termination from tool-call traces.','Agents','60 min']])
   return <main className="page catalog-page">
-    <header className="page-lead compact"><span className="section-no">EXPERIMENTS</span><h1>{pick('最好的老师，','The best teacher')}<br />{pick('是一个反直觉的结果。','is a surprising result.')}</h1><p>{pick('每个实验都要求先预测、再运行、后解释；没有“点一下看动画”的伪互动。','Every lab requires a prediction, a run, and an explanation—no click-to-watch pseudo-interactivity.')}</p></header>
+    <header className="page-lead compact"><span className="section-no">EXPERIMENTS</span><h1>{pick('最好的老师，','The best teacher')}<br />{pick('是一个反直觉的结果。','is a surprising result.')}</h1><p>{pick('每个实验都要求先预测、再运行、后解释；没有“点一下看动画”的伪互动。','Every lab requires a prediction, a run, and an explanation—no click-to-watch pseudo-interactivity.')}</p><DoodleFlask className="page-lead-doodle" /></header>
     <div className="lab-grid">{labs.map(([n, title, desc, phase, time], i) => <article key={n}>
       <div className="lab-no">{n}<Flask /></div><span className="section-no">{phase} · {time}</span><h2>{title}</h2><p>{desc}</p><button onClick={i === 0 ? goLesson : undefined}>{pick('进入实验','Open lab')} <ArrowRight /></button>
     </article>)}</div>
@@ -273,7 +317,7 @@ function Projects({ trackId }) {
   const { locale, pick } = useI18n()
   const modulesData = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   return <main className="page projects-page">
-    <header className="page-lead compact"><span className="section-no">BUILD IN PUBLIC</span><h1>{pick('八个作品，','Eight projects.')}<br />{pick('证明你真的会。','Proof that you can build.')}</h1><p>{pick('每个作品都能独立发布：有源码、有实验、有测试、有失败复盘，不只是 notebook 截图。','Every project is publishable: source, experiments, tests, and failure reviews—not notebook screenshots.')}</p></header>
+    <header className="page-lead compact"><span className="section-no">BUILD IN PUBLIC</span><h1>{pick('八个作品，','Eight projects.')}<br />{pick('证明你真的会。','Proof that you can build.')}</h1><p>{pick('每个作品都能独立发布：有源码、有实验、有测试、有失败复盘，不只是 notebook 截图。','Every project is publishable: source, experiments, tests, and failure reviews—not notebook screenshots.')}</p><DoodleRocket className="page-lead-doodle" /></header>
     <div className="project-list">{modulesData.map((m, i) => <article key={m.id}>
       <div className="project-index"><span>{m.no}</span><i className={i === 0 ? 'done' : i === 1 ? 'active' : ''} /></div>
       <div><span className="section-no">{m.weeks} · {m.hours} HOURS</span><h2>{m.project.split('：')[0]}</h2><p>{m.project.includes('：') ? m.project.split('：').slice(1).join('：') : m.project}</p></div>
@@ -292,7 +336,7 @@ function Library({ trackId }) {
   useEffect(() => setType(types[0]), [locale])
   const filtered = localizedResources.filter(r => (type === types[0] || r.type === type) && `${r.author}${r.title}${r.phase}`.toLowerCase().includes(query.toLowerCase()))
   return <main className="page library-page">
-    <header className="page-lead compact"><span className="section-no">CURATED SOURCES</span><h1>{pick('不是链接仓库，','Not a link dump.')}<br />{pick('是大师课导航。','A guide to master classes.')}</h1><p>{pick('只选一手、可复现、高信噪比材料。每一份都标明学习位置和使用方式。','Only primary, reproducible, high-signal material—each source has a clear place and purpose.')}</p></header>
+    <header className="page-lead compact"><span className="section-no">CURATED SOURCES</span><h1>{pick('不是链接仓库，','Not a link dump.')}<br />{pick('是大师课导航。','A guide to master classes.')}</h1><p>{pick('只选一手、可复现、高信噪比材料。每一份都标明学习位置和使用方式。','Only primary, reproducible, high-signal material—each source has a clear place and purpose.')}</p><DoodleBook className="page-lead-doodle" /></header>
     <div className="library-tools"><label><MagnifyingGlass /><input value={query} onChange={e => setQuery(e.target.value)} placeholder={pick('搜索作者、项目或主题','Search author, project, or topic')} /></label><div>{types.map(x => <button className={type === x ? 'active' : ''} onClick={() => setType(x)} key={x}>{x}</button>)}</div></div>
     <div className="resource-table"><div className="resource-head"><span>{pick('来源 / 题目','Source / Title')}</span><span>{pick('用于','Used for')}</span><span>{pick('使用说明','How to use it')}</span><span /></div>{filtered.map(r => <a key={r.title} href={r.url} target="_blank" rel="noreferrer">
       <span><i>{r.type}</i><strong>{r.title}</strong><small>{r.author}</small></span><span>{r.phase}<b>{r.level}</b></span><span>{r.note}</span><ArrowRight />
@@ -302,66 +346,11 @@ function Library({ trackId }) {
 
 function LessonView({ info, onBack, onNavigate, theme, toggleTheme, complete, onToggleComplete, onSaveNote, onAccount, user, syncStatus }) {
   const { locale } = useI18n()
-  const [tab, setTab] = useState('代码')
-  const [ran, setRan] = useState(false)
   const localized = useMemo(() => localizeModules(modules, locale), [locale])
   const fallbackModule = localized[2]
   const module = info?.module || fallbackModule
   const lesson = info?.lesson || fallbackModule.lessons[2]
-  const lessonKey = `uth-lesson-${lesson[0]}`
-  const [reflection, setReflection] = useState(() => localStorage.getItem(`${lessonKey}-note`) || '')
-  const specialMaterial = buildLessonMaterial(module, lesson, locale)
-  useEffect(() => {
-    setReflection(localStorage.getItem(`${lessonKey}-note`) || '')
-  }, [lessonKey])
-  useEffect(() => {
-    if (lesson[0] !== '1.3') return
-    localStorage.setItem(`${lessonKey}-note`, reflection)
-    localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString())
-    onSaveNote?.(lesson[0], reflection)
-  }, [lesson, lessonKey, reflection, onSaveNote])
-  useEffect(() => {
-    const receive = event => {
-      if (event.detail?.lessonId === lesson[0] && typeof event.detail.note === 'string') setReflection(event.detail.note)
-    }
-    addEventListener('uth-learning-sync', receive)
-    return () => removeEventListener('uth-learning-sync', receive)
-  }, [lesson])
   return <LessonStudy key={`${locale}-${lesson[0]}`} module={module} lesson={lesson} onBack={onBack} onNavigate={onNavigate} theme={theme} toggleTheme={toggleTheme} complete={complete} onToggleComplete={onToggleComplete} onSaveNote={onSaveNote} onAccount={onAccount} user={user} syncStatus={syncStatus} />
-  /* Legacy bespoke micrograd workstation retained for a future bilingual editor pass. */
-  const outline = ['直觉', '链式法则', '计算图', '实现 Value', '拓扑排序', '梯度检查']
-  return <main className="lesson-shell">
-    <aside className="lesson-outline">
-      <button onClick={onBack}><ArrowLeft /> 返回课程</button>
-      <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-      <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} compact />
-      <span className="section-no">{module.no} {module.title}</span>
-      <h3>{lesson[0]} {lesson[1]}</h3>
-      <div>{outline.map((x, i) => <button className={i === 3 ? 'active' : i < 3 ? 'done' : ''} key={x}><span>{i < 3 ? <Check /> : i + 1}</span>{x}</button>)}</div>
-    </aside>
-    <article className="lesson-reading">
-      <div className="lesson-breadcrumb">{module.no} {module.title} / {lesson[0]} {lesson[1]}</div>
-      <span className="section-no">CONCEPT → DERIVATION → CODE</span>
-      <h1>让梯度沿计算图<br />倒着走</h1>
-      <p className="lead">从局部导数到 reverse-mode autodiff，亲手实现一个微型 autograd 引擎。</p>
-      {specialMaterial.media && <LessonMedia media={specialMaterial.media} />}
-      <hr />
-      <section><span className="section-no">01 · INTUITION</span><h2>先建立直觉：梯度是敏感度</h2><p>前向传播像水从上游流向下游：输入经过一连串局部运算，最后形成损失。反向传播则从 loss 出发，把“如果这里动一点，loss 会动多少”这条消息沿原路送回去。</p><p>关键并不是背导数表，而是把复杂函数拆成小节点。每条边只负责一个局部导数，节点再把上游梯度乘进来。</p></section>
-      <section><span className="section-no">02 · DERIVATION</span><h2>链式法则，其实是消息传递</h2><p>设中间变量 <code>z = f(x, y)</code>，最终损失 <code>L = g(z)</code>。我们关心的不是孤立的局部导数，而是 x 对最终 L 的影响：</p><div className="formula">∂L / ∂x = (∂L / ∂z) · (∂z / ∂x)</div><p>右边第一项是从下游传来的“上游梯度”，第二项是当前边的“局部导数”。乘法完成了影响的连接；若同一变量通过多条路径影响 L，则各路径贡献相加。</p></section>
-      <aside className="insight"><Sparkle weight="fill" /><div><strong>Karpathy 的教学切口</strong><p>先在标量上把每个加法和乘法都展开。它很慢，却让动态计算图、梯度累加和拓扑顺序无处藏身；理解以后再把标量换成张量。</p></div></aside>
-      <section><span className="section-no">03 · IMPLEMENTATION</span><h2>Value 需要保存什么？</h2><ul className="reading-list"><li><b>data</b>：当前节点的前向数值</li><li><b>grad</b>：最终输出对它的导数，初始为 0</li><li><b>_prev</b>：产生它的父节点集合</li><li><b>_backward</b>：把上游梯度分配给父节点的局部规则</li></ul></section>
-      <section className="checkpoint"><span>停下来预测</span><h3>如果 <code>a</code> 同时被两条分支使用，为什么不能写 <code>a.grad = ...</code>？</h3><button onClick={() => alert('提示：两条路径对最终 loss 的影响都要保留。想想多元链式法则中的求和。')}>给我一点提示</button></section>
-      <div className="reflection"><span className="section-no">LEARNING CHECK</span><h3>用自己的话解释：为什么反向传播需要拓扑排序？</h3><textarea value={reflection} onChange={e => setReflection(e.target.value)} placeholder="不要复制定义。试着用‘依赖’和‘上游梯度’解释……" /><small>{reflection.length} / 600 · 写满 80 字后进入自评</small></div>
-    </article>
-    <aside className="workbench">
-      <div className="work-tabs">{['解释', '代码', '可视化'].map(x => <button className={tab === x ? 'active' : ''} onClick={() => setTab(x)} key={x}>{x}</button>)}</div>
-      {tab === '代码' && <><div className="editor"><div><span>micrograd.py</span><i /></div><pre><code>{codeSample}</code></pre></div><Graph ran={ran} /></>}
-      {tab === '解释' && <div className="explain-panel"><span className="section-no">MENTAL MODEL</span><h3>一次 backward 的四步</h3>{['把输出节点 grad 设为 1', '对图做拓扑排序', '按逆序调用 _backward', '在父节点上累加梯度'].map((x, i) => <p key={x}><b>0{i + 1}</b>{x}</p>)}</div>}
-      {tab === '可视化' && <Graph ran={ran} large />}
-      <div className="work-actions"><button className="primary" onClick={() => setRan(true)}><Play weight="fill" />运行</button><button className="secondary" onClick={() => setRan(false)}>重置</button></div>
-      <div className="completion"><button className={complete ? 'completed' : ''} onClick={onToggleComplete}>{complete ? <CheckCircle weight="fill" /> : <Circle />} {complete ? '本节已完成' : '标记完成'}</button><button className="primary" onClick={() => onNavigate(1)}>下一节 <ArrowRight /></button></div>
-    </aside>
-  </main>
 }
 
 function LessonMedia({ media }) {
@@ -451,7 +440,7 @@ function LessonMedia({ media }) {
       {selectedSegment && isBilibili && !sourceStopsAtSegmentEnd && <p className="segment-source-note">{locale === 'en' ? segmentTiming.noteEn : segmentTiming.noteZh}</p>}
     </div>}
     <div className="media-frame">
-      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{network === 'global' ? t('globalOriginal') : t('domesticOriginal')}</b><p>{resolvedSource ? (network === 'global' ? t('noGlobalEmbed') : t('noDomesticEmbed')) : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={locale === 'en' ? (source.titleEn || source.title) : source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
+      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{network === 'global' ? t('globalOriginal') : t('domesticOriginal')}</b><p>{resolvedSource ? (network === 'global' ? t('noGlobalEmbed') : t('noDomesticEmbed')) : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={locale === 'en' ? (source.titleEn || source.title) : source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><DoodleArrow className="play-arrow" /><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
     <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${locale === 'en' ? (selectedPart.labelEn || selectedPart.label) : selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (source.titleEn || source.title || media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
     <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{selectedSegment?.before || media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{selectedSegment?.after || media.after}</p></article></div>
@@ -503,6 +492,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <div className="study-breadcrumb">{module.no} {module.title} / {material.id}</div>
         <span className="section-no">{t('theoryPracticeEvidence')}</span>
         <h1>{material.title}</h1>
+        <DoodleUnderline className="title-swash" />
         <p className="study-lead">{t('lessonLead')}</p>
 
         <GeoAnswer lessonId={lesson[0]} />
@@ -517,7 +507,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <section id="study-0" className="study-section">
           <span className="section-no">01 · INTUITION</span><h2>{t('whyNeed')}</h2>
           {material.opening.map(x => <p key={x}>{x}</p>)}
-          <aside className="mental-prompt"><Sparkle weight="fill" /><div><b>{t('predictFirst')}</b><p>{t('predictPrompt', { concept:material.concepts[0]?.name || material.title })}</p></div></aside>
+          <aside className="mental-prompt"><DoodleTape className="note-tape" /><Sparkle weight="fill" /><div><b>{t('predictFirst')}</b><p>{t('predictPrompt', { concept:material.concepts[0]?.name || material.title })}</p></div></aside>
         </section>
 
         <section id="study-1" className="study-section">
@@ -525,7 +515,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
           <div className="concept-stack">{material.concepts.map((concept, i) => <article key={`${concept.name}-${i}`}><span>{String(i + 1).padStart(2, '0')}</span><div><h3>{concept.name}</h3><p>{concept.note}</p></div></article>)}</div>
           <div className="mechanism-loop">{material.workflow.map((x, i) => <div key={x}><span>STEP {i + 1}</span><b>{x}</b>{i < material.workflow.length - 1 && <ArrowRight />}</div>)}</div>
           <div className="worked-example"><div><span className="section-no">WORKED EXAMPLE</span><h3>{material.worked.title}</h3></div><ol>{material.worked.steps.map((x, i) => <li key={x}><span>{i + 1}</span>{x}</li>)}</ol><button onClick={() => setShowWorked(x => !x)}>{showWorked ? t('collapseCheck') : t('whatCheck')}</button>{showWorked && <p>{material.worked.question}</p>}</div>
-          <div className="misconception"><b>{t('pitfall')}</b><p>{material.misconception}</p></div>
+          <div className="misconception"><DoodleWarn className="warn-doodle" /><b>{t('pitfall')}</b><p>{material.misconception}</p></div>
         </section>
 
         {material.spotlight && <section className="paper-spotlight">
@@ -548,13 +538,14 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         </section>
 
         <section className="notes-card">
+          <DoodleTape className="note-tape notes-tape" />
           <span className="section-no">FIELD NOTES · {user ? t('localCloud') : t('localAuto')}</span><h2>{t('notesTitle')}</h2>
           <textarea value={note} onChange={e => setNote(e.target.value)} placeholder={t('notesPlaceholder')} />
           <small>{t('charsGoal', { count:note.length })}</small>
         </section>
 
         <section id="study-4" className="mastery-gate-study">
-          <div><span className="section-no">05 · MASTERY GATE</span><h2>{t('masteryQuestion')}</h2></div>
+          <div><span className="section-no">05 · MASTERY GATE</span><h2>{t('masteryQuestion')}</h2><DoodleTarget className="gate-doodle" /></div>
           <ul>{material.mastery.map(x => <li key={x}><Circle />{x}</li>)}</ul>
         </section>
 
@@ -582,16 +573,6 @@ function GeoAnswer({ lessonId }) {
     </div>
     <footer><span>{pick('一手来源','Primary sources')}</span>{brief.sources.map(source => <a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} <ArrowRight /></a>)}</footer>
   </section>
-}
-
-function Graph({ ran, large }) {
-  return <div className={`graph-panel ${large ? 'large' : ''}`}><div className="graph-title"><span>计算图</span><em>{ran ? '梯度已更新' : '等待运行'}</em></div><div className="graph-canvas">
-    <div className="edge e1" /><div className="edge e2" /><div className="edge e3" />
-    <div className="node a"><b>a</b><span>2.0</span><em>{ran ? 'grad -2.0' : 'grad 0.0'}</em></div>
-    <div className="node b"><b>b</b><span>-3.0</span><em>{ran ? 'grad -2.0' : 'grad 0.0'}</em></div>
-    <div className="node c"><b>c</b><span>-1.0</span><em>{ran ? 'grad -2.0' : 'grad 0.0'}</em></div>
-    <div className="node loss"><b>loss</b><span>1.0</span><em>{ran ? 'grad 1.0' : 'grad 0.0'}</em></div>
-  </div></div>
 }
 
 function SearchModal({ onClose, onOpen }) {
@@ -679,6 +660,11 @@ export default function App() {
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#07110e' : '#f5f7f5')
   }, [theme])
   useEffect(() => {
+    const id = lessonInfo?.lesson?.[0]
+    if (view !== 'lesson' || !id) return
+    localStorage.setItem(LAST_LESSON_KEY, JSON.stringify({ id, trackId, at: Date.now() }))
+  }, [view, lessonInfo?.lesson?.[0], trackId])
+  useEffect(() => {
     const syncFromLocation = () => {
       const matched = matchSitePath(location.pathname)
       const legacyId = legacyLessonId(location.hash)
@@ -742,13 +728,20 @@ export default function App() {
   useEffect(() => {
     trackEvent('view_changed', { view, locale })
   }, [view, locale])
+  const resumeInfo = useMemo(() => resolveLastLesson(locale), [locale, view, completed])
+  const notesCount = useMemo(() => lessonIds.reduce((n, id) => n + ((localStorage.getItem(`uth-lesson-${id}-note`) || '').trim() ? 1 : 0), 0), [view, completed])
+  const continueLearning = () => {
+    const found = resolveLastLesson(locale)
+    if (found) { openLesson(found.module, found.lesson, found.index, found.trackId); return }
+    openLesson()
+  }
   const accountModal = accountOpen && <AccountModal onClose={() => setAccountOpen(false)} progress={progress} completedCount={trackCompleted} totalLessons={flatLessons.length} syncStatus={sync.status} lastSynced={sync.lastSynced} />
   const currentLessonInfo = lessonInfo ? flatLessons.find(item => item.lesson[0] === lessonInfo.lesson[0]) || lessonInfo : null
   if (view === 'lesson') return <><LessonView info={currentLessonInfo} onBack={closeLesson} onNavigate={navigateLesson} theme={theme} toggleTheme={toggleTheme} complete={completed.has(currentLessonInfo?.lesson?.[0])} onToggleComplete={toggleLessonComplete} onSaveNote={saveNote} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />{accountModal}</>
   return <div className="app-shell">
     <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} theme={theme} toggleTheme={toggleTheme} trackId={trackId} onTrack={changeTrack} />
     <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />
-      {view === 'home' && <Dashboard goLesson={() => openLesson()} setView={setView} trackId={trackId} onTrack={changeTrack} />}
+      {view === 'home' && <Dashboard goLesson={continueLearning} setView={setView} trackId={trackId} onTrack={changeTrack} completed={completed} notesCount={notesCount} resume={resumeInfo} />}
       {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} trackId={trackId} />}
       {view === 'labs' && <Labs goLesson={() => openLesson()} trackId={trackId} />}
       {view === 'projects' && <Projects trackId={trackId} />}
