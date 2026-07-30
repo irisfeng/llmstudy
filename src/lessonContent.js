@@ -569,7 +569,7 @@ const conceptRules = [
   [/SGD|AdamW|学习率|warmup|cosine|weight decay/i, name => `${name}规定参数怎样沿噪声梯度移动。学习率决定步长，动量平滑方向，权重衰减约束参数规模；它们的效果必须结合 batch size 与训练阶段解释。`],
   [/bigram|计数|平滑/i, name => `${name}是最小可审计语言模型：只用当前 token 估计下一个 token。它提供概率归一化、采样和 NLL 的基线，也清楚暴露短上下文无法表达长期依赖。`],
   [/Embedding|embedding|稠密表示|查表/i, name => `${name}本质上是可训练查表：离散 id 选择参数矩阵的一行。相似性不是预先赋予的语义，而是训练目标让经常承担相似预测角色的行逐渐靠近。`],
-  [/BPE|pair merge|vocabulary|encode|decode|UTF-8|token/i, name => `${name}位于字符串与模型之间。BPE 反复合并高频相邻单元来换取更短序列，但词表、字节边界和特殊 token 会直接影响多语言、公平性与数字处理。`],
+  [/BPE|pair merge|vocabulary|\bencode\b|\bdecode\b|UTF-8|\btoken(?:izer|ization)?\b/i, name => `${name}位于字符串与模型之间。BPE 反复合并高频相邻单元来换取更短序列，但词表、字节边界和特殊 token 会直接影响多语言、公平性与数字处理。`],
   [/query|key|value|相似度|Scaled Dot-Product|注意力/i, name => `${name}把“我要找什么”与“每个位置提供什么”分开：Q 与 K 产生路由权重，softmax 归一化后对 V 加权求和；缩放避免维度增大时 logits 过尖。`],
   [/mask|causal/i, name => `${name}是因果约束而非普通正则化。训练时整段序列并行计算，但第 t 个位置只能读取不晚于 t 的 token，否则模型会偷看答案并得到虚假低 loss。`],
   [/Multi-Head|head 分割|多头/i, name => `${name}让多个较小子空间并行学习不同路由模式。head 数增加不会自动增加总维度；需要追踪拆分、拼接和输出投影，避免把“更多头”误解为免费容量。`],
@@ -585,7 +585,7 @@ const conceptRules = [
   [/SFT|instruction data|chat template|packing/i, name => `${name}用高质量示范把基础模型的续写分布塑造成助手行为。训练时通常只对目标回复计算 loss；模板、mask 和 packing 错误会让模型学到错误角色或跨样本泄漏。`],
   [/Bradley-Terry|reward model|pairwise|偏好/i, name => `${name}从成对比较中学习相对偏好，而非绝对真值。数据采样、标注者分歧和长度偏差会进入奖励模型，并可能被策略利用。`],
   [/DPO|reference policy|reference|KL/i, name => `${name}比较策略对 chosen/rejected 的相对 log-prob，并用参考策略约束偏移。它省去在线 rollout，但仍依赖偏好数据覆盖和 beta 强度。`],
-  [/PPO|GRPO|policy gradient|advantage|rollout/i, name => `${name}用采样轨迹估计行为对奖励的贡献。优势函数降低方差，KL 控制策略漂移；训练稳定性取决于奖励、采样和更新比例的共同设计。`],
+  [/PPO|GRPO|policy gradient|advantage/i, name => `${name}用采样轨迹估计行为对奖励的贡献。优势函数降低方差，KL 控制策略漂移；训练稳定性取决于奖励、采样和更新比例的共同设计。`],
   [/LLM judge|eval|评测|perplexity|污染|方差/i, name => `${name}必须先固定任务分布、评分规则和置信区间。单一平均分会掩盖子群失败；LLM-as-judge 还需做顺序、长度、自偏好与人工一致性校准。`],
   [/幻觉|校准|confidence|abstention|事实性/i, name => `${name}要求模型的置信程度与真实正确率匹配。生成概率不是事实概率；应分别评估回答正确性、拒答选择和证据可验证性。`],
   [/KV Cache|cache shape|GQA|MQA|长上下文/i, name => `${name}保存历史 token 的 K/V，避免 decode 时重复计算前缀。代价随层数、序列长度、KV head 数和 head dim 增长，因此长上下文常先受显存带宽限制。`],
@@ -593,7 +593,7 @@ const conceptRules = [
   [/INT8|INT4|GPTQ|AWQ|GGUF|量化/i, name => `${name}用更少比特近似权重或激活。速度收益取决于硬件 kernel，质量损失取决于离群值、分组与校准；文件变小不等于端到端一定更快。`],
   [/PagedAttention|continuous batching|block table|调度/i, name => `${name}把 KV cache 切成可复用块，并在请求进出时动态组成批次。这样减少内存碎片与等待，但调度策略会直接影响首 token 延迟和吞吐公平性。`],
   [/SLO|queue|backpressure|限流|降级|tracing/i, name => `${name}把模型服务从“能响应”提升到“可承诺”。队列长度是过载的早期信号；背压、限流和降级要在资源耗尽前触发，并通过 tracing 定位尾延迟。`],
-  [/observe|reason|act|termination|Agent|tool loop/i, name => `${name}把生成模型嵌入状态机：观察环境、选择动作、执行工具、记录结果并判断终止。可靠性来自显式状态和边界，不来自更长的思维文本。`],
+  [/\bobserve\b|\breason\b|\bact\b|\btermination\b|\bagent\b|tool loop/i, name => `${name}把生成模型嵌入状态机：观察环境、选择动作、执行工具、记录结果并判断终止。可靠性来自显式状态和边界，不来自更长的思维文本。`],
   [/schema|validation|idempotency|side effect|工具调用/i, name => `${name}控制模型输出与真实世界副作用之间的接口。结构校验防止格式漂移，幂等键避免重试造成重复操作，高风险动作必须在执行前审批。`],
   [/记忆|working context|retrieval|summary|memory policy/i, name => `${name}解决有限上下文下“保留什么”的问题。短期工作状态、可检索事实和长期摘要应分层；写入记忆也需要质量门，否则错误会被长期放大。`],
   [/POMDP|belief state|隐藏状态|观测模型|状态、观察|transition|转移/i, name => `${name}把真实世界与智能体能看到的信息分开。世界状态通过动作发生变化，观察只是状态的不完整投影；belief state 用概率汇总历史证据，供预测与规划使用。`],
@@ -610,6 +610,66 @@ const conceptRules = [
   [/parallel drafter|semi-autoregressive|prefix survival|hardware-aware/i, name => `${name}把草稿质量与服务调度连起来：并行骨干降低草稿时延，轻量顺序头补回块内依赖，前缀存活概率帮助调度器避免在高并发下浪费验证批容量。`],
   [/masked diffusion|block diffusion|parallel decoding/i, name => `${name}尝试并行修复或生成多个 token，减少纯自回归的串行步数。端到端收益取决于迭代次数、草稿接受率、目标模型验证成本和质量约束。`],
 ]
+
+const scopedConceptRules = {
+  'world-foundations': [
+    [/POMDP|隐藏状态|belief state|观测模型|奖励与策略/i, name => `${name}属于部分可观察决策过程：环境隐藏状态经观测模型产生当前观察，智能体用历史动作与观察更新 belief state，再据此比较策略的预期累计回报。验证时要把真实状态、可见观察和 belief 估计分开记录。`],
+    [/GridWorld|action-conditioned dynamics|rollout|模型预测控制/i, name => `${name}把候选动作送入学习到的转移模型，得到后续状态或观察的预测轨迹；模型预测控制比较整条轨迹的目标值与约束，只执行当前一步再根据新观察重规划。必须同时报告单步误差和多步滚动失败率。`],
+    [/状态|观察|动作|转移|预测与规划/i, name => `${name}是世界模型闭环中的明确变量：真实状态产生观察，动作改变后续状态，模型学习这种条件转移并为规划提供反事实预测。检查时要标明它来自真实环境、传感器、策略还是模型内部，避免把预测状态当成世界真值。`],
+  ],
+  'world-dynamics': [
+    [/VAE|MDN-RNN|latent dynamics|controller|dream rollout/i, name => `${name}位于经典 World Models 的“压缩—预测—控制”链路：VAE 把画面压成隐变量，MDN-RNN 预测动作条件下的下一隐状态分布，控制器在想象轨迹中选动作。最终仍要用真实环境回报检查策略是否利用了模型偏差。`],
+    [/RSSM|reconstruction|reward prediction|imagined trajectory|actor-critic/i, name => `${name}连接 Dreamer 的确定性记忆与随机隐状态：表示模型吸收新观察，动力学在没有新画面时展开想象，奖励与价值头为 actor-critic 提供训练信号。要比较 imagined return 与真实 return 随预测跨度增长的偏差。`],
+    [/MuZero|MCTS|representation|dynamics|prediction|value.*policy/i, name => `${name}属于 MuZero 的任务相关隐空间：representation 编码历史，dynamics 在动作条件下预测下一隐状态与奖励，prediction 输出 policy 和 value，MCTS 用这些量搜索。它不要求重建像素，因此隐状态不能直接当作真实物理状态解释。`],
+  ],
+  jepa: [
+    [/JEPA|joint embedding|context encoder|target encoder|predictor|collapse prevention/i, name => `${name}服务于表征空间预测：context encoder 只读取可见区域，target encoder 产生停止梯度的目标表征，predictor 根据上下文和位置预测被遮挡或未来内容。防坍塌设计必须阻止所有输入映射为同一常数表示。`],
+    [/self-supervised video|action conditioning|latent planning|zero-shot control/i, name => `${name}连接 V-JEPA 2 的两个阶段：先从无动作标签视频学习视觉与运动表征，再用较少机器人数据训练动作条件世界模型，在隐空间比较候选动作的预测结果。规划价值必须由新环境中的真实控制成功率验证。`],
+  ],
+  'generative-worlds': [
+    [/video tokenizer/i, name => `${name}把连续视频压缩成离散的时空 token 网格，保留跨帧运动和场景结构，供动力学模型预测后续内容；它编码的是视觉时空模式，不是文本 tokenizer 的子词切分。应检查重建质量、压缩率和动作相关细节是否被保留。`],
+    [/latent action/i, name => `${name}从无动作标签视频的相邻变化中学习离散控制变量，使动力学能够区分“世界自行变化”和“可由用户触发的变化”。它不是工具调用循环；可辨识性要通过同一初始画面下不同动作的响应方向与稳定性验证。`],
+    [/autoregressive dynamics/i, name => `${name}根据过去的时空 token 与动作逐步预测下一帧或下一段隐表示。自回归展开让误差随时间累积，因此既要测短期像素或表征质量，也要测固定动作脚本下的长时漂移、失控和状态遗忘。`],
+    [/real-time interaction/i, name => `${name}要求系统在逐帧接收用户动作后，于交互延迟预算内生成对应的后续观察，并保持控制方向和世界状态连续。实时帧率只证明速度，仍需分别验证动作响应、回访一致性和长时间稳定性。`],
+    [/一致性|consistency/i, name => `${name}要求已出现的物体、几何与事件在离开视野后仍能被正确恢复，并在持续交互中避免无因漂移。应使用闭环轨迹、回访位置和更长动作序列测量，而不能凭一段顺利演示判断。`],
+    [/persistent 3D|World API|navigation|空间智能|物体恒常性/i, name => `${name}要求世界在视角离开后仍保存几何和对象状态。可导航、可回访、可编辑比单段视频的局部逼真更强，也需要独立的闭环轨迹测试。`],
+    [/multimodal world creation|editing/i, name => `${name}把文字、图像、多视图或视频条件映射为可探索世界，并允许后续扩展或编辑。输入一致不保证生成几何正确；需要比较不同条件下的空间闭合、编辑局部性和未观察区域的不确定性。`],
+  ],
+  'physical-ai': [
+    [/world foundation model|physical AI|synthetic data|post-training|policy model/i, name => `${name}把预训练世界表示、生成数据、领域后训练和下游策略串成 Physical AI 管线。合成数据的收益不能由画面逼真度代替，必须在真实留出环境中报告策略成功率、安全违规和 sim-to-real 偏差。`],
+    [/controllability|long-horizon consistency|physics|planning utility|sim-to-real|安全/i, name => `${name}是世界模型从“看起来真实”走向“可用于决策”的独立验收维度。评测应固定动作与初始条件，分别测响应、长时漂移、物理约束、规划收益和现实迁移，避免用一个综合观感分掩盖失败。`],
+  ],
+}
+
+const scopedEnglishConceptRules = {
+  'world-foundations': [
+    [/POMDP|latent state|belief state|observation model|reward|policy/i, name => `${name} belongs to a partially observable decision process: hidden state produces observations, action changes future state, and the agent updates a belief from its action-observation history before comparing expected returns. Keep ground-truth state, visible observation, and estimated belief separate in the experiment.`],
+    [/GridWorld|action-conditioned dynamics|rollout|model-predictive control/i, name => `${name} sends candidate actions through a learned transition model to predict later states or observations. Model-predictive control scores complete trajectories, executes only the current action, and replans after the next observation; report both one-step error and multi-step failure rate.`],
+    [/state|observation|action|transition|prediction|planning/i, name => `${name} is an explicit variable in the world-model loop: state produces observations, actions alter subsequent state, and the model supplies conditional counterfactuals for planning. Label whether each value comes from the environment, a sensor, the policy, or the model rather than treating a prediction as ground truth.`],
+  ],
+  'world-dynamics': [
+    [/VAE|MDN-RNN|latent dynamics|controller|dream rollout/i, name => `${name} sits in the classic compress-predict-control chain: a VAE encodes frames, an MDN-RNN predicts the action-conditioned next latent distribution, and a controller acts inside imagined trajectories. Real-environment return must still reveal whether the policy exploited model error.`],
+    [/RSSM|reconstruction|reward prediction|imagined trajector|actor-critic/i, name => `${name} connects Dreamer’s deterministic memory and stochastic latent state. Representation learning incorporates observations, dynamics unfolds without new frames, and reward-value heads train the actor-critic; compare imagined and real returns as prediction horizon grows.`],
+    [/MuZero|MCTS|representation|dynamics|prediction|\bvalue\b|\bpolicy\b/i, name => `${name} belongs to MuZero’s task-relevant latent system: representation encodes history, dynamics predicts the next latent state and reward under an action, prediction emits policy and value, and MCTS searches with those quantities. The state need not reconstruct pixels and should not be read as literal physics.`],
+  ],
+  jepa: [
+    [/JEPA|joint embedding|context encoder|target encoder|predictor|collapse prevention/i, name => `${name} supports prediction in representation space: the context encoder reads visible regions, the target encoder supplies stop-gradient targets, and the predictor estimates masked or future content from context and position. Anti-collapse design must prevent every input from mapping to the same representation.`],
+    [/self-supervised video|action conditioning|latent planning|zero-shot control/i, name => `${name} connects V-JEPA 2’s two stages: learn visual-motion representations from action-free video, then fit an action-conditioned world model with a smaller robot dataset and compare candidate outcomes in latent space. Planning value must be verified by physical task success in unseen settings.`],
+  ],
+  'generative-worlds': [
+    [/video tokenization/i, name => `${name} compresses continuous video into a discrete spatiotemporal token grid that preserves motion and scene structure for future prediction. This is visual-temporal representation rather than text subword segmentation; evaluate reconstruction, compression, and whether action-relevant detail survives.`],
+    [/latent actions?/i, name => `${name} learns discrete control variables from changes between frames in video without action labels, helping dynamics separate autonomous change from user-controllable change. This variable describes environment control rather than language-model orchestration; test identifiability with different actions from the same starting frame.`],
+    [/autoregressive dynamics/i, name => `${name} predicts the next frame or latent segment step by step from prior spatiotemporal tokens and actions. Errors compound during autoregressive rollout, so evaluate short-horizon quality alongside long-horizon drift, control failure, and state loss.`],
+    [/interaction/i, name => `${name} requires frame-by-frame actions to produce corresponding observations within an interaction-latency budget while preserving control direction and world state. Frame rate proves speed only; action response, revisit consistency, and sustained stability remain separate tests.`],
+    [/consistency/i, name => `${name} requires objects, geometry, and events to remain recoverable after leaving view and to avoid unexplained drift during continued interaction. Measure it with closed trajectories, revisited locations, and longer action sequences rather than a favorable demo clip.`],
+    [/persistent 3D|World API|navigation|spatial intelligence|object permanence/i, name => `${name} requires geometry and object state to survive viewpoint changes. Navigability, revisiting, and editing are stronger than local video realism and need independent closed-loop trajectory tests.`],
+    [/multimodal world creation|editing/i, name => `${name} maps text, images, multiview input, or video into an explorable world and may extend or modify it. Consistent conditioning does not guarantee correct geometry; test spatial closure, edit locality, and uncertainty in unobserved regions.`],
+  ],
+  'physical-ai': [
+    [/world foundation model|physical AI|synthetic data|post-training|policy model/i, name => `${name} connects pretrained world representations, generated data, domain adaptation, and downstream policy learning. Visual realism is not evidence of utility; report policy success, safety violations, and sim-to-real gap in held-out physical settings.`],
+    [/controllability|long-horizon consistency|physics|planning utility|sim-to-real|safety/i, name => `${name} is an independent acceptance dimension between an impressive video and a decision-useful world model. Fix actions and initial conditions, then measure response, drift, physical constraints, planning gain, and real-world transfer separately.`],
+  ],
+}
 
 const moduleFallback = {
   foundations: name => `${name}要落在一个可手算的小例子上：写清输入、运算、输出与单位，再用代码对拍。`,
@@ -629,8 +689,16 @@ const moduleFallback = {
 }
 
 function explainConcept(name, moduleId, index) {
-  const rule = conceptRules.find(([pattern]) => pattern.test(name))
+  const rule = scopedConceptRules[moduleId]?.find(([pattern]) => pattern.test(name))
+    || conceptRules.find(([pattern]) => pattern.test(name))
   return rule ? rule[1](name) : `${moduleFallback[moduleId]?.(name) || mechanismNotes[index % mechanismNotes.length]} ${mechanismNotes[index % mechanismNotes.length]}`
+}
+
+function explainEnglishConcept(name, moduleId, index) {
+  const rule = scopedEnglishConceptRules[moduleId]?.find(([pattern]) => pattern.test(name))
+  return rule
+    ? rule[1](name)
+    : `${name} is part of the lesson’s causal model. State its inputs, outputs, invariants, and failure mode; then verify it with a hand-check or a minimal experiment${index === 0 ? ' before moving to an optimized implementation' : ''}.`
 }
 
 function splitTheory(text) {
@@ -1155,10 +1223,7 @@ function buildEnglishLessonMaterial(module, lesson) {
       `Start from the failure of a simpler method. Identify the exact condition where it stops working, then introduce the new mechanism only when the need is visible.`,
       `For every transformation, ask three questions: what enters, what changes, and what observation would prove the output is correct?`,
     ],
-    concepts: concepts.map((name, index) => ({
-      name,
-      note: `${name} is part of the lesson’s causal model. State its inputs, outputs, invariants, and failure mode; then verify it with a hand-check or a minimal experiment${index === 0 ? ' before moving to an optimized implementation' : ''}.`,
-    })),
+    concepts: concepts.map((name, index) => ({ name, note: explainEnglishConcept(name, module.id, index) })),
     workflow,
     practice: {
       task: practice,
