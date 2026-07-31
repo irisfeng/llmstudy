@@ -142,7 +142,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack, completed = new Set(),
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
           <DoodleRail className="signal-doodle" />
           <DoodleStar className="signal-star" />
-          {(isWorld ? ['STATE', 'DYNAMICS', 'JEPA', 'WORLDS', 'PHYSICAL AI'] : ['TOKENS', 'BACKPROP', 'GPT', 'REASONING', 'AGENTS']).map((x, i) => <span key={x} style={{ left: `${i * 24.5}%`, top: i % 2 ? 57 : 26 }}>{x}</span>)}
+          {(isWorld ? ['STATE', 'DYNAMICS', 'JEPA', 'WORLDS', 'PHYSICAL AI'] : ['TOKENS', 'BACKPROP', 'GPT', 'REASONING', 'AGENTS']).map((x, i) => <span key={x} style={{ left: `${i * 24.5}%`, top: 14 }}>{x}</span>)}
         </div>
       </div>
       <CurrentLesson goLesson={goLesson} trackId={trackId} resume={trackResume} completed={completed} />

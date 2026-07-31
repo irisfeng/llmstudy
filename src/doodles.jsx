@@ -26,13 +26,13 @@ export function useDrawIn(threshold = 0.3) {
   return [ref, drawn]
 }
 
-function DoodleSvg({ viewBox, className = '', children, stretch = false, ...rest }) {
+function DoodleSvg({ viewBox, className = '', children, stretch = false, still = false, ...rest }) {
   const [ref, drawn] = useDrawIn()
   return (
     <svg
       ref={ref}
       viewBox={viewBox}
-      className={`doodle ${drawn ? 'drawn' : ''} ${className}`}
+      className={`doodle ${drawn || still ? 'drawn' : ''} ${className}`}
       fill="none"
       stroke="currentColor"
       strokeLinecap="round"
@@ -217,10 +217,11 @@ export function DoodleWarn({ className = '' }) {
   )
 }
 
-/* Long wobbly connector line (roadmap rail, signal map). Stretches horizontally. */
+/* Long wobbly connector line (roadmap rail, signal map). Stretches horizontally.
+   Rendered statically: core navigation lines should not animate in. */
 export function DoodleRail({ className = '' }) {
   return (
-    <DoodleSvg viewBox="0 0 1200 40" stretch className={`doodle-rail ${className}`}>
+    <DoodleSvg viewBox="0 0 1200 40" stretch still className={`doodle-rail ${className}`}>
       <P d="M2 22 C 90 12, 190 28, 300 19 C 410 10, 520 27, 640 19 C 760 11, 890 28, 1010 18 C 1090 12, 1150 24, 1198 17" strokeWidth="2" vectorEffect="non-scaling-stroke" />
     </DoodleSvg>
   )
