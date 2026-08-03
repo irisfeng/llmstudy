@@ -272,18 +272,18 @@
       "has_media": true,
       "priority": "P0",
       "assessment_status": "verified",
-      "score": 54,
-      "grade": "C",
+      "score": 91,
+      "grade": "A",
       "hard_gates": {
         "sources": true,
         "facts": true,
         "practice": false,
-        "mobile": false
+        "mobile": true
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-08-17",
-      "change_reason": "Baseline rubric audit completed; source and factual review passed, but the displayed implementation cannot yet satisfy the practice task and target viewport QA is incomplete."
+      "next_review_at": "2026-08-10",
+      "change_reason": "Independent re-audit after lesson-specific implementation scored 91/A; runnable Value code, bounded source segments, and five local viewports passed, while archived pytest, finite-difference, PyTorch, and mutation evidence remains the promotion blocker."
     },
     {
       "id": "1.4",

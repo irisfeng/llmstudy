@@ -122,7 +122,7 @@ async function auditResponsive(width) {
   const learning = await assertPage('learning')
 
   const reading = []
-  for (const lessonId of ['p.2', 'p.3', '0.3', '1.2', '8.2']) {
+  for (const lessonId of ['p.2', 'p.3', '0.3', '1.2', '1.3', '8.2']) {
     await page.goto(`${baseUrl}${lessonPath(lessonId, 'zh')}`, { waitUntil: 'networkidle0' })
     await page.waitForSelector('.reading-hero > h1')
     const titleLayout = await page.$eval('.reading-hero > h1', node => {
@@ -148,7 +148,7 @@ try {
   const [zh, en, ...responsive] = await Promise.all([
     auditZh(),
     auditEn(),
-    ...[320, 768, 1024, 1440].map(auditResponsive),
+    ...[320, 390, 768, 1024, 1440].map(auditResponsive),
   ])
   console.log(JSON.stringify({ ok: true, baseUrl, zh, en, responsive }, null, 2))
 } finally {

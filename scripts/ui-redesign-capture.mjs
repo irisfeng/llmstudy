@@ -7,6 +7,7 @@ const baseUrl = (process.env.QA_URL || 'http://127.0.0.1:4173').replace(/\/$/, '
 const outputDir = process.env.UI_CAPTURE_DIR || '/tmp/llmstudy-ui-redesign'
 const label = process.env.UI_CAPTURE_LABEL || 'capture'
 const theme = process.env.UI_CAPTURE_THEME || 'light'
+const readingLessonId = process.env.UI_LESSON_ID || 'p.2'
 
 mkdirSync(outputDir, { recursive: true })
 
@@ -54,11 +55,16 @@ async function captureLearningPath(width, height, viewport) {
 
 async function captureReadingAndShare(width, height, viewport) {
   const page = await preparePage(width, height)
-  await page.goto(`${baseUrl}${lessonPath('p.2', 'zh')}`, { waitUntil: 'networkidle0' })
+  await page.goto(`${baseUrl}${lessonPath(readingLessonId, 'zh')}`, { waitUntil: 'networkidle0' })
   await page.waitForSelector('.study-reading h1')
   await settle(page)
   await assertNoHorizontalOverflow(page, `reading-${viewport}`)
   await page.screenshot({ path: `${outputDir}/${label}-reading-${viewport}.png`, fullPage: false })
+
+  await page.$eval('#study-2', node => node.scrollIntoView({ block:'start' }))
+  await settle(page)
+  await assertNoHorizontalOverflow(page, `practice-${viewport}`)
+  await page.screenshot({ path: `${outputDir}/${label}-practice-${viewport}.png`, fullPage: false })
 
   await page.click('[data-qa="share-trigger"]')
   await page.waitForSelector('[data-qa="share-dialog"]')
@@ -97,4 +103,4 @@ await captureReadingAndShare(1440, 1000, 'desktop')
 await captureReadingAndShare(390, 844, 'mobile')
 
 await browser.close()
-console.log(JSON.stringify({ outputDir, label, theme, files: 7 }, null, 2))
+console.log(JSON.stringify({ outputDir, label, theme, readingLessonId, files: 9 }, null, 2))

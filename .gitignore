@@ -6,6 +6,7 @@ dist/
 
 # Local QA and working files
 qa-*.png
+output/playwright/
 tmp/
 generated_images/
 *.zip
