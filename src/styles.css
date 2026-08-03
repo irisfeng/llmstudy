@@ -16,6 +16,7 @@
   --marker: rgba(57,215,164,.2);
   --radius: 12px;
   --side: 172px;
+
   font-family: 'Noto Sans SC Variable', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
