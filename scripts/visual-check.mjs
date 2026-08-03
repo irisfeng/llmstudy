@@ -47,6 +47,7 @@ await page.click('nav.main-nav button:nth-child(2)')
 const curriculumVideoBadges = await page.$$eval('.lesson-video', els => els.length)
 await page.screenshot({ path: 'qa-curriculum.png', fullPage: true })
 
+await openModule(page, '神经网络地基')
 await page.click('.lesson-table > button:nth-child(2)')
 const studyTitle = await page.$eval('.study-reading h1', el => el.textContent)
 const objectiveCount = await page.$$eval('.objective-card li', els => els.length)

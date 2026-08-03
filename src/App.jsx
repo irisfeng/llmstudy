@@ -80,10 +80,10 @@ function TrackSwitcher({ trackId, onTrack, compact = false }) {
 function Sidebar({ view, setView, open, onClose, progress, theme, toggleTheme, trackId, onTrack }) {
   const { t, pick } = useI18n()
   return <aside className={`sidebar ${open ? 'open' : ''}`}>
-    <div className="side-head"><Brand /><button className="icon-button mobile-only" onClick={onClose}><X /></button></div>
+    <div className="side-head"><Brand /><button className="icon-button mobile-only" onClick={onClose} aria-label={pick('关闭导航','Close navigation')}><X /></button></div>
     <TrackSwitcher trackId={trackId} onTrack={onTrack} compact />
     <nav className="main-nav" aria-label="主要导航">
-      {navItems.map(([id, label, Icon]) => <button key={id} className={view === id ? 'active' : ''} onClick={() => { setView(id); onClose() }}>
+      {navItems.map(([id, label, Icon]) => <button key={id} data-qa={`nav-${id}`} className={view === id ? 'active' : ''} onClick={() => { setView(id); onClose() }}>
         <Icon size={20} weight={view === id ? 'fill' : 'regular'} /><span>{t(label)}</span>
       </button>)}
     </nav>
@@ -107,9 +107,9 @@ function ThemeToggle({ theme, toggleTheme, compact = false }) {
 }
 
 function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, user, syncStatus }) {
-  const { t } = useI18n()
+  const { t, pick } = useI18n()
   return <header className="topbar">
-    <button className="icon-button mobile-only" onClick={onMenu}><List /></button>
+    <button className="icon-button mobile-only" onClick={onMenu} aria-label={pick('打开导航','Open navigation')}><List /></button>
     <button className="search-trigger" onClick={onSearch} aria-label={t('search')}><MagnifyingGlass size={17} /><span>{t('search')}</span><kbd>⌘ K</kbd></button>
     <div className="top-progress"><span>{t('totalProgress')} <b>{progress}%</b></span><i><em style={{ width: `${progress}%` }} /></i></div>
     <LanguageToggle />
@@ -118,7 +118,7 @@ function Topbar({ onMenu, onSearch, theme, toggleTheme, progress, onAccount, use
   </header>
 }
 
-function Dashboard({ goLesson, setView, trackId, onTrack, completed = new Set(), notesCount = 0, resume = null }) {
+function Dashboard({ goLesson, setView, trackId, onTrack, completed = new Set(), notesCount = 0, resume = null, theme }) {
   const { pick, locale } = useI18n()
   const localized = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const isWorld = trackId === 'world-models'
@@ -136,7 +136,7 @@ function Dashboard({ goLesson, setView, trackId, onTrack, completed = new Set(),
         <div className="hero-actions">
           <button className="primary" onClick={goLesson}>{resume ? pick('继续学习','Continue learning') : pick('开始学习','Start learning')} <ArrowRight weight="bold" /></button>
           <button className="secondary" onClick={() => setView('path')}>{pick('查看完整路线','View full path')}</button>
-          <ShareButton trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('80 节中英双语课程，从 Python 先修、反向传播、Transformer 到推理模型、部署与 Agent。','80 bilingual lessons from Python prerequisites and backpropagation to Transformers, reasoning models, serving, and agents.')} />
+          <ShareButton theme={theme} trackId={trackId} title={isWorld ? 'World Models · Under the Hood' : pick('LLM Study · 免费大模型系统课','LLM Study · Free systems course for LLMs')} text={isWorld ? pick('12 节世界模型课程，从 POMDP、Dreamer 和 JEPA 到 Genie、Marble 与 Cosmos。','12 world-model lessons from POMDPs, Dreamer, and JEPA to Genie, Marble, and Cosmos.') : pick('80 节中英双语课程，从 Python 先修、反向传播、Transformer 到推理模型、部署与 Agent。','80 bilingual lessons from Python prerequisites and backpropagation to Transformers, reasoning models, serving, and agents.')} />
         </div>
         <p className="hero-note"><DoodleArrow className="hero-note-arrow" /><span className="hand">{pick('不用注册，点开就学','No sign-up — just start')}</span></p>
         <div className="signal-map" aria-label="从 token 到 agent 的学习信号图">
@@ -249,27 +249,47 @@ function Curriculum({ selected, setSelected, goLesson, completed, trackId }) {
   const current = modulesData[selected]
   const isWorld = trackId === 'world-models'
   const mediaLessons = isWorld ? lessonMediaStats.world : lessonMediaStats.llm
-  return <main className="page curriculum-page">
-    <header className="page-lead">
-      <span className="section-no">THE COMPLETE PATH</span>
-      <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
-      <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('32 周包含可跳过的 3 周零基础先修；主线仍是一套持续更新、可验证的能力建造计划，每阶段都以作品和掌握门结束。','The 32-week plan includes an optional three-week prerequisite sprint; every phase still ends with a project and mastery gate.')}</p>
-      <div className="curriculum-stats"><span><b>{flattenLessons(modulesData).length}</b> {pick('深度课','deep lessons')}</span><span><b>{mediaLessons}</b> {pick('视频研讨','video seminars')}</span><span><b>{isWorld ? 8 : 30}</b> {pick('核心实验','core labs')}</span><span><b>{modulesData.length}</b> {pick('阶段作品','phase projects')}</span></div>
-      {isWorld ? <DoodleWorld className="page-lead-doodle" /> : <DoodleNetwork className="page-lead-doodle" />}
+  const totalLessons = flattenLessons(modulesData).length
+  const completedLessons = flattenLessons(modulesData).filter(({ lesson }) => completed.has(lesson[0])).length
+  const currentDone = current.lessons.filter(lesson => completed.has(lesson[0])).length
+  const pathProgress = Math.round((completedLessons / totalLessons) * 100)
+  return <main className="page curriculum-page" data-qa="learning-path">
+    <header className="page-lead curriculum-lead">
+      <div className="curriculum-lead-grid">
+        <div className="path-lead-copy">
+          <span className="section-no">THE COMPLETE PATH · FIELD GUIDE</span>
+          <h1>{pick('一条能走到底的','A complete path through')}<br />{isWorld ? pick('世界模型学习路线','world models') : pick('大模型学习路线','large language models')}</h1>
+          <p>{isWorld ? pick('从 POMDP 与隐空间动力学开始，走到 JEPA、Genie、空间智能、Physical AI 与严谨评测。','Start with POMDPs and latent dynamics, then progress through JEPA, Genie, spatial intelligence, physical AI, and rigorous evaluation.') : pick('32 周包含可跳过的 3 周零基础先修；主线仍是一套持续更新、可验证的能力建造计划，每阶段都以作品和掌握门结束。','The 32-week plan includes an optional three-week prerequisite sprint; every phase still ends with a project and mastery gate.')}</p>
+        </div>
+        <aside className="path-route-card" aria-label={pick('当前路线位置','Current position on the path')}>
+          <div className="path-route-head"><span>{pick('你在这里','YOU ARE HERE')}</span><b>{String(selected + 1).padStart(2, '0')} / {String(modulesData.length).padStart(2, '0')}</b></div>
+          {isWorld ? <DoodleWorld className="path-route-doodle" /> : <DoodleNetwork className="path-route-doodle" />}
+          <div className="path-route-current"><small>PHASE {current.no}</small><strong>{current.title}</strong><span>{currentDone} / {current.lessons.length} {pick('节完成','lessons complete')}</span></div>
+          <div className="path-route-progress" aria-label={`${pathProgress}%`}><i style={{ width:`${pathProgress}%` }} /></div>
+        </aside>
+      </div>
+      <div className="curriculum-stats"><span><b>{totalLessons}</b><small>{pick('深度课','deep lessons')}</small></span><span><b>{mediaLessons}</b><small>{pick('视频研讨','video seminars')}</small></span><span><b>{isWorld ? 8 : 30}</b><small>{pick('核心实验','core labs')}</small></span><span><b>{modulesData.length}</b><small>{pick('阶段作品','phase projects')}</small></span></div>
     </header>
     <div className="curriculum-layout">
-      <aside className="module-index">
-        {modulesData.map((m, i) => <button key={m.id} onClick={() => setSelected(i)} className={selected === i ? 'active' : ''}>
-          <span>{m.no}</span><div><strong>{m.title}</strong><small>{m.weeks} · {m.hours}h</small></div><ArrowRight />
-        </button>)}
+      <aside className="module-index" aria-label={pick('学习阶段','Learning phases')}>
+        <div className="module-index-label"><span>{pick('阶段地图','PHASE MAP')}</span><b>{String(selected + 1).padStart(2, '0')} / {String(modulesData.length).padStart(2, '0')}</b></div>
+        {modulesData.map((m, i) => {
+          const done = m.lessons.filter(lesson => completed.has(lesson[0])).length
+          return <button key={m.id} onClick={() => setSelected(i)} className={selected === i ? 'active' : ''} aria-current={selected === i ? 'step' : undefined}>
+          <span>{m.no}</span><div><strong>{m.title}</strong><small>{m.weeks} · {m.hours}h · {m.lessons.length} {pick('节','lessons')}</small><i><em style={{ width:`${Math.round((done / m.lessons.length) * 100)}%` }} /></i></div><ArrowRight />
+        </button>})}
       </aside>
       <section className="module-detail">
-        <div className="module-head"><div><span className="section-no">PHASE {current.no}</span><h2>{current.title}</h2><p>{current.summary}</p></div><div className="module-time"><strong>{current.weeks}</strong><span>{current.hours} {pick('小时','hours')}</span></div></div>
-        <blockquote>{pick('核心问题：','Core question: ')}{current.question}</blockquote>
+        <div className="module-head"><div><span className="section-no">PHASE {current.no} · FIELD NOTES</span><h2>{current.title}</h2><p>{current.summary}</p></div><div className="module-time"><strong>{current.weeks}</strong><span>{current.hours} {pick('小时','hours')}</span><small>{currentDone}/{current.lessons.length} {pick('已完成','done')}</small></div></div>
+        <blockquote><span>{pick('本阶段要回答','QUESTION TO ANSWER')}</span>{current.question}<DoodleArrow className="question-arrow" /></blockquote>
+        <div className="phase-proof-strip">
+          <div><span>BUILD</span><b>{pick('完成一个可展示作品','Ship one inspectable project')}</b><small>{current.project}</small></div>
+          <div><span>PROVE</span><b>{pick('通过掌握门','Pass the mastery gate')}</b><small>{current.mastery.length} {pick('项可验证标准','verifiable checks')}</small></div>
+        </div>
         <div className="lesson-table">
           <div className="lesson-table-head"><span>{pick('课程','Lesson')}</span><span>{pick('理论内核','Theory')}</span><span>{pick('实践产出','Deliverable')}</span><span>{pick('时长','Time')}</span></div>
           {current.lessons.map((l, i) => <button key={l[0]} className={completed.has(l[0]) ? 'completed-row' : ''} onClick={() => goLesson(current, l, i)}>
-            <span><i>{l[0]}</i><strong>{l[1]}</strong><em>{l[2]}</em>{lessonHasMedia(l[0]) && <small className="lesson-video"><VideoCamera weight="fill" /> {t('video')}</small>}</span><span>{l[4]}</span><span>{l[5]}</span><span>{l[3]} <ArrowRight /></span>
+            <span><i>{l[0]}</i><strong>{l[1]}</strong><em>{l[2]}</em>{lessonHasMedia(l[0]) && <small className="lesson-video"><VideoCamera weight="fill" /> {t('video')}</small>}</span><span data-label={pick('理论','THEORY')}>{l[4]}</span><span data-label={pick('产出','OUTPUT')}>{l[5]}</span><span>{l[3]} <ArrowRight /></span>
           </button>)}
         </div>
         <div className="module-outcomes">
@@ -455,6 +475,8 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
   const [answer, setAnswer] = useState(null)
   const [showWorked, setShowWorked] = useState(false)
   const [note, setNote] = useState(() => localStorage.getItem(`${lessonKey}-note`) || '')
+  const sectionLabels = [t('understand'),t('mechanism'),t('practice'),t('quiz'),t('masteryGate')]
+  const readingProgress = complete ? 100 : (section + 1) * 20
 
   useEffect(() => {
     localStorage.setItem(`${lessonKey}-note`, note)
@@ -468,12 +490,22 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
     addEventListener('uth-learning-sync', receive)
     return () => removeEventListener('uth-learning-sync', receive)
   }, [lesson])
+  useEffect(() => {
+    const targets = sectionLabels.map((_, index) => document.getElementById(`study-${index}`)).filter(Boolean)
+    if (!targets.length || !('IntersectionObserver' in window)) return undefined
+    const observer = new IntersectionObserver(entries => {
+      const visible = entries.filter(entry => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+      if (visible) setSection(Number(visible.target.id.replace('study-', '')))
+    }, { rootMargin:'-22% 0px -62% 0px', threshold:[0, .2, .6] })
+    targets.forEach(target => observer.observe(target))
+    return () => observer.disconnect()
+  }, [lesson[0]])
 
-  return <main className="study-shell">
+  return <main className="study-shell" data-qa="reading-page">
     <header className="study-topbar">
       <button onClick={onBack}><ArrowLeft /> {t('backPath')}</button>
-      <div className="study-progress"><span>{module.no} · {module.title}</span><i><em style={{ width: complete ? '100%' : '42%' }} /></i></div>
-      <ShareButton compact surface="lesson_header" lessonId={lesson[0]} trackId={lesson[0].startsWith('wm.') ? 'world-models' : 'llm'} title={material.title} text={material.opening[0] || t('lessonLead')} />
+      <div className="study-progress"><span>{module.no} · {module.title} · {readingProgress}%</span><i aria-label={`${readingProgress}%`}><em style={{ width:`${readingProgress}%` }} /></i></div>
+      <ShareButton theme={theme} compact surface="lesson_header" lessonId={lesson[0]} trackId={lesson[0].startsWith('wm.') ? 'world-models' : 'llm'} title={material.title} text={material.opening[0] || t('lessonLead')} />
       <ThemeToggle theme={theme} toggleTheme={toggleTheme} compact />
       <LanguageToggle compact />
       <AccountButton onClick={onAccount} user={user} syncStatus={syncStatus} compact />
@@ -484,16 +516,19 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <span className="section-no">LESSON {material.id}</span>
         <h3>{material.title}</h3>
         <small>{material.type} · {material.duration}</small>
-        <nav>{[t('understand'),t('mechanism'),t('practice'),t('quiz'),t('masteryGate')].map((item, index) => <button key={item} className={section === index ? 'active' : ''} onClick={() => { setSection(index); document.getElementById(`study-${index}`)?.scrollIntoView({ behavior: 'smooth' }) }}><span>0{index + 1}</span>{item}</button>)}</nav>
+        <nav aria-label={pick('本节目录','Lesson outline')}>{sectionLabels.map((item, index) => <button key={item} className={section === index ? 'active' : ''} aria-current={section === index ? 'location' : undefined} aria-controls={`study-${index}`} onClick={() => { setSection(index); document.getElementById(`study-${index}`)?.scrollIntoView({ behavior: 'smooth' }) }}><span>0{index + 1}</span>{item}</button>)}</nav>
         <div className="study-source-mini"><span>{t('sources')}</span>{material.references.map(x => <b key={x}>{x}</b>)}</div>
       </aside>
 
-      <article className="study-reading">
-        <div className="study-breadcrumb">{module.no} {module.title} / {material.id}</div>
-        <span className="section-no">{t('theoryPracticeEvidence')}</span>
-        <h1>{material.title}</h1>
-        <DoodleUnderline className="title-swash" />
-        <p className="study-lead">{t('lessonLead')}</p>
+      <article className="study-reading" aria-labelledby="lesson-title">
+        <header className="reading-hero">
+          <div className="study-breadcrumb">{module.no} {module.title} / {material.id}</div>
+          <div className="reading-kicker"><span className="section-no">{t('theoryPracticeEvidence')}</span><span>{material.type}</span><span>{material.duration}</span></div>
+          <h1 id="lesson-title">{material.title}</h1>
+          <DoodleUnderline className="title-swash" />
+          <p className="study-lead">{t('lessonLead')}</p>
+          <aside className="reading-contract"><DoodleBook /><div><span>{pick('本节不是摘要','NOT A SUMMARY')}</span><b>{pick('先理解，再实现，最后留下可检查证据。','Understand it, build it, then leave inspectable evidence.')}</b><small>{material.practice.task}</small></div></aside>
+        </header>
 
         <GeoAnswer lessonId={lesson[0]} />
 
@@ -534,7 +569,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <section id="study-3" className="study-section quiz-card">
           <span className="section-no">04 · RETRIEVAL CHECK</span><h2>{material.quiz.question}</h2>
           <div>{material.quiz.options.map((x, i) => <button key={x} className={answer === i ? (i === 0 ? 'correct' : 'wrong') : ''} onClick={() => setAnswer(i)}><span>{String.fromCharCode(65 + i)}</span>{x}{answer === i && (i === 0 ? <CheckCircle weight="fill" /> : <X weight="bold" />)}</button>)}</div>
-          {answer !== null && <p className={`quiz-feedback ${answer === 0 ? 'ok' : ''}`}>{answer === 0 ? t('correct') : t('almost')} {material.quiz.explanation}</p>}
+          {answer !== null && <p className={`quiz-feedback ${answer === 0 ? 'ok' : ''}`} aria-live="polite">{answer === 0 ? t('correct') : t('almost')} {material.quiz.explanation}</p>}
         </section>
 
         <section className="notes-card">
@@ -597,7 +632,7 @@ export default function App() {
   const localizedModules = useMemo(() => trackModules(trackId, locale), [trackId, locale])
   const flatLessons = useMemo(() => flattenLessons(localizedModules), [localizedModules])
   const [view, setView] = useState('home')
-  const [moduleIndex, setModuleIndex] = useState(2)
+  const [moduleIndex, setModuleIndex] = useState(1)
   const [lessonInfo, setLessonInfo] = useState(null)
   const [mobileNav, setMobileNav] = useState(false)
   const [search, setSearch] = useState(false)
@@ -741,7 +776,7 @@ export default function App() {
   return <div className="app-shell">
     <Sidebar view={view} setView={setView} open={mobileNav} onClose={() => setMobileNav(false)} progress={progress} theme={theme} toggleTheme={toggleTheme} trackId={trackId} onTrack={changeTrack} />
     <div className="app-main"><Topbar onMenu={() => setMobileNav(true)} onSearch={() => setSearch(true)} theme={theme} toggleTheme={toggleTheme} progress={progress} onAccount={() => setAccountOpen(true)} user={user} syncStatus={sync.status} />
-      {view === 'home' && <Dashboard goLesson={continueLearning} setView={setView} trackId={trackId} onTrack={changeTrack} completed={completed} notesCount={notesCount} resume={resumeInfo} />}
+      {view === 'home' && <Dashboard goLesson={continueLearning} setView={setView} trackId={trackId} onTrack={changeTrack} completed={completed} notesCount={notesCount} resume={resumeInfo} theme={theme} />}
       {view === 'path' && <Curriculum selected={moduleIndex} setSelected={setModuleIndex} goLesson={openLesson} completed={completed} trackId={trackId} />}
       {view === 'labs' && <Labs goLesson={() => openLesson()} trackId={trackId} />}
       {view === 'projects' && <Projects trackId={trackId} />}
