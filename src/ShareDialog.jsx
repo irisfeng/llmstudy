@@ -71,6 +71,9 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   const panel = '#0d1c17'
   const text = '#edf2ef'
   const muted = '#9aaca4'
+  const sansFamily = locale === 'zh'
+    ? '"Noto Sans SC Variable", system-ui, sans-serif'
+    : '"Manrope Variable", "Noto Sans SC Variable", system-ui, sans-serif'
 
   context.fillStyle = background
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT)
@@ -92,7 +95,7 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   context.textAlign = 'center'
   context.fillText('μ', 117, 132)
   context.textAlign = 'left'
-  context.font = '700 25px "Noto Sans SC", system-ui, sans-serif'
+  context.font = `700 25px ${sansFamily}`
   context.fillText('UNDER THE HOOD', 170, 112)
   context.fillStyle = muted
   context.font = '500 18px "IBM Plex Mono", monospace'
@@ -104,13 +107,13 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   context.fillText(`${isWorld ? 'WORLD MODELS' : 'LLM SYSTEMS'}${lessonId ? `  /  LESSON ${lessonId}` : ''}`, 88, 248)
 
   context.fillStyle = text
-  context.font = `700 ${locale === 'zh' ? 78 : 72}px "Noto Sans SC", system-ui, sans-serif`
+  context.font = `700 ${locale === 'zh' ? 78 : 72}px ${sansFamily}`
   const titleEnd = drawWrappedText(context, title, {
     x: 88, y: 346, maxWidth: 884, lineHeight: locale === 'zh' ? 112 : 100, maxLines: 4, locale,
   })
 
   context.fillStyle = muted
-  context.font = `400 ${locale === 'zh' ? 31 : 29}px "Noto Sans SC", system-ui, sans-serif`
+  context.font = `400 ${locale === 'zh' ? 31 : 29}px ${sansFamily}`
   drawWrappedText(context, description, {
     x: 88, y: Math.max(titleEnd + 42, 640), maxWidth: 820, lineHeight: 52, maxLines: 4, locale,
   })
@@ -118,10 +121,10 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   context.fillStyle = panel
   context.fillRect(88, 1080, 904, 272)
   context.fillStyle = accent
-  context.font = '600 24px "Noto Sans SC", system-ui, sans-serif'
+  context.font = `600 24px ${sansFamily}`
   context.fillText(locale === 'zh' ? '扫码打开本节课' : 'SCAN TO OPEN THIS LESSON', 126, 1150)
   context.fillStyle = text
-  context.font = '700 34px "Noto Sans SC", system-ui, sans-serif'
+  context.font = `700 34px ${sansFamily}`
   context.fillText(locale === 'zh' ? '从原理到系统，亲手学会。' : 'Learn it from first principles.', 126, 1203)
   context.fillStyle = muted
   context.font = '500 19px "IBM Plex Mono", monospace'

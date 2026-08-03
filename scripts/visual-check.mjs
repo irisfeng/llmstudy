@@ -9,6 +9,15 @@ const browser = await puppeteer.launch({
 
 const errors = []
 const targetUrl = process.env.QA_URL || `file://${resolve('dist/index.html')}`
+const openModule = async (target, label) => {
+  const found = await target.$$eval('.module-index button', (buttons, expected) => {
+    const button = buttons.find(candidate => candidate.textContent.includes(expected))
+    button?.click()
+    return Boolean(button)
+  }, label)
+  if (!found) throw new Error(`Module not found: ${label}`)
+  await target.waitForFunction(expected => document.querySelector('.module-detail h2')?.textContent.includes(expected), {}, label)
+}
 const page = await browser.newPage()
 await page.evaluateOnNewDocument(() => {
   localStorage.setItem('uth-theme', 'dark')
@@ -64,8 +73,7 @@ await page.click('.study-topbar > button:first-child')
 const completedRows = await page.$$eval('.lesson-table > button.completed-row', els => els.length)
 const progressLabel = await page.$eval('.top-progress b', el => el.textContent)
 
-await page.click('.module-index button:nth-child(4)')
-await page.waitForFunction(() => document.querySelector('.module-detail h2')?.textContent.includes('从注意力到 GPT'))
+await openModule(page, '从注意力到 GPT')
 await page.$$eval('.lesson-table > button', buttons => buttons.find(button => button.textContent.includes('3.3'))?.click())
 await page.waitForSelector('.media-parts button:nth-child(2)')
 const mediaParts = await page.$$eval('.media-parts button', els => els.length)
@@ -94,8 +102,7 @@ const mobileMenuOpen = await mobile.$eval('.sidebar', el => el.classList.contain
 await mobile.screenshot({ path: 'qa-mobile.png', fullPage: true })
 await mobile.click('.main-nav button:nth-child(2)')
 const mobileCurriculumWidth = await mobile.evaluate(() => document.documentElement.scrollWidth)
-await mobile.click('.module-index button:nth-child(4)')
-await mobile.waitForFunction(() => document.querySelector('.module-detail h2')?.textContent.includes('从注意力到 GPT'))
+await openModule(mobile, '从注意力到 GPT')
 await mobile.$$eval('.lesson-table > button', buttons => buttons.find(button => button.textContent.includes('3.3'))?.click())
 const mobileMediaParts = await mobile.$$eval('.media-parts button', els => els.length)
 const mobileStudyWidth = await mobile.evaluate(() => document.documentElement.scrollWidth)
