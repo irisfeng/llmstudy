@@ -16,3 +16,4 @@ project_sources/
 # OS/editor noise
 .DS_Store
 *.log
+.gstack/
