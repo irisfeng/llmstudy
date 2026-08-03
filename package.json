@@ -19,6 +19,8 @@
     "qa:kimi-k3": "node scripts/kimi-k3-content-check.mjs",
     "qa:world-content": "node scripts/world-content-check.mjs",
     "qa:world": "npm run qa:world-content && node scripts/world-model-check.mjs",
+    "qa:ui:capture": "node scripts/ui-redesign-capture.mjs",
+    "qa:ui:compare": "node scripts/ui-redesign-compare.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"
   },
   "dependencies": {
