@@ -1,10 +1,14 @@
 {
-  "version": "2026-07-13",
+  "version": "2026-08-03",
   "site": "https://llmstudy.shddai.net",
   "campaign": "organic_launch",
   "channels": [
     {
+      "campaignId": "organic_launch_github_readme_01",
       "id": "github",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 1,
       "medium": "referral",
       "content": "repository_readme",
@@ -12,7 +16,11 @@
       "goal": "把仓库访问者转成课程学习者"
     },
     {
+      "campaignId": "organic_launch_v2ex_build_01",
       "id": "v2ex",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 1,
       "medium": "community",
       "content": "build_in_public",
@@ -20,7 +28,11 @@
       "goal": "获得开发者对课程结构和移动体验的真实反馈"
     },
     {
+      "campaignId": "organic_launch_juejin_backprop_01",
       "id": "juejin",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 2,
       "medium": "article",
       "content": "backprop_deep_dive",
@@ -28,7 +40,11 @@
       "goal": "用完整技术文章带来高意图学习访问"
     },
     {
+      "campaignId": "organic_launch_zhihu_qkv_01",
       "id": "zhihu",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 3,
       "medium": "answer",
       "content": "qkv_explainer",
@@ -36,7 +52,11 @@
       "goal": "用高质量问答覆盖长期搜索需求"
     },
     {
+      "campaignId": "organic_launch_bilibili_kv_cache_01",
       "id": "bilibili",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 4,
       "medium": "video",
       "content": "kv_cache_short",
@@ -44,7 +64,11 @@
       "goal": "用一分钟技术短视频验证视频转化"
     },
     {
+      "campaignId": "organic_launch_wechat_course_intro_01",
       "id": "wechat_video",
+      "status": "draft",
+      "originalUrl": null,
+      "publishedAt": null,
       "week": 4,
       "medium": "video",
       "content": "course_intro",

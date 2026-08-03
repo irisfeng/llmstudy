@@ -184,6 +184,7 @@ const karpathy = (id, title, duration, page, details = {}) => {
   const { cn: cnDetails, ...rest } = details
   return {
     platform:'YouTube', id, title, author:'Andrej Karpathy', duration,
+    sourceType:'primary', sourceLabel:'Original course', sourceNote:'Andrej Karpathy 原始课程视频。',
     cnQuery:`Karpathy ${title} 中文`,
     cn:bili('karpathy', { title:`中英字幕 · ${title}`, duration, page, ...cnDetails }),
     ...rest,
@@ -261,6 +262,9 @@ const karpathyMedia = ({ segments, requiredDuration, activityDuration, activityD
   id:karpathyDeepResource.id,
   title:karpathyDeepResource.title,
   author:karpathyDeepResource.author,
+  sourceType:'primary',
+  sourceLabel:'Original course',
+  sourceNote:'Andrej Karpathy 原始完整讲座；本课只要求观看标注片段。',
   duration:karpathyDeepResource.duration,
   resourceDuration:karpathyDeepResource.duration,
   requiredDuration,
@@ -296,6 +300,10 @@ const lessonMedia = {
         videoPart('-7xg8pGcP6w','Loops'),
       ],
     },
+    before:'先写一个只会顺序执行的 Python 小程序，再预测函数、条件与循环分别会替代哪一段重复代码。',
+    after:'闭卷写出一个含函数、条件与循环的小程序，并用至少三个输入验证正常、边界与失败路径。',
+    beforeEn:'Write a sequential Python script, then predict which repeated lines a function, condition, and loop should replace.',
+    afterEn:'From memory, write one small program with a function, condition, and loop; test normal, boundary, and failure inputs.',
   },
   'p.2': {
     ...bili('cs50p', {
@@ -373,7 +381,19 @@ const lessonMedia = {
 
   '1.1': bili('neuralNet', { title:'神经网络到底是什么？', duration:'19m13s' }),
   '1.2': bili('calculus', { title:'直观理解链式法则和乘积法则', duration:'16m52s', page:4 }),
-  '1.3': karpathy('VMj-3S1tku0', 'Building micrograd', '2h25m', 1, { before:'在播放前先写下：一个 Value 节点至少要保存哪些状态，为什么梯度必须累加？', after:'暂停视频，闭卷实现 add、mul、tanh 和 backward，再用有限差分检查。' }),
+  '1.3': karpathy('VMj-3S1tku0', 'Building micrograd', '2h25m', 1, {
+    requiredDuration:'57:53',
+    before:'在播放前先写下：一个 Value 节点至少要保存哪些状态，为什么梯度必须累加？',
+    after:'暂停视频，闭卷实现 add、mul、tanh 和 backward，再用有限差分检查。',
+    beforeEn:'Before watching, list the state a Value node needs and predict why gradients must accumulate.',
+    afterEn:'Close the source, implement add, multiply, tanh, and backward, then check them with finite differences.',
+    segments:[
+      { id:'value-object', role:'required', start:1160, end:1760, title:'Value object and graph edges', titleZh:'Value 对象与计算图边', before:'先写出 Value 最少要保存的 data、grad、parents 与 operation。', after:'画出一次加法产生的新节点及两条父边。', beforeEn:'List the minimum data, grad, parents, and operation fields.', afterEn:'Draw the output node and two parent edges created by one addition.' },
+      { id:'chain-rule', role:'required', start:2288, end:3071, title:'Chain rule and gradient checks', titleZh:'链式法则与数值梯度', before:'手算一个两层标量表达式的局部导数和上游梯度。', after:'用中心差分核对一个叶子节点的解析梯度。', beforeEn:'Hand-calculate local and upstream derivatives for a two-layer scalar expression.', afterEn:'Check one leaf gradient with a centered finite difference.' },
+      { id:'backward-closures', role:'required', start:3071, end:4161, title:'Backward closures and tanh', titleZh:'反向闭包与 tanh', before:'预测 add、mul、tanh 各自需要把什么贡献传回父节点。', after:'为三个运算分别写 _backward，并解释为什么使用 +=。', beforeEn:'Predict the parent contribution for add, multiply, and tanh.', afterEn:'Write each _backward closure and explain why every update uses +=.' },
+      { id:'topology-accumulation', role:'required', start:4161, end:5161, title:'Reverse topology and accumulation', titleZh:'逆拓扑与梯度累加', before:'找一个共享节点 x 同时走两条路径到 loss 的例子。', after:'构建拓扑序、逆序执行，并用 y=x*x+x 验证 x.grad=5。', beforeEn:'Create a loss where x reaches the output through two paths.', afterEn:'Build the topological order, reverse it, and verify x.grad=5 for y=x*x+x at x=2.' },
+    ],
+  }),
   '1.5': karpathy('VMj-3S1tku0', 'From Value to MLP', '2h25m', 1),
   '1.7': karpathy('P6sfmUTpUmc', 'Activations, gradients and BatchNorm', '1h55m', 4),
   '1.8': karpathy('VMj-3S1tku0', 'Rebuild micrograd from scratch', '2h25m', 1),
@@ -389,7 +409,20 @@ const lessonMedia = {
   '2.9': bili('karpathy', { title:'makemore + Tokenizer 复习路径', duration:'选看', page:2, parts:[part(2,'Bigram 与 makemore'), part(3,'MLP 语言模型'), part(4,'激活与梯度'), part(5,'手工反传'), part(9,'GPT Tokenizer')] }),
 
   '3.1': bili('transformerVisual', { title:'GPT 是什么？直观解释 Transformer', duration:'27m14s' }),
-  '3.2': bili('liMuAttention', { title:'Transformer 论文逐段精读', duration:'1h27m', before:'带着三个问题看：为什么除以 √d、mask 在哪里加、Multi-Head 如何拼接？', after:'用四个 token 的小矩阵手算一次 attention，并标注每个张量 shape。' }),
+  '3.2': bili('liMuAttention', {
+    title:'Transformer 论文逐段精读', duration:'1h27m',
+    before:'带着三个问题看：为什么除以 √d、mask 在哪里加、Multi-Head 如何拼接？',
+    after:'用四个 token 的小矩阵手算一次 attention，并标注每个张量 shape。',
+    beforeEn:'Watch with three questions: why divide by √d, where is the mask added, and how are multiple heads concatenated?',
+    afterEn:'Hand-calculate attention for a four-token matrix, label every tensor shape, and compare the result with code.',
+    global:{
+      platform:'YouTube', id:'eMlx5fFNoYc', title:'Attention in transformers, step-by-step | Deep Learning Chapter 6',
+      author:'3Blue1Brown', duration:'26m10s', sourceType:'official', sourceLabel:'Official lesson',
+      sourceNote:'3Blue1Brown 官方可视化课程，逐步解释 Q、K、V、缩放、mask 与多头注意力。',
+      originalUrl:'https://www.youtube.com/watch?v=eMlx5fFNoYc',
+      referenceUrl:'https://www.3blue1brown.com/lessons/attention/',
+    },
+  }),
   '3.3': bili('raschka', { title:'从单头到 Multi-Head Attention', duration:'28m52s', page:16, parts:[part(16,'堆叠多个单头注意力层'), part(17,'权重分割实现多头注意力')] }),
   '3.4': bili('raschka', { title:'位置编码、LayerNorm 与残差连接', duration:'45m30s', page:8, parts:[part(8,'位置编码'), part(19,'LayerNorm'), part(21,'残差连接')] }),
   '3.5': bili('raschka', { title:'逐步搭建 Transformer Block', duration:'58m', page:18, parts:[part(18,'编码 LLM 架构'), part(19,'LayerNorm'), part(20,'GELU 与前馈网络'), part(21,'残差连接'), part(22,'连接注意力与线性层')] }),
@@ -425,7 +458,19 @@ const lessonMedia = {
   '5.6': bili('cs336', { title:'模型评估：任务、指标与污染', duration:'1h20m', page:12 }),
 
   '6.1': bili('cs336', { title:'大模型推理：Prefill、Decode 与服务负载', duration:'1h22m', page:10 }),
-  '6.2': bili('vllm', { title:'KV Cache 与 PagedAttention', duration:'12m08s' }),
+  '6.2': bili('vllm', {
+    title:'KV Cache 与 PagedAttention', duration:'12m08s', requiredDuration:'12:08',
+    before:'先估算一个请求的 KV cache：层数 × 2 × KV heads × head dim × token 数 × 每元素字节数，并预测长度翻倍后的显存变化。',
+    after:'对同一批请求分别画出连续分配与分页分配，标出碎片、复用和 block table；再用公式复核总显存。',
+    beforeEn:'Estimate one request’s KV cache from layers × 2 × KV heads × head dim × tokens × bytes, then predict the effect of doubling context.',
+    afterEn:'Draw contiguous and paged allocation for the same requests; label fragmentation, reuse, and the block table, then verify total memory.',
+    global:{
+      platform:'Original', title:'Efficient Memory Management for Large Language Model Serving with PagedAttention',
+      author:'vLLM team', url:'https://arxiv.org/abs/2309.06180', sourceType:'primary', sourceLabel:'Original paper',
+      sourceNote:'International mode opens the primary PagedAttention paper rather than presenting a third-party video as official.',
+      referenceUrl:'https://docs.vllm.ai/en/v0.7.2/design/kernel/paged_attention.html',
+    },
+  }),
   '6.3': bili('llamaCpp', { title:'GGUF 文件解析与模型加载', duration:'28m16s', page:5 }),
   '6.4': bili('llamaCpp', { title:'llama.cpp 源码逐行调试带读', duration:'2h34m', page:3, parts:[part(3,'加载后端'), part(5,'解析 GGUF'), part(8,'CPU/GPU Buffer'), part(14,'llama_context'), part(15,'分配 KV Cache')] }),
   '6.5': bili('vllm', { title:'vLLM：KV Cache、PagedAttention 与吞吐', duration:'12m08s' }),
@@ -796,6 +841,110 @@ for prompt in prompts:
             base_model.generate(base_input),
             instruct_model.generate(chat_input))`
 
+const microgradLessonCode = `import math
+
+class Value:
+    def __init__(self, data, parents=(), op=""):
+        self.data = float(data)
+        self.grad = 0.0
+        self.parents = set(parents)
+        self.op = op
+        self._backward = lambda: None
+
+    def __add__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data + other.data, (self, other), "+")
+        def _backward():
+            self.grad += out.grad
+            other.grad += out.grad
+        out._backward = _backward
+        return out
+
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), "*")
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+        out._backward = _backward
+        return out
+
+    def tanh(self):
+        t = math.tanh(self.data)
+        out = Value(t, (self,), "tanh")
+        def _backward():
+            self.grad += (1 - t * t) * out.grad
+        out._backward = _backward
+        return out
+
+    def backward(self):
+        topo, seen = [], set()
+        def build(node):
+            if node not in seen:
+                seen.add(node)
+                for parent in node.parents:
+                    build(parent)
+                topo.append(node)
+        build(self)
+        self.grad = 1.0
+        for node in reversed(topo):
+            node._backward()
+
+x = Value(2.0)
+y = x * x + x              # x is shared by two paths
+y.backward()
+assert y.data == 6.0
+assert x.grad == 5.0        # 2*x + 1; overwrite would fail`
+
+const kvCacheLessonCode = `import math
+
+W_Q = [[1.0, 0.0], [0.0, 1.0]]
+W_K = [[1.0, 0.0], [0.0, 1.0]]
+W_V = [[1.0, 1.0], [1.0, -1.0]]
+
+def matvec(x, weight):
+    return [sum(x[i] * weight[i][j] for i in range(len(x)))
+            for j in range(len(weight[0]))]
+
+def softmax(values):
+    peak = max(values)
+    exp = [math.exp(value - peak) for value in values]
+    total = sum(exp)
+    return [value / total for value in exp]
+
+def attend(query, keys, values):
+    scale = math.sqrt(len(query))
+    scores = [sum(q * k for q, k in zip(query, key)) / scale
+              for key in keys]
+    weights = softmax(scores)
+    return [sum(weight * value[d] for weight, value in zip(weights, values))
+            for d in range(len(values[0]))]
+
+def decode_step(x_t, cache):
+    query = matvec(x_t, W_Q)
+    cache["k"].append(matvec(x_t, W_K))
+    cache["v"].append(matvec(x_t, W_V))
+    return attend(query, cache["k"], cache["v"])
+
+def reference(prefix):
+    keys = [matvec(token, W_K) for token in prefix]
+    values = [matvec(token, W_V) for token in prefix]
+    query = matvec(prefix[-1], W_Q)
+    return attend(query, keys, values)
+
+tokens = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+cache = {"k": [], "v": []}
+cached = [decode_step(token, cache) for token in tokens]
+recomputed = [reference(tokens[:i + 1]) for i in range(len(tokens))]
+for actual, expected in zip(cached, recomputed):
+    assert all(abs(a - b) < 1e-12 for a, b in zip(actual, expected))
+assert len(cache["k"]) == len(tokens) == len(cache["v"])
+
+def kv_cache_bytes(layers, batch, tokens, kv_heads, head_dim, bytes_per_element):
+    return layers * 2 * batch * tokens * kv_heads * head_dim * bytes_per_element
+
+assert kv_cache_bytes(32, 1, 4096, 8, 128, 2) == 536_870_912`
+
 const specialLessonCopy = {
   zh: {
     'p.1': {
@@ -816,6 +965,46 @@ const specialLessonCopy = {
       quiz:{question:'哪项最能证明你已经掌握 Python 基础，而不是只会照抄？',options:['换一组输入后先预测结果，再独立写函数和边界测试并解释 traceback','完整看完一门视频课并记住所有语法名词','复制示例代码后得到同样的三行输出'],explanation:'可迁移的预测、实现、测试与诊断才是掌握证据。'},
       mastery:['闭卷写出 tokenize 与 bigram_counts。','解释 list、dict、set、tuple 的选择差异。','在两分钟内从 traceback 定位一处故意错误。','为一个未见过的纯函数补齐正常、边界和失败测试。'],
       references:['Harvard CS50P · Weeks 0–4','Python Tutorial · Control Flow Tools','Python Tutorial · Data Structures'],
+    },
+    '1.3': {
+      objectives:['能解释 reverse-mode 为什么从标量输出沿逆拓扑顺序传播。','能为 add、mul、tanh 写局部反向规则。','能说明共享节点的梯度为何必须累加而不能覆盖。','能用有限差分和共享节点测试验证实现。'],
+      opening:['这一节只做一个最小自动微分内核：前向运算一边计算数值，一边构建动态 DAG；backward 再按逆拓扑顺序把上游梯度乘上局部导数。','先修诊断：若不能手算链式法则，先回到 1.2；若不熟悉类、闭包与集合，先回到 p.1。不要用复制完整 micrograd 掩盖断层。'],
+      concepts:[
+        {name:'动态 DAG',note:'每次运算创建一个新 Value，并记录父节点和局部反向函数。图由真实执行路径生成，因此分支和重复使用会直接改变依赖关系。'},
+        {name:'局部反向规则',note:'add 把上游梯度原样传给两个输入；mul 把上游梯度分别乘以另一个输入的前向值；tanh 乘以 1-t²。每条规则只负责一条局部边。'},
+        {name:'拓扑依赖',note:'节点只有在所有下游贡献都到齐后才能继续向父节点传播。先通过 DFS 建立父节点在前的拓扑序，再逆序执行 _backward。'},
+        {name:'梯度累加',note:'同一个节点可能经多条路径影响 loss。链式法则要求把各路径贡献相加；使用赋值号会静默丢掉先到的贡献。'},
+        {name:'标量种子',note:'对最终标量 y 求 dy/dy=1，因此从输出 grad=1 开始。若输出不是标量，需要显式提供向量—雅可比积的上游向量。'},
+        {name:'有限差分边界',note:'中心差分可检查解析梯度，但步长太大不够局部、太小会受浮点消减影响；它是测试工具，不是训练算法。'},
+      ],
+      workflow:['手算一张含共享节点的图','实现前向节点和局部闭包','建立拓扑序并逆序传播','用有限差分与共享路径测试'],
+      practice:{task:'实现可测试的 Value、运算符与 backward',steps:['实现 Value(data, parents, op)，并让 add、mul、tanh 返回新节点。','为每个运算写只处理局部贡献的 _backward，所有父梯度使用 +=。','DFS 建立拓扑序，从输出 grad=1 开始逆序执行。','用 y=x*x+x、中心差分和 PyTorch 标量结果做三重对拍。'],evidence:['可直接运行的 value.py','pytest 覆盖 add、mul、tanh 与有限差分','共享节点 y=x*x+x 在 x=2 时 grad=5 的回归测试','一次把 += 错写成 = 后失败并修复的记录']},
+      worked:{title:'为什么 y=x*x+x 会暴露覆盖错误',steps:['x=2 时前向 y=6，x 经 x*x 的左右输入和末尾 +x 共三条边到达输出。','解析导数是 x+x+1=5；每条边只产生自己的贡献。','若 _backward 使用 =，后执行的路径覆盖先前贡献；只有 += 能得到 5。'],question:'若同一节点在两个 batch 中连续 backward，什么时候累加是故意的，什么时候应先清零？'},
+      code:microgradLessonCode,codeLabel:'value.py',
+      misconception:'“按图倒着遍历”仍不够：没有拓扑依赖会过早传播，没有 += 会在共享节点丢梯度。',
+      quiz:{question:'为什么不能在发现一个节点后立刻调用它的 _backward？',options:['它可能还有其他下游路径尚未贡献梯度，必须等依赖到齐','Python 递归不能访问父节点','tanh 的导数只能最后计算'],explanation:'逆拓扑顺序保证节点收到所有下游贡献后才继续传播。'},
+      mastery:['闭卷实现 add、mul、tanh 与 backward。','画出 y=x*x+x 的边并逐项算出 grad=5。','故意把 += 改成 =，用测试定位共享节点错误。','解释非标量输出为何需要显式上游向量。'],
+      references:['Karpathy · micrograd','Karpathy · Neural Networks: Zero to Hero Lecture 1','PyTorch · Autograd mechanics'],
+    },
+    '6.2': {
+      objectives:['能区分 prefill 一次写入整段 K/V 与 decode 每步追加一个位置。','能写出 KV cache 的 shape 与字节公式，并解释 GQA/MQA 如何改变 KV head 数。','能证明缓存版本与每步重算前缀的注意力输出一致。','能区分 KV cache 本身、分页分配和 prefix caching。'],
+      opening:['KV cache 不让注意力“少看历史”，而是避免每生成一个 token 都重新计算历史 token 的 K/V。当前 query 仍需读取全部可见缓存，因此计算、带宽和容量要分开记账。','先修诊断：若还不能解释 Q/K/V 与 causal attention，先回到 3.2；本节只处理自回归 decoder 的推理状态，不讨论训练期完整序列反传。'],
+      concepts:[
+        {name:'Prefill 与 decode',note:'Prefill 并行处理 prompt，产生每层所有 prompt token 的 K/V；decode 每步只为新 token 计算并追加一组 K/V，再让新 query 读取已有前缀。'},
+        {name:'缓存 shape',note:'常见逻辑形状可写成 [layers, 2, batch, tokens, kv_heads, head_dim]。实现可能转置或分页，但元素数量仍由这些维度决定。'},
+        {name:'容量公式',note:'字节数 = layers × 2(K,V) × batch × tokens × kv_heads × head_dim × 每元素字节。上下文翻倍时，其他条件不变，缓存容量线性翻倍。'},
+        {name:'MHA、GQA 与 MQA',note:'MHA 通常让 query heads 与 KV heads 相同；GQA 让多组 query 共享较少 KV heads；MQA 只保留一组 K/V，因此直接降低缓存与读取量。'},
+        {name:'结果等价',note:'正确缓存只复用已经算过的历史 K/V，不改变注意力数学。固定权重和输入时，逐步缓存输出必须与每步重算整个前缀一致。'},
+        {name:'PagedAttention 边界',note:'分页把逻辑 token 位置映射到非连续物理块，减少预留和碎片；它改变存储与调度，不等于减少单个 query 需要读取的有效历史。'},
+      ],
+      workflow:['写出每步 K/V 生命周期','实现追加式 decode_step','与重算前缀逐元素对拍','用公式比较 MHA/GQA/MQA'],
+      practice:{task:'手写带 KV cache 的 attention 并验证等价性',steps:['用三个二维 token 和固定 WQ/WK/WV，先手算第一个位置的 K/V 与输出。','实现 decode_step：新 token 只计算一次 K/V，追加后让当前 query 读取整个 cache。','实现 reference：每一步重算完整前缀，逐元素断言两种输出一致。','填写 layers、tokens、kv_heads、head_dim、dtype 的容量表，再比较上下文翻倍和 GQA。'],evidence:['可直接运行的 kv_cache.py','cached 与 recomputed 三步逐元素一致断言','一张含逻辑 shape、元素数与字节数的 cache ledger','一个错误案例：漏追加、重复追加或 K/V 位置错位及其失败断言']},
+      worked:{title:'32 层、4096 token 的 GQA 缓存是多少',steps:['取 batch=1、kv_heads=8、head_dim=128、BF16=2 bytes。','代入 32×2×1×4096×8×128×2，得到 536,870,912 bytes，即 512 MiB。','上下文变为 8192 时变为 1 GiB；若误用 query head 数，会高估 GQA 缓存。'],question:'为什么 prefix caching 能省掉共享前缀的 prefill，却不保证长回答的每步 decode 更快？'},
+      code:kvCacheLessonCode,codeLabel:'kv_cache.py',
+      misconception:'KV cache 省的是历史 K/V 的重复计算，不会把标准注意力对长前缀的读取成本变成常数，也不自动解决碎片和调度。',
+      quiz:{question:'将上下文从 4k 增加到 8k，其他配置不变，单请求 KV cache 怎样变化？',options:['近似翻倍，因为 token 维线性增长','保持不变，因为历史 K/V 已缓存','变成四倍，因为 attention 是平方复杂度'],explanation:'缓存容量对 token 数线性增长；平方关系描述训练或 prefill 中完整注意力矩阵的部分计算，不是 K/V 元素数。'},
+      mastery:['从配置写出逻辑 cache shape 和字节数。','解释 prefill 写入与 decode 追加的不同。','用测试证明缓存输出等于重算前缀。','区分 GQA、PagedAttention 与 prefix caching 各自改变的量。'],
+      references:['vLLM · PagedAttention paper','vLLM · Paged Attention design','Lesson 3.2 · Scaled Dot-Product Attention'],
     },
     'p.2': {
       objectives:['能创建隔离环境并记录 Python 与依赖版本。','能把脚本拆成可导入模块、命令入口与测试。','能为文件编码、路径与输入错误设计明确失败方式。','能用 pytest 的 arrange–act–assert 结构保护重构。'],
@@ -936,6 +1125,44 @@ specialLessonCopy.en = {
     mastery:['Rewrite tokenize and bigram_counts without a reference.','Explain when to choose list, dict, set, and tuple.','Locate a deliberate error from its traceback in two minutes.','Add normal, boundary, and failure tests to an unseen pure function.'],
     references:['Harvard CS50P · Weeks 0–4','Python Tutorial · Control Flow Tools','Python Tutorial · Data Structures'],
   },
+  '1.3': { ...specialLessonCopy.zh['1.3'],
+    objectives:['Explain why reverse mode propagates from a scalar output in reverse topological order.','Implement local backward rules for add, multiply, and tanh.','Explain why gradients at shared nodes must accumulate.','Validate the engine with finite differences and a shared-node regression test.'],
+    opening:['Build one minimal autodiff engine: forward operations compute values and construct a dynamic DAG; backward multiplies upstream gradients by local derivatives in reverse topological order.','Prerequisite check: return to 1.2 if you cannot hand-calculate the chain rule, or p.1 if classes, closures, and sets are unfamiliar.'],
+    concepts:[
+      {name:'Dynamic DAG',note:'Every operation creates a Value and records its parents plus a local backward closure. The graph follows the actual execution path, including branches and repeated use.'},
+      {name:'Local backward rules',note:'Add copies the upstream gradient to both inputs; multiply scales by the other forward value; tanh scales by 1-t². Each rule owns one local edge.'},
+      {name:'Topological dependency',note:'A node can propagate only after all downstream paths have contributed. Build parent-first topology with DFS, then execute _backward in reverse.'},
+      {name:'Gradient accumulation',note:'A node may influence the loss through several paths. The chain rule sums those contributions, so assignment silently discards earlier paths.'},
+      {name:'Scalar seed',note:'For final scalar y, dy/dy=1 seeds the pass. A non-scalar output requires an explicit upstream vector for a vector–Jacobian product.'},
+      {name:'Finite-difference boundary',note:'Centered differences check analytic gradients, but steps that are too large are nonlocal and steps that are too small suffer cancellation. This is a test, not a training algorithm.'},
+    ],
+    workflow:['Hand-check a graph with a shared node','Implement forward nodes and local closures','Build topology and propagate in reverse','Test finite differences and shared paths'],
+    practice:{task:'Implement a tested Value class, operators, and backward',steps:['Implement Value(data, parents, op), with add, multiply, and tanh returning new nodes.','Write local _backward closures and update every parent with +=.','Build topology with DFS, seed the output with grad=1, and execute in reverse.','Compare y=x*x+x against hand math, centered differences, and a scalar PyTorch result.'],evidence:['A directly runnable value.py','pytest coverage for add, multiply, tanh, and finite differences','A regression test proving grad=5 for y=x*x+x at x=2','A preserved failure created by replacing += with =, plus the repair']},
+    worked:{title:'Why y=x*x+x exposes overwrite bugs',steps:['At x=2, y=6 and x reaches the output through the left and right inputs of x*x plus the final +x.','The analytic derivative is x+x+1=5; each edge contributes one term.','An assignment in _backward overwrites an earlier path. Only accumulation produces 5.'],question:'Across two consecutive batches, when is accumulated grad intentional and when must you clear it first?'},
+    misconception:'Walking backward is insufficient: without topology you propagate too early, and without += you lose shared-node contributions.',
+    quiz:{question:'Why not call a node’s _backward immediately when first discovered?',options:['Another downstream path may not have contributed yet, so dependencies must complete first','Python recursion cannot access parent nodes','The derivative of tanh can only be computed last'],explanation:'Reverse topological order ensures every downstream contribution has reached the node before it propagates.'},
+    mastery:['Implement add, multiply, tanh, and backward without a reference.','Draw y=x*x+x and derive grad=5 edge by edge.','Replace += with = and use the test to locate the shared-node bug.','Explain why non-scalar outputs require an upstream vector.'],
+    references:['Karpathy · micrograd','Karpathy · Neural Networks: Zero to Hero Lecture 1','PyTorch · Autograd mechanics'],
+  },
+  '6.2': { ...specialLessonCopy.zh['6.2'],
+    objectives:['Separate prefill, which writes prompt K/V in parallel, from decode, which appends one position per step.','Derive the KV-cache shape and byte formula, including the effect of GQA and MQA.','Prove that cached attention matches recomputing every prefix.','Distinguish the KV cache itself from paged allocation and prefix caching.'],
+    opening:['A KV cache does not let attention ignore history. It prevents recomputing historical keys and values at every token; the current query still reads the visible cache, so compute, bandwidth, and capacity remain separate constraints.','Prerequisite check: return to 3.2 if Q/K/V and causal attention are unclear. This lesson covers inference state in an autoregressive decoder, not full-sequence training backpropagation.'],
+    concepts:[
+      {name:'Prefill and decode',note:'Prefill processes the prompt in parallel and writes each layer’s K/V. Decode computes and appends one new K/V pair, then lets the current query read the prefix cache.'},
+      {name:'Cache shape',note:'A useful logical shape is [layers, 2, batch, tokens, kv_heads, head_dim]. Implementations may transpose or page it, but these dimensions still determine the element count.'},
+      {name:'Capacity formula',note:'Bytes = layers × 2(K,V) × batch × tokens × kv_heads × head_dim × bytes per element. Doubling context doubles capacity when all other dimensions stay fixed.'},
+      {name:'MHA, GQA, and MQA',note:'MHA commonly uses one KV head per query head; GQA shares fewer KV heads across query groups; MQA keeps one K/V head. The reduction directly lowers cache size and reads.'},
+      {name:'Output equivalence',note:'A correct cache reuses previously computed K/V without changing the attention equation. Fixed inputs and weights must match a reference that recomputes every prefix.'},
+      {name:'PagedAttention boundary',note:'Paging maps logical token positions to non-contiguous physical blocks to reduce reservation and fragmentation. It changes storage and scheduling, not the valid history a query must attend to.'},
+    ],
+    workflow:['Write the K/V lifetime for each step','Implement append-only decode_step','Compare every output with prefix recomputation','Use the formula across MHA/GQA/MQA'],
+    practice:{task:'Implement cached attention and prove equivalence',steps:['Use three 2-D tokens and fixed WQ/WK/WV; hand-calculate the first K/V and output.','Implement decode_step so each new token computes K/V once and appends them before attention.','Implement a reference that recomputes every prefix, then assert elementwise equality at every step.','Build a capacity table for layers, tokens, kv_heads, head_dim, and dtype; compare doubled context and GQA.'],evidence:['A directly runnable kv_cache.py','Three elementwise cached-versus-recomputed assertions','A cache ledger with logical shape, element count, and bytes','One preserved failure from a missing append, duplicate append, or K/V position mismatch']},
+    worked:{title:'Size a 32-layer, 4096-token GQA cache',steps:['Use batch=1, kv_heads=8, head_dim=128, and BF16=2 bytes.','32×2×1×4096×8×128×2 = 536,870,912 bytes, or 512 MiB.','At 8192 tokens it becomes 1 GiB; substituting query heads would overestimate a GQA cache.'],question:'Why can prefix caching remove shared-prefix prefill work without guaranteeing faster decode for a long answer?'},
+    misconception:'KV caching removes repeated historical K/V computation. It does not make standard long-prefix reads constant-time or automatically solve fragmentation and scheduling.',
+    quiz:{question:'What happens to one request’s KV cache when context grows from 4k to 8k with all other settings fixed?',options:['It approximately doubles because the token dimension grows linearly','It stays fixed because historical K/V is cached','It quadruples because attention has quadratic compute'],explanation:'Cache capacity is linear in token count. Quadratic behavior describes parts of full attention computation, not the number of stored K/V elements.'},
+    mastery:['Derive logical cache shape and bytes from a model config.','Explain prefill writes versus decode appends.','Test cached outputs against prefix recomputation.','Separate the effects of GQA, PagedAttention, and prefix caching.'],
+    references:['vLLM · PagedAttention paper','vLLM · Paged Attention design','Lesson 3.2 · Scaled Dot-Product Attention'],
+  },
   'p.2': { ...specialLessonCopy.zh['p.2'],
     objectives:['Create an isolated environment and record interpreter and dependency versions.','Separate importable logic, command entry points, and tests.','Define failures for file encoding, paths, and invalid input.','Protect refactors with arrange–act–assert pytest tests.'],
     opening:['Many apparent model failures are environment, path, encoding, or data-file failures. Turning a one-off script into a reproducible project is a prerequisite for credible training experiments.','The minimum bar is reconstructable environments, validated inputs, tested behavior, and diagnosable failures.'],
@@ -1036,6 +1263,7 @@ function buildSpecialLessonMaterial(lesson, locale) {
   if (!copy) return null
   const media = lessonMedia[id]
   const englishGuidanceFor = segment => {
+    if (segment.beforeEn && segment.afterEn) return { before:segment.beforeEn, after:segment.afterEn }
     const guidance = karpathyEnglishGuidance[segment.id]
     if (!guidance?.before || !guidance?.after) throw new Error(`Missing English Karpathy guidance: ${segment.id}`)
     return guidance
@@ -1052,8 +1280,12 @@ function buildSpecialLessonMaterial(lesson, locale) {
     media: localizedMedia ? {
       ...localizedMedia,
       globalTitle:title,
-      before:localizedMedia.before || (locale === 'en' ? 'Write a prediction before opening the source.' : '打开资料前先写下预测。'),
-      after:localizedMedia.after || (locale === 'en' ? 'Save the required artifact and one failed case.' : '保存本节要求的产物和一个失败案例。'),
+      before:locale === 'en'
+        ? (localizedMedia.beforeEn || 'Write a prediction before opening the source.')
+        : (localizedMedia.before || '打开资料前先写下预测。'),
+      after:locale === 'en'
+        ? (localizedMedia.afterEn || 'Save the required artifact and one failed case.')
+        : (localizedMedia.after || '保存本节要求的产物和一个失败案例。'),
     } : null,
     spotlight:null,
   }
@@ -1249,7 +1481,12 @@ function buildEnglishLessonMaterial(module, lesson) {
     },
     mastery: [`Explain the causal chain behind ${concepts.slice(0, 2).join(' and ') || title} in two minutes.`, `Implement the core of “${practice}” without a reference.`, 'Break one assumption deliberately and locate the error using observations.', 'Change one condition and explain whether the result transfers.'],
     references: module.sources.slice(0, 3),
-    media: media ? { ...media, globalTitle:title, before:`Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`, after:`Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.` } : null,
+    media: media ? {
+      ...media,
+      globalTitle:title,
+      before:media.beforeEn || `Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`,
+      after:media.afterEn || `Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.`,
+    } : null,
     spotlight: id === '8.4' ? { title:'Paper bridge: from fixed batches to confidence-aware scheduling', body:'Speculative decoding drafts several tokens and verifies them with the target model. DSpark connects parallel drafting, lightweight sequential dependency, prefix-survival confidence, and hardware-aware scheduling.', points:['Sequential heads recover dependencies within a draft block.','Confidence estimates prevent wasteful over-verification.','The scheduler chooses verification length for the current serving load.'] } : null,
   }
 }

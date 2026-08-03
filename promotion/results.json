@@ -1,0 +1,19 @@
+{
+  "version": "2026-08-03",
+  "metricDefinitions": {
+    "impressions": "平台可提供时记录；不可见时为 null",
+    "landings": "对应 campaign_landing 数量",
+    "lesson_starts": "对应 lesson_started 数量",
+    "lesson_engaged": "阅读达到 50% 或累计可见 5 分钟的数量",
+    "lesson_completed": "对应 lesson_completed 数量",
+    "shares": "对应 content_shared 数量",
+    "actionable_feedback": "可直接形成课程或体验改动的反馈条数"
+  },
+  "decisionRules": {
+    "scale": "样本量足够且有效学习达到当前健康门槛",
+    "iterate": "有真实需求但标题、开头、课程落地或渠道适配需要调整",
+    "pause": "连续两次低于门槛或没有有效学习/可执行反馈",
+    "pending": "尚未到复盘窗口或样本不足"
+  },
+  "records": []
+}

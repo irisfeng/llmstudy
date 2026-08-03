@@ -1,0 +1,1852 @@
+{
+  "version": 1,
+  "generated_at": "2026-08-03",
+  "lessons": [
+    {
+      "id": "p.1",
+      "track": "llm",
+      "module": "prerequisites",
+      "title": "Python 零基础：从表达式到可测试函数",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 64,
+      "grade": "C",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; live source metadata verified, while practice artifact and target viewport gates remain open."
+    },
+    {
+      "id": "p.2",
+      "track": "llm",
+      "module": "prerequisites",
+      "title": "Python 工程习惯：环境、文件、异常与 pytest",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "p.3",
+      "track": "llm",
+      "module": "prerequisites",
+      "title": "从 NumPy 数组到 PyTorch 张量",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "p.4",
+      "track": "llm",
+      "module": "prerequisites",
+      "title": "先修掌握门：跑通第一条训练循环",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.1",
+      "track": "llm",
+      "module": "foundations",
+      "title": "先画地图：LLM 全栈与学习方法",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 75,
+      "grade": "B",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; segmented source path and facts verified, while downloadable practice artifact and target viewport gates remain open."
+    },
+    {
+      "id": "0.2",
+      "track": "llm",
+      "module": "foundations",
+      "title": "Python：对象、迭代器与向量化思维",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.3",
+      "track": "llm",
+      "module": "foundations",
+      "title": "线性代数只学模型真正会用的",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.4",
+      "track": "llm",
+      "module": "foundations",
+      "title": "概率、信息量与交叉熵",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.5",
+      "track": "llm",
+      "module": "foundations",
+      "title": "导数、偏导与链式法则",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.6",
+      "track": "llm",
+      "module": "foundations",
+      "title": "PyTorch 张量与可复现实验",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "0.7",
+      "track": "llm",
+      "module": "foundations",
+      "title": "掌握门 0：读懂一条训练循环",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.1",
+      "track": "llm",
+      "module": "autograd",
+      "title": "神经元不是魔法：函数、参数与激活",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.2",
+      "track": "llm",
+      "module": "autograd",
+      "title": "链式法则是一条消息传递规则",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.3",
+      "track": "llm",
+      "module": "autograd",
+      "title": "让梯度沿计算图倒着走",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 91,
+      "grade": "A",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": true
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-10",
+      "change_reason": "Independent re-audit after lesson-specific implementation scored 91/A; runnable Value code, bounded source segments, and five local viewports passed, while archived pytest, finite-difference, PyTorch, and mutation evidence remains the promotion blocker."
+    },
+    {
+      "id": "1.4",
+      "track": "llm",
+      "module": "autograd",
+      "title": "梯度检查：相信代码之前先验证",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.5",
+      "track": "llm",
+      "module": "autograd",
+      "title": "从 Value 到 Neuron、Layer、MLP",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.6",
+      "track": "llm",
+      "module": "autograd",
+      "title": "损失、正则化与 SGD",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.7",
+      "track": "llm",
+      "module": "autograd",
+      "title": "为什么网络会训坏",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "1.8",
+      "track": "llm",
+      "module": "autograd",
+      "title": "掌握门 1：闭卷重写 micrograd",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.1",
+      "track": "llm",
+      "module": "language",
+      "title": "Bigram：最小语言模型",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.2",
+      "track": "llm",
+      "module": "language",
+      "title": "负对数似然：模型的记分牌",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.3",
+      "track": "llm",
+      "module": "language",
+      "title": "Embedding：把离散符号放进空间",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.4",
+      "track": "llm",
+      "module": "language",
+      "title": "MLP 语言模型与数据切分",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.5",
+      "track": "llm",
+      "module": "language",
+      "title": "训练深网：激活、梯度与 BatchNorm",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.6",
+      "track": "llm",
+      "module": "language",
+      "title": "手工反传：成为 Backprop Ninja",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.7",
+      "track": "llm",
+      "module": "language",
+      "title": "BPE：从字节到子词",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.8",
+      "track": "llm",
+      "module": "language",
+      "title": "Tokenizer 的隐形代价",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "2.9",
+      "track": "llm",
+      "module": "language",
+      "title": "掌握门 2：实现 minBPE + makemore",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.1",
+      "track": "llm",
+      "module": "transformer",
+      "title": "上下文聚合：从平均池化到注意力",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.2",
+      "track": "llm",
+      "module": "transformer",
+      "title": "Scaled Dot-Product Attention",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 62,
+      "grade": "C",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed after adding and verifying the official international attention source; lesson-specific runnable practice and target viewport gates remain open."
+    },
+    {
+      "id": "3.3",
+      "track": "llm",
+      "module": "transformer",
+      "title": "Multi-Head：并行读取不同关系",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.4",
+      "track": "llm",
+      "module": "transformer",
+      "title": "位置、残差与归一化",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.5",
+      "track": "llm",
+      "module": "transformer",
+      "title": "Transformer Block 逐行实现",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.6",
+      "track": "llm",
+      "module": "transformer",
+      "title": "GPT：自回归目标与权重共享",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.7",
+      "track": "llm",
+      "module": "transformer",
+      "title": "采样不是随机按钮",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.8",
+      "track": "llm",
+      "module": "transformer",
+      "title": "读懂 GPT-2：配置、参数量、权重加载",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.9",
+      "track": "llm",
+      "module": "transformer",
+      "title": "复现 124M：从正确到更快",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "3.10",
+      "track": "llm",
+      "module": "transformer",
+      "title": "掌握门 3：闭卷画出并实现 GPT",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.1",
+      "track": "llm",
+      "module": "training",
+      "title": "训练前先算账：参数、FLOPs 与显存",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.2",
+      "track": "llm",
+      "module": "training",
+      "title": "数据工程：采集、清洗、去重与混合",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.3",
+      "track": "llm",
+      "module": "training",
+      "title": "训练循环的每一个旋钮",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.4",
+      "track": "llm",
+      "module": "training",
+      "title": "混合精度与数值稳定性",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.5",
+      "track": "llm",
+      "module": "training",
+      "title": "GPU、Kernel 与内存层级",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.6",
+      "track": "llm",
+      "module": "training",
+      "title": "FlashAttention 与 Triton 入门",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.7",
+      "track": "llm",
+      "module": "training",
+      "title": "并行训练：DP、TP、PP、FSDP",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.8",
+      "track": "llm",
+      "module": "training",
+      "title": "Scaling Laws 与 Chinchilla 直觉",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.9",
+      "track": "llm",
+      "module": "training",
+      "title": "训练可观测性与故障恢复",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "4.10",
+      "track": "llm",
+      "module": "training",
+      "title": "掌握门 4：从 nanoGPT 到小型预训练",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.1",
+      "track": "llm",
+      "module": "alignment",
+      "title": "Base model 与 Assistant 的断层",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.2",
+      "track": "llm",
+      "module": "alignment",
+      "title": "SFT：用示范重写行为先验",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.3",
+      "track": "llm",
+      "module": "alignment",
+      "title": "偏好数据与奖励模型",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.4",
+      "track": "llm",
+      "module": "alignment",
+      "title": "DPO：绕开奖励模型的偏好优化",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.5",
+      "track": "llm",
+      "module": "alignment",
+      "title": "PPO / GRPO 与 RL 后训练",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.6",
+      "track": "llm",
+      "module": "alignment",
+      "title": "评测：先定义“好”再优化",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.7",
+      "track": "llm",
+      "module": "alignment",
+      "title": "幻觉、校准与不确定性",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.8",
+      "track": "llm",
+      "module": "alignment",
+      "title": "安全、红队与系统卡",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.9",
+      "track": "llm",
+      "module": "alignment",
+      "title": "从激活看内部：可解释性入口",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "5.10",
+      "track": "llm",
+      "module": "alignment",
+      "title": "掌握门 5：后训练方案答辩",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.1",
+      "track": "llm",
+      "module": "inference",
+      "title": "Prefill 与 Decode：两种完全不同的负载",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.2",
+      "track": "llm",
+      "module": "inference",
+      "title": "KV Cache：用显存换重复计算",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 82,
+      "grade": "B",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": true
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-10",
+      "change_reason": "Independent re-audit after KV-cache refinement scored 82/B; runnable cached-vs-recomputed attention, capacity math, explicit paper source, and five local viewports passed, while archived learner failure evidence remains the promotion blocker."
+    },
+    {
+      "id": "6.3",
+      "track": "llm",
+      "module": "inference",
+      "title": "量化：数值、误差与校准",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.4",
+      "track": "llm",
+      "module": "inference",
+      "title": "llama.cpp：本地推理的工程解剖",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.5",
+      "track": "llm",
+      "module": "inference",
+      "title": "vLLM：PagedAttention 与连续批处理",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.6",
+      "track": "llm",
+      "module": "inference",
+      "title": "服务可靠性：限流、缓存、降级与观测",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "6.7",
+      "track": "llm",
+      "module": "inference",
+      "title": "掌握门 6：两套部署、一份基准",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.1",
+      "track": "llm",
+      "module": "agents",
+      "title": "Agent 的最小闭环",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.2",
+      "track": "llm",
+      "module": "agents",
+      "title": "工具调用与结构化输出",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.3",
+      "track": "llm",
+      "module": "agents",
+      "title": "上下文工程与记忆",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.4",
+      "track": "llm",
+      "module": "agents",
+      "title": "规划、反思与多 Agent",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.5",
+      "track": "llm",
+      "module": "agents",
+      "title": "Agent 评测：从最终答案到轨迹",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.6",
+      "track": "llm",
+      "module": "agents",
+      "title": "生产边界：权限、安全与人机协同",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.7",
+      "track": "llm",
+      "module": "agents",
+      "title": "nanochat：看懂一套完整聊天系统",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "7.8",
+      "track": "llm",
+      "module": "agents",
+      "title": "掌握门 7：毕业答辩",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.1",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "MoE、MLA 与多 Token 预测",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.2",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "推理模型与可验证奖励强化学习",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.3",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "长上下文不是一个数字",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.4",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "DSpark：投机解码的生成与调度",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.5",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "扩散与块并行语言模型",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.6",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "面向 Agent 的后训练",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "8.7",
+      "track": "llm",
+      "module": "frontier-llm",
+      "title": "Kimi K3：3T 级开放权重系统审计",
+      "has_media": false,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.0.1",
+      "track": "world-models",
+      "module": "world-foundations",
+      "title": "世界模型究竟是什么",
+      "has_media": true,
+      "priority": "P0",
+      "assessment_status": "verified",
+      "score": 61,
+      "grade": "C",
+      "hard_gates": {
+        "sources": true,
+        "facts": true,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; domestic and international source metadata plus factual boundaries were verified, while concrete practice evidence and target viewport QA remain open."
+    },
+    {
+      "id": "wm.0.2",
+      "track": "world-models",
+      "module": "world-foundations",
+      "title": "POMDP：看不全的世界如何建模",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.0.3",
+      "track": "world-models",
+      "module": "world-foundations",
+      "title": "造一个最小可运行世界模型",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.1.1",
+      "track": "world-models",
+      "module": "world-dynamics",
+      "title": "经典 World Models：VAE + RNN + Controller",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.1.2",
+      "track": "world-models",
+      "module": "world-dynamics",
+      "title": "Dreamer：让智能体在隐空间里做梦",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.1.3",
+      "track": "world-models",
+      "module": "world-dynamics",
+      "title": "MuZero：只学习规划真正需要的动力学",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.2.1",
+      "track": "world-models",
+      "module": "jepa",
+      "title": "JEPA：为什么不直接预测像素",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.2.2",
+      "track": "world-models",
+      "module": "jepa",
+      "title": "V-JEPA 2：从视频理解到机器人规划",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.3.1",
+      "track": "world-models",
+      "module": "generative-worlds",
+      "title": "Genie 1→3：从潜在动作到实时世界",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.3.2",
+      "track": "world-models",
+      "module": "generative-worlds",
+      "title": "李飞飞、Marble 与空间智能",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.4.1",
+      "track": "world-models",
+      "module": "physical-ai",
+      "title": "NVIDIA Cosmos 与世界基础模型",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    },
+    {
+      "id": "wm.4.2",
+      "track": "world-models",
+      "module": "physical-ai",
+      "title": "如何评测世界模型：从好看走向可用",
+      "has_media": true,
+      "priority": "P1",
+      "assessment_status": "pending",
+      "score": null,
+      "hard_gates": {
+        "sources": false,
+        "facts": false,
+        "practice": false,
+        "mobile": false
+      },
+      "promotion_eligible": false,
+      "last_verified_at": "2026-08-03",
+      "next_review_at": "2026-09-02",
+      "change_reason": "Initial operations ledger entry; quality assessment pending."
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ArrowLeft, ArrowRight, BookOpen, BracketsCurly, Check, CheckCircle, Circle,
   Clock, Code, Command, Cube, Flask, FolderOpen, Gauge, GithubLogo, House,
@@ -12,6 +12,7 @@ import { AccountButton, AccountModal, useAuth, useLearningSync } from './auth.js
 import { LanguageToggle, useI18n } from './i18n.jsx'
 import { localizeModules, localizeResources, sourceTypesFor } from './localizedData.js'
 import { trackEvent } from './analytics.js'
+import { advanceLessonTelemetry, createLessonTelemetryState, noteLengthBucket } from './learningTelemetry.js'
 import { legacyLessonId, lessonPath, matchSitePath, trackPath } from './lessonRoutes.js'
 import { applyDocumentSeo, getHomeSeo, getLessonSeo } from './seo.js'
 import { GEO_UPDATED_AT, getGeoBrief } from './geoContent.js'
@@ -41,6 +42,24 @@ function EditorialTitle({ text, locale }) {
 }
 
 const LAST_LESSON_KEY = 'uth-last-lesson'
+const campaignContext = () => {
+  const params = new URLSearchParams(location.search)
+  return {
+    source: params.get('utm_source') || undefined,
+    medium: params.get('utm_medium') || undefined,
+    campaign: params.get('utm_campaign') || undefined,
+    content: params.get('utm_content') || undefined,
+  }
+}
+const markSessionEvent = key => {
+  try {
+    if (sessionStorage.getItem(key) === '1') return false
+    sessionStorage.setItem(key, '1')
+  } catch (_) {
+    // Session de-duplication is best effort; analytics must not block learning.
+  }
+  return true
+}
 const readLastLesson = () => {
   try {
     const parsed = JSON.parse(localStorage.getItem(LAST_LESSON_KEY) || 'null')
@@ -386,7 +405,7 @@ function LessonView({ info, onBack, onNavigate, theme, toggleTheme, complete, on
   return <LessonStudy key={`${locale}-${lesson[0]}`} module={module} lesson={lesson} onBack={onBack} onNavigate={onNavigate} theme={theme} toggleTheme={toggleTheme} complete={complete} onToggleComplete={onToggleComplete} onSaveNote={onSaveNote} onAccount={onAccount} user={user} syncStatus={syncStatus} />
 }
 
-function LessonMedia({ media }) {
+function LessonMedia({ media, lessonId }) {
   const { locale, t, pick } = useI18n()
   const [active, setActive] = useState(false)
   const [network, setNetwork] = useState(() => localStorage.getItem('uth-network') || ((navigator.language === 'zh-CN' || Intl.DateTimeFormat().resolvedOptions().timeZone === 'Asia/Shanghai') ? 'cn' : 'global'))
@@ -473,7 +492,7 @@ function LessonMedia({ media }) {
       {selectedSegment && isBilibili && !sourceStopsAtSegmentEnd && <p className="segment-source-note">{locale === 'en' ? segmentTiming.noteEn : segmentTiming.noteZh}</p>}
     </div>}
     <div className="media-frame">
-      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{network === 'global' ? t('globalOriginal') : t('domesticOriginal')}</b><p>{resolvedSource ? (network === 'global' ? t('noGlobalEmbed') : t('noDomesticEmbed')) : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer">{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={locale === 'en' ? (source.titleEn || source.title) : source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }) }}><DoodleArrow className="play-arrow" /><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
+      {!isEmbeddable ? <div className="cn-fallback global-fallback"><span>↗</span><b>{network === 'global' ? t('globalOriginal') : t('domesticOriginal')}</b><p>{resolvedSource ? (network === 'global' ? t('noGlobalEmbed') : t('noDomesticEmbed')) : t('noSource')}</p>{external && <a href={external} target="_blank" rel="noreferrer" onClick={() => trackEvent('resource_opened', { lesson_id:lessonId, resource_type:'video', network, platform:source.platform, ...campaignContext() })}>{t('openOfficial')} <ArrowRight /></a>}</div> : active ? <iframe src={embed} title={locale === 'en' ? (source.titleEn || source.title) : source.title} loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen referrerPolicy="strict-origin-when-cross-origin" /> : <button onClick={() => { setActive(true); trackEvent('video_played', { network, platform: source.platform }); trackEvent('resource_opened', { lesson_id:lessonId, resource_type:'video', network, platform:source.platform, ...campaignContext() }) }}><DoodleArrow className="play-arrow" /><span><Play weight="fill" /></span><b>{t('loadPlayer', { platform:source.platform })}</b><small>{t('privacyLoad')}</small></button>}
     </div>
     <div className="media-meta"><div><span>{source.author} · {selectedSegment ? (sourceStopsAtSegmentEnd ? `${formatTime(selectedSegment.start)}–${formatTime(selectedSegment.end)}` : `${formatTime(sourceStart)} ${pick('起点 · 不自动停止','start · no automatic stop')}`) : source.duration}{selectedPart ? ` · ${locale === 'en' ? (selectedPart.labelEn || selectedPart.label) : selectedPart.label}` : ''}</span><h3>{selectedSegment ? (locale === 'en' ? selectedSegment.title : selectedSegment.titleZh) : (locale === 'en' ? (source.titleEn || source.title || media.globalTitle || media.title) : source.title)}</h3></div>{external && <a href={external} target="_blank" rel="noreferrer">{isEmbeddable ? t('openExternal') : t('openOfficial')} <ArrowRight /></a>}</div>
     <div className="watch-contract"><article><span>BEFORE</span><b>{t('beforeWatch')}</b><p>{selectedSegment?.before || media.before}</p></article><article><span>AFTER</span><b>{t('afterWatch')}</b><p>{selectedSegment?.after || media.after}</p></article></div>
@@ -488,14 +507,67 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
   const [answer, setAnswer] = useState(null)
   const [showWorked, setShowWorked] = useState(false)
   const [note, setNote] = useState(() => localStorage.getItem(`${lessonKey}-note`) || '')
+  const noteTouched = useRef(false)
   const sectionLabels = [t('understand'),t('mechanism'),t('practice'),t('quiz'),t('masteryGate')]
   const readingProgress = complete ? 100 : (section + 1) * 20
 
   useEffect(() => {
+    let state = createLessonTelemetryState()
+    let visibleMs = 0
+    let lastTick = performance.now()
+    let frame = null
+
+    const sample = () => {
+      frame = null
+      const now = performance.now()
+      if (document.visibilityState === 'visible') visibleMs += now - lastTick
+      lastTick = now
+      const article = document.querySelector('.study-reading')
+      if (!article) return
+      const top = scrollY + article.getBoundingClientRect().top
+      const depth = Math.round(((scrollY + innerHeight - top) / Math.max(article.scrollHeight, 1)) * 100)
+      const result = advanceLessonTelemetry(state, { visibleMs, depth })
+      state = result.state
+      for (const milestone of result.depthsReached) {
+        if (markSessionEvent(`uth-telemetry:${lesson[0]}:depth:${milestone}`)) {
+          trackEvent('lesson_depth_reached', { lesson_id:lesson[0], depth:milestone, locale, ...campaignContext() })
+        }
+      }
+      if (result.engagedNow && markSessionEvent(`uth-telemetry:${lesson[0]}:engaged`)) {
+        trackEvent('lesson_engaged', { lesson_id:lesson[0], locale, trigger:state.maxDepth >= 50 ? 'depth' : 'visible_time', ...campaignContext() })
+      }
+    }
+    const schedule = () => {
+      if (frame === null) frame = requestAnimationFrame(sample)
+    }
+    const interval = setInterval(schedule, 1000)
+    addEventListener('scroll', schedule, { passive:true })
+    addEventListener('resize', schedule)
+    document.addEventListener('visibilitychange', sample)
+    schedule()
+    return () => {
+      clearInterval(interval)
+      if (frame !== null) cancelAnimationFrame(frame)
+      removeEventListener('scroll', schedule)
+      removeEventListener('resize', schedule)
+      document.removeEventListener('visibilitychange', sample)
+    }
+  }, [lesson, locale])
+
+  useEffect(() => {
     localStorage.setItem(`${lessonKey}-note`, note)
-    localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString())
     onSaveNote?.(lesson[0], note)
   }, [lessonKey, lesson, note, onSaveNote])
+  useEffect(() => {
+    if (!noteTouched.current || !note.trim()) return undefined
+    const bucket = noteLengthBucket(note)
+    const timeout = setTimeout(() => {
+      if (markSessionEvent(`uth-telemetry:${lesson[0]}:note:${bucket}`)) {
+        trackEvent('note_saved', { lesson_id:lesson[0], length_bucket:bucket, locale, ...campaignContext() })
+      }
+    }, 1200)
+    return () => clearTimeout(timeout)
+  }, [lesson, locale, note])
   useEffect(() => {
     const receive = event => {
       if (event.detail?.lessonId === lesson[0] && typeof event.detail.note === 'string') setNote(event.detail.note)
@@ -550,7 +622,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
           <ol>{material.objectives.map((x, i) => <li key={x}><span>0{i + 1}</span>{x}</li>)}</ol>
         </section>
 
-        {material.media && <LessonMedia media={material.media} />}
+        {material.media && <LessonMedia media={material.media} lessonId={lesson[0]} />}
 
         <section id="study-0" className="study-section">
           <span className="section-no">01 · INTUITION</span><h2>{t('whyNeed')}</h2>
@@ -581,14 +653,14 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
 
         <section id="study-3" className="study-section quiz-card">
           <span className="section-no">04 · RETRIEVAL CHECK</span><h2>{material.quiz.question}</h2>
-          <div>{material.quiz.options.map((x, i) => <button key={x} className={answer === i ? (i === 0 ? 'correct' : 'wrong') : ''} onClick={() => setAnswer(i)}><span>{String.fromCharCode(65 + i)}</span>{x}{answer === i && (i === 0 ? <CheckCircle weight="fill" /> : <X weight="bold" />)}</button>)}</div>
+          <div>{material.quiz.options.map((x, i) => <button key={x} className={answer === i ? (i === 0 ? 'correct' : 'wrong') : ''} onClick={() => { setAnswer(i); if (markSessionEvent(`uth-telemetry:${lesson[0]}:quiz`)) trackEvent('quiz_answered', { lesson_id:lesson[0], correct:i === 0, locale, ...campaignContext() }) }}><span>{String.fromCharCode(65 + i)}</span>{x}{answer === i && (i === 0 ? <CheckCircle weight="fill" /> : <X weight="bold" />)}</button>)}</div>
           {answer !== null && <p className={`quiz-feedback ${answer === 0 ? 'ok' : ''}`} aria-live="polite">{answer === 0 ? t('correct') : t('almost')} {material.quiz.explanation}</p>}
         </section>
 
         <section className="notes-card">
           <DoodleTape className="note-tape notes-tape" />
           <span className="section-no">FIELD NOTES · {user ? t('localCloud') : t('localAuto')}</span><h2>{t('notesTitle')}</h2>
-          <textarea value={note} onChange={e => setNote(e.target.value)} placeholder={t('notesPlaceholder')} />
+          <textarea value={note} onChange={e => { noteTouched.current = true; localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString()); setNote(e.target.value) }} placeholder={t('notesPlaceholder')} />
           <small>{t('charsGoal', { count:note.length })}</small>
         </section>
 

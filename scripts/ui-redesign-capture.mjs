@@ -1,12 +1,15 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import puppeteer from 'puppeteer-core'
-import { lessonPath } from '../src/lessonRoutes.js'
+import { getLessonRoute, lessonPath } from '../src/lessonRoutes.js'
 import { browserLaunchOptions } from './browser-runtime.mjs'
 
 const baseUrl = (process.env.QA_URL || 'http://127.0.0.1:4173').replace(/\/$/, '')
 const outputDir = process.env.UI_CAPTURE_DIR || '/tmp/llmstudy-ui-redesign'
 const label = process.env.UI_CAPTURE_LABEL || 'capture'
 const theme = process.env.UI_CAPTURE_THEME || 'light'
+const readingLessonId = process.env.UI_LESSON_ID || 'p.2'
+if (!getLessonRoute(readingLessonId)) throw new Error(`Unknown UI_LESSON_ID: ${readingLessonId}`)
+const lessonFileId = readingLessonId.replace(/[^a-z0-9.-]+/gi, '-')
 
 mkdirSync(outputDir, { recursive: true })
 
@@ -54,11 +57,16 @@ async function captureLearningPath(width, height, viewport) {
 
 async function captureReadingAndShare(width, height, viewport) {
   const page = await preparePage(width, height)
-  await page.goto(`${baseUrl}${lessonPath('p.2', 'zh')}`, { waitUntil: 'networkidle0' })
+  await page.goto(`${baseUrl}${lessonPath(readingLessonId, 'zh')}`, { waitUntil: 'networkidle0' })
   await page.waitForSelector('.study-reading h1')
   await settle(page)
   await assertNoHorizontalOverflow(page, `reading-${viewport}`)
-  await page.screenshot({ path: `${outputDir}/${label}-reading-${viewport}.png`, fullPage: false })
+  await page.screenshot({ path: `${outputDir}/${label}-${lessonFileId}-reading-${viewport}.png`, fullPage: false })
+
+  await page.$eval('#study-2', node => node.scrollIntoView({ block:'start' }))
+  await settle(page)
+  await assertNoHorizontalOverflow(page, `practice-${viewport}`)
+  await page.screenshot({ path: `${outputDir}/${label}-${lessonFileId}-practice-${viewport}.png`, fullPage: false })
 
   await page.click('[data-qa="share-trigger"]')
   await page.waitForSelector('[data-qa="share-dialog"]')
@@ -67,7 +75,7 @@ async function captureReadingAndShare(width, height, viewport) {
   await assertNoHorizontalOverflow(page, `share-dialog-${viewport}`)
   const renderedTheme = await page.$eval('[data-qa="share-card-preview"]', node => node.dataset.shareCardTheme)
   if (renderedTheme !== theme) throw new Error(`share-dialog-${viewport}: expected ${theme}, got ${renderedTheme}`)
-  await page.screenshot({ path: `${outputDir}/${label}-share-dialog-${viewport}.png`, fullPage: false })
+  await page.screenshot({ path: `${outputDir}/${label}-${lessonFileId}-share-dialog-${viewport}.png`, fullPage: false })
 
   if (viewport === 'desktop') {
     const dataUrl = await page.$eval('[data-share-card-preview]', async image => {
@@ -86,7 +94,7 @@ async function captureReadingAndShare(width, height, viewport) {
     if (cardDimensions.width !== 1080 || cardDimensions.height !== 1440) {
       throw new Error(`share-card: expected 1080x1440, got ${cardDimensions.width}x${cardDimensions.height}`)
     }
-    writeFileSync(`${outputDir}/${label}-share-card-${theme}.png`, Buffer.from(dataUrl.split(',')[1], 'base64'))
+    writeFileSync(`${outputDir}/${label}-${lessonFileId}-share-card-${theme}.png`, Buffer.from(dataUrl.split(',')[1], 'base64'))
   }
   await page.close()
 }
@@ -97,4 +105,4 @@ await captureReadingAndShare(1440, 1000, 'desktop')
 await captureReadingAndShare(390, 844, 'mobile')
 
 await browser.close()
-console.log(JSON.stringify({ outputDir, label, theme, files: 7 }, null, 2))
+console.log(JSON.stringify({ outputDir, label, theme, readingLessonId, files: 9 }, null, 2))
