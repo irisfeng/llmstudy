@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
   <defs>
-    <style>@import url('../node_modules/@fontsource-variable/noto-sans-sc/wght.css');</style>
+    <style>
+      @import url('../node_modules/@fontsource-variable/noto-sans-sc/wght.css');
+      @import url('../node_modules/@fontsource-variable/noto-serif-sc/wght.css');
+    </style>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="#06100d"/>
       <stop offset="1" stop-color="#10231d"/>
@@ -23,8 +26,8 @@
     <text x="78" y="48" font-size="15" font-family="Arial, sans-serif" letter-spacing="2" fill="#77a99a">LLM STUDY</text>
   </g>
   <g transform="translate(82 202)">
-    <text y="0" font-size="62" font-family="Noto Sans SC Variable, Arial, sans-serif" font-weight="700" fill="#f4fbf8">别只会调用模型。</text>
-    <text y="82" font-size="62" font-family="Noto Sans SC Variable, Arial, sans-serif" font-weight="700" fill="#58e0b4">亲手造一个。</text>
+    <text y="0" font-size="62" font-family="Noto Serif SC Variable, Songti SC, STSong, serif" font-weight="650" letter-spacing="-1" fill="#f4fbf8">别只会调用模型。</text>
+    <text y="82" font-size="62" font-family="Noto Serif SC Variable, Songti SC, STSong, serif" font-weight="650" letter-spacing="-1" fill="#58e0b4">亲手造一个。</text>
     <text y="144" font-size="23" font-family="Noto Sans SC Variable, Arial, sans-serif" font-weight="700" fill="#a9c7bd">从 Token、Transformer 到训练、对齐、部署与 Agent</text>
   </g>
   <g transform="translate(82 500)" font-family="Arial, sans-serif" font-size="16" font-weight="700">
