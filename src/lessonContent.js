@@ -184,6 +184,7 @@ const karpathy = (id, title, duration, page, details = {}) => {
   const { cn: cnDetails, ...rest } = details
   return {
     platform:'YouTube', id, title, author:'Andrej Karpathy', duration,
+    sourceType:'primary', sourceLabel:'Original course', sourceNote:'Andrej Karpathy 原始课程视频。',
     cnQuery:`Karpathy ${title} 中文`,
     cn:bili('karpathy', { title:`中英字幕 · ${title}`, duration, page, ...cnDetails }),
     ...rest,
@@ -261,6 +262,9 @@ const karpathyMedia = ({ segments, requiredDuration, activityDuration, activityD
   id:karpathyDeepResource.id,
   title:karpathyDeepResource.title,
   author:karpathyDeepResource.author,
+  sourceType:'primary',
+  sourceLabel:'Original course',
+  sourceNote:'Andrej Karpathy 原始完整讲座；本课只要求观看标注片段。',
   duration:karpathyDeepResource.duration,
   resourceDuration:karpathyDeepResource.duration,
   requiredDuration,
@@ -296,6 +300,10 @@ const lessonMedia = {
         videoPart('-7xg8pGcP6w','Loops'),
       ],
     },
+    before:'先写一个只会顺序执行的 Python 小程序，再预测函数、条件与循环分别会替代哪一段重复代码。',
+    after:'闭卷写出一个含函数、条件与循环的小程序，并用至少三个输入验证正常、边界与失败路径。',
+    beforeEn:'Write a sequential Python script, then predict which repeated lines a function, condition, and loop should replace.',
+    afterEn:'From memory, write one small program with a function, condition, and loop; test normal, boundary, and failure inputs.',
   },
   'p.2': {
     ...bili('cs50p', {
@@ -389,7 +397,18 @@ const lessonMedia = {
   '2.9': bili('karpathy', { title:'makemore + Tokenizer 复习路径', duration:'选看', page:2, parts:[part(2,'Bigram 与 makemore'), part(3,'MLP 语言模型'), part(4,'激活与梯度'), part(5,'手工反传'), part(9,'GPT Tokenizer')] }),
 
   '3.1': bili('transformerVisual', { title:'GPT 是什么？直观解释 Transformer', duration:'27m14s' }),
-  '3.2': bili('liMuAttention', { title:'Transformer 论文逐段精读', duration:'1h27m', before:'带着三个问题看：为什么除以 √d、mask 在哪里加、Multi-Head 如何拼接？', after:'用四个 token 的小矩阵手算一次 attention，并标注每个张量 shape。' }),
+  '3.2': bili('liMuAttention', {
+    title:'Transformer 论文逐段精读', duration:'1h27m',
+    before:'带着三个问题看：为什么除以 √d、mask 在哪里加、Multi-Head 如何拼接？',
+    after:'用四个 token 的小矩阵手算一次 attention，并标注每个张量 shape。',
+    global:{
+      platform:'YouTube', id:'eMlx5fFNoYc', title:'Attention in transformers, step-by-step | Deep Learning Chapter 6',
+      author:'3Blue1Brown', duration:'26m10s', sourceType:'official', sourceLabel:'Official lesson',
+      sourceNote:'3Blue1Brown 官方可视化课程，逐步解释 Q、K、V、缩放、mask 与多头注意力。',
+      originalUrl:'https://www.youtube.com/watch?v=eMlx5fFNoYc',
+      referenceUrl:'https://www.3blue1brown.com/lessons/attention/',
+    },
+  }),
   '3.3': bili('raschka', { title:'从单头到 Multi-Head Attention', duration:'28m52s', page:16, parts:[part(16,'堆叠多个单头注意力层'), part(17,'权重分割实现多头注意力')] }),
   '3.4': bili('raschka', { title:'位置编码、LayerNorm 与残差连接', duration:'45m30s', page:8, parts:[part(8,'位置编码'), part(19,'LayerNorm'), part(21,'残差连接')] }),
   '3.5': bili('raschka', { title:'逐步搭建 Transformer Block', duration:'58m', page:18, parts:[part(18,'编码 LLM 架构'), part(19,'LayerNorm'), part(20,'GELU 与前馈网络'), part(21,'残差连接'), part(22,'连接注意力与线性层')] }),
@@ -425,7 +444,11 @@ const lessonMedia = {
   '5.6': bili('cs336', { title:'模型评估：任务、指标与污染', duration:'1h20m', page:12 }),
 
   '6.1': bili('cs336', { title:'大模型推理：Prefill、Decode 与服务负载', duration:'1h22m', page:10 }),
-  '6.2': bili('vllm', { title:'KV Cache 与 PagedAttention', duration:'12m08s' }),
+  '6.2': bili('vllm', {
+    title:'KV Cache 与 PagedAttention', duration:'12m08s',
+    before:'先估算一个请求的 KV cache：层数 × 2 × KV heads × head dim × token 数 × 每元素字节数，并预测长度翻倍后的显存变化。',
+    after:'对同一批请求分别画出连续分配与分页分配，标出碎片、复用和 block table；再用公式复核总显存。',
+  }),
   '6.3': bili('llamaCpp', { title:'GGUF 文件解析与模型加载', duration:'28m16s', page:5 }),
   '6.4': bili('llamaCpp', { title:'llama.cpp 源码逐行调试带读', duration:'2h34m', page:3, parts:[part(3,'加载后端'), part(5,'解析 GGUF'), part(8,'CPU/GPU Buffer'), part(14,'llama_context'), part(15,'分配 KV Cache')] }),
   '6.5': bili('vllm', { title:'vLLM：KV Cache、PagedAttention 与吞吐', duration:'12m08s' }),
@@ -1052,8 +1075,12 @@ function buildSpecialLessonMaterial(lesson, locale) {
     media: localizedMedia ? {
       ...localizedMedia,
       globalTitle:title,
-      before:localizedMedia.before || (locale === 'en' ? 'Write a prediction before opening the source.' : '打开资料前先写下预测。'),
-      after:localizedMedia.after || (locale === 'en' ? 'Save the required artifact and one failed case.' : '保存本节要求的产物和一个失败案例。'),
+      before:locale === 'en'
+        ? (localizedMedia.beforeEn || 'Write a prediction before opening the source.')
+        : (localizedMedia.before || '打开资料前先写下预测。'),
+      after:locale === 'en'
+        ? (localizedMedia.afterEn || 'Save the required artifact and one failed case.')
+        : (localizedMedia.after || '保存本节要求的产物和一个失败案例。'),
     } : null,
     spotlight:null,
   }

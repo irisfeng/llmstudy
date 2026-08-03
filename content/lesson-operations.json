@@ -9,18 +9,19 @@
       "title": "Python 零基础：从表达式到可测试函数",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 64,
+      "grade": "C",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; live source metadata verified, while practice artifact and target viewport gates remain open."
     },
     {
       "id": "p.2",
@@ -89,18 +90,19 @@
       "title": "先画地图：LLM 全栈与学习方法",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 75,
+      "grade": "B",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; segmented source path and facts verified, while downloadable practice artifact and target viewport gates remain open."
     },
     {
       "id": "0.2",
@@ -269,18 +271,19 @@
       "title": "让梯度沿计算图倒着走",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 54,
+      "grade": "C",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; source and factual review passed, but the displayed implementation cannot yet satisfy the practice task and target viewport QA is incomplete."
     },
     {
       "id": "1.4",
@@ -589,18 +592,19 @@
       "title": "Scaled Dot-Product Attention",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 62,
+      "grade": "C",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed after adding and verifying the official international attention source; lesson-specific runnable practice and target viewport gates remain open."
     },
     {
       "id": "3.3",
@@ -1189,18 +1193,19 @@
       "title": "KV Cache：用显存换重复计算",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 58,
+      "grade": "C",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; domestic video and primary paper are reachable and facts reviewed, while KV-cache practice evidence and target viewport QA remain open."
     },
     {
       "id": "6.3",
@@ -1609,18 +1614,19 @@
       "title": "世界模型究竟是什么",
       "has_media": true,
       "priority": "P0",
-      "assessment_status": "pending",
-      "score": null,
+      "assessment_status": "verified",
+      "score": 61,
+      "grade": "C",
       "hard_gates": {
-        "sources": false,
-        "facts": false,
+        "sources": true,
+        "facts": true,
         "practice": false,
         "mobile": false
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-09-02",
-      "change_reason": "Initial operations ledger entry; quality assessment pending."
+      "next_review_at": "2026-08-17",
+      "change_reason": "Baseline rubric audit completed; domestic and international source metadata plus factual boundaries were verified, while concrete practice evidence and target viewport QA remain open."
     },
     {
       "id": "wm.0.2",
