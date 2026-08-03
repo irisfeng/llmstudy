@@ -413,6 +413,8 @@ const lessonMedia = {
     title:'Transformer 论文逐段精读', duration:'1h27m',
     before:'带着三个问题看：为什么除以 √d、mask 在哪里加、Multi-Head 如何拼接？',
     after:'用四个 token 的小矩阵手算一次 attention，并标注每个张量 shape。',
+    beforeEn:'Watch with three questions: why divide by √d, where is the mask added, and how are multiple heads concatenated?',
+    afterEn:'Hand-calculate attention for a four-token matrix, label every tensor shape, and compare the result with code.',
     global:{
       platform:'YouTube', id:'eMlx5fFNoYc', title:'Attention in transformers, step-by-step | Deep Learning Chapter 6',
       author:'3Blue1Brown', duration:'26m10s', sourceType:'official', sourceLabel:'Official lesson',
@@ -1479,7 +1481,12 @@ function buildEnglishLessonMaterial(module, lesson) {
     },
     mastery: [`Explain the causal chain behind ${concepts.slice(0, 2).join(' and ') || title} in two minutes.`, `Implement the core of “${practice}” without a reference.`, 'Break one assumption deliberately and locate the error using observations.', 'Change one condition and explain whether the result transfers.'],
     references: module.sources.slice(0, 3),
-    media: media ? { ...media, globalTitle:title, before:`Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`, after:`Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.` } : null,
+    media: media ? {
+      ...media,
+      globalTitle:title,
+      before:media.beforeEn || `Before watching, write down the failure that ${concepts[0] || title} is meant to solve and predict the example the instructor will use.`,
+      after:media.afterEn || `Build the smallest version of “${practice}” and record one way the result differed from your initial prediction.`,
+    } : null,
     spotlight: id === '8.4' ? { title:'Paper bridge: from fixed batches to confidence-aware scheduling', body:'Speculative decoding drafts several tokens and verifies them with the target model. DSpark connects parallel drafting, lightweight sequential dependency, prefix-survival confidence, and hardware-aware scheduling.', points:['Sequential heads recover dependencies within a draft block.','Confidence estimates prevent wasteful over-verification.','The scheduler chooses verification length for the current serving load.'] } : null,
   }
 }

@@ -33,6 +33,8 @@ check(result.depthsReached.join(',') === '75,90', 'Later depth milestones are in
 check(noteLengthBucket('') === 'empty', 'Empty note bucket changed')
 check(noteLengthBucket('a'.repeat(49)) === '1-49', 'Short note bucket changed')
 check(noteLengthBucket('a'.repeat(120)) === '50-199', 'Medium note bucket changed')
+check(noteLengthBucket('a'.repeat(200)) === '200-499', 'Long-medium note lower bound changed')
+check(noteLengthBucket('a'.repeat(499)) === '200-499', 'Long-medium note upper bound changed')
 check(noteLengthBucket('a'.repeat(500)) === '500+', 'Long note bucket changed')
 
 const appSource = fs.readFileSync(path.join(root, 'src/App.jsx'), 'utf8')

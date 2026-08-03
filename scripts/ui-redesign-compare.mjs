@@ -7,14 +7,16 @@ const outputDir = process.env.UI_CAPTURE_DIR || '/tmp/llmstudy-ui-redesign'
 const beforeLabel = process.env.UI_COMPARE_BEFORE_LABEL || 'before'
 const afterLabel = process.env.UI_COMPARE_AFTER_LABEL || 'after-light'
 const comparisonLabel = process.env.UI_COMPARE_LABEL || 'comparison'
+const readingLessonId = process.env.UI_LESSON_ID || 'p.2'
+const lessonFileId = readingLessonId.replace(/[^a-z0-9.-]+/gi, '-')
 const names = [
   'learning-desktop',
   'learning-mobile',
-  'reading-desktop',
-  'reading-mobile',
-  'share-dialog-desktop',
-  'share-dialog-mobile',
-  'share-card-light',
+  `${lessonFileId}-reading-desktop`,
+  `${lessonFileId}-reading-mobile`,
+  `${lessonFileId}-share-dialog-desktop`,
+  `${lessonFileId}-share-dialog-mobile`,
+  `${lessonFileId}-share-card-light`,
 ]
 const pairs = names.map(name => [name, `${beforeLabel}-${name}.png`, `${afterLabel}-${name}.png`])
 

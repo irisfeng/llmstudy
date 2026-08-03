@@ -57,7 +57,7 @@ LLM Study 已经越过“能否上线”的阶段，进入“内容产品运营�
 | 代码/推导/案例 | 15 | 是否有最小可运行例子、shape/输入输出和失败反例？ |
 | 实践与证据 | 15 | 学习者最终交付什么可检查的产物？ |
 | 自测与掌握门 | 10 | 能否区分“看懂”与“独立完成”？ |
-| 阅读与移动体验 | 5 | 320/390/768/1440px 是否可读、无溢出、交互可用？ |
+| 阅读与移动体验 | 5 | 320/390/768/1024/1440px 是否可读、无溢出、交互可用？ |
 | 新鲜度与溯源 | 5 | 是否记录一手来源、核验日期、版本和变更原因？ |
 
 评级与动作：
@@ -260,7 +260,7 @@ B站/视频号素材不剪辑、重传或伪装成大神原视频；推广视频
 
 **Verification:**
 - [ ] `npm run qa:content`
-- [ ] 人工抽查 6 节门面课及 4 个视口。
+- [ ] 人工抽查 6 节门面课及 5 个视口。
 
 **Dependencies:** None
 
@@ -320,7 +320,7 @@ B站/视频号素材不剪辑、重传或伪装成大神原视频；推广视频
 
 **Dependencies:** Task 2
 
-**Files likely touched:** `promotion/campaigns.json`、`promotion/results.csv`、`scripts/promotion-check.mjs`
+**Files likely touched:** `promotion/campaigns.json`、`promotion/results.json`、`scripts/promotion-check.mjs`
 
 **Estimated scope:** Medium
 
@@ -338,7 +338,7 @@ B站/视频号素材不剪辑、重传或伪装成大神原视频；推广视频
 
 **Dependencies:** Tasks 2、3、4
 
-**Files likely touched:** `promotion/ready-to-post.md`、`promotion/results.csv`
+**Files likely touched:** `promotion/ready-to-post.md`、`promotion/results.json`
 
 **Estimated scope:** Small
 
@@ -356,7 +356,7 @@ B站/视频号素材不剪辑、重传或伪装成大神原视频；推广视频
 
 **Dependencies:** Task 5
 
-**Files likely touched:** `promotion/ready-to-post.md`、`promotion/results.csv`、课程内容文件
+**Files likely touched:** `promotion/ready-to-post.md`、`promotion/results.json`、课程内容文件
 
 **Estimated scope:** 四个独立 Small 任务
 

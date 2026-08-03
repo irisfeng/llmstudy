@@ -4,13 +4,24 @@ import { spawnSync } from 'node:child_process'
 
 const failures = []
 const check = (value, message) => { if (!value) failures.push(message) }
-const autogradModule = modules.find(module => module.id === 'autograd')
-const lesson = autogradModule.lessons.find(item => item[0] === '1.3')
+const requireLesson = (moduleId, lessonId) => {
+  const module = modules.find(item => item.id === moduleId)
+  const lesson = Array.isArray(module?.lessons) ? module.lessons.find(item => item[0] === lessonId) : null
+  if (!module || !lesson) throw new Error(`Flagship practice QA cannot locate ${moduleId}/${lessonId}`)
+  return { module, lesson }
+}
+const normalizeRuntime = runtime => ({
+  ok: runtime.status === 0 && !runtime.error,
+  detail: runtime.error?.message
+    || (typeof runtime.stderr === 'string' ? runtime.stderr.trim() : '')
+    || `exit status ${runtime.status ?? 'unavailable'}`,
+})
+
+const { module:autogradModule, lesson } = requireLesson('autograd', '1.3')
 const zh = buildLessonMaterial(autogradModule, lesson, 'zh')
 const en = buildLessonMaterial(autogradModule, lesson, 'en')
 const media = getLessonMedia('1.3')
-const inferenceModule = modules.find(module => module.id === 'inference')
-const cacheLesson = inferenceModule.lessons.find(item => item[0] === '6.2')
+const { module:inferenceModule, lesson:cacheLesson } = requireLesson('inference', '6.2')
 const cacheZh = buildLessonMaterial(inferenceModule, cacheLesson, 'zh')
 const cacheEn = buildLessonMaterial(inferenceModule, cacheLesson, 'en')
 const cacheMedia = getLessonMedia('6.2')
@@ -32,7 +43,8 @@ check(media?.segments?.every(segment => segment.before && segment.after), '1.3 s
 check(media?.requiredDuration, '1.3 must disclose required video duration')
 
 const runtime = spawnSync('python3', ['-c', zh.code], { encoding:'utf8' })
-check(runtime.status === 0, `1.3 displayed Python must run cleanly: ${runtime.stderr.trim()}`)
+const runtimeResult = normalizeRuntime(runtime)
+check(runtimeResult.ok, `1.3 displayed Python must run cleanly: ${runtimeResult.detail}`)
 
 for (const [label, material] of [['zh', cacheZh], ['en', cacheEn]]) {
   check(/def decode_step/.test(material.code), `6.2 ${label} code must implement incremental decode`)
@@ -44,7 +56,8 @@ for (const [label, material] of [['zh', cacheZh], ['en', cacheEn]]) {
 }
 check(cacheMedia?.requiredDuration === '12:08', '6.2 must disclose the full 12:08 required video')
 const cacheRuntime = spawnSync('python3', ['-c', cacheZh.code], { encoding:'utf8' })
-check(cacheRuntime.status === 0, `6.2 displayed Python must run cleanly: ${cacheRuntime.stderr.trim()}`)
+const cacheRuntimeResult = normalizeRuntime(cacheRuntime)
+check(cacheRuntimeResult.ok, `6.2 displayed Python must run cleanly: ${cacheRuntimeResult.detail}`)
 
 if (failures.length) {
   console.error(`Flagship practice QA failed (${failures.length}):`)

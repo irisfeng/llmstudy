@@ -8,6 +8,14 @@ const failures = []
 const check = (condition, message) => {
   if (!condition) failures.push(message)
 }
+const datePattern = /^\d{4}-\d{2}-\d{2}$/
+const isValidDate = value => {
+  if (value === null) return true
+  if (typeof value !== 'string' || !datePattern.test(value)) return false
+  const parsed = new Date(`${value}T00:00:00Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
+}
+const isGateMap = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value)
 
 const expectedLessons = [
   ...modules.flatMap(module => module.lessons.map(lesson => ({
@@ -43,6 +51,8 @@ const rows = ledger && !Array.isArray(ledger) && Array.isArray(ledger.lessons)
   ? ledger.lessons
   : null
 check(Array.isArray(rows), 'Ledger must be an object with a lessons array')
+check(ledger?.version === 1, 'Ledger version must be 1')
+check(typeof ledger?.generated_at === 'string' && isValidDate(ledger.generated_at), 'Ledger generated_at must be a valid YYYY-MM-DD date')
 
 const requiredFields = [
   'id',
@@ -61,14 +71,7 @@ const requiredFields = [
 ]
 const validPriorities = new Set(['P0', 'P1', 'P2'])
 const validStatuses = new Set(['pending', 'verified'])
-const datePattern = /^\d{4}-\d{2}-\d{2}$/
 const flagshipIds = new Set(['p.1', '0.1', '1.3', '3.2', '6.2', 'wm.0.1'])
-const isValidDate = value => {
-  if (value === null) return true
-  if (typeof value !== 'string' || !datePattern.test(value)) return false
-  const parsed = new Date(`${value}T00:00:00Z`)
-  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value
-}
 
 if (rows) {
   const rowIds = rows.map(row => row?.id)
@@ -95,8 +98,8 @@ if (rows) {
     check(validStatuses.has(row.assessment_status), `${row.id}: invalid assessment_status ${row.assessment_status}`)
     check(row.score === null || (Number.isInteger(row.score) && row.score >= 0 && row.score <= 100), `${row.id}: score must be null or an integer from 0 to 100`)
     check(row.promotion_eligible === false || row.promotion_eligible === true, `${row.id}: promotion_eligible must be boolean`)
-    check(row.hard_gates && typeof row.hard_gates === 'object' && !Array.isArray(row.hard_gates), `${row.id}: hard_gates must be an object of booleans`)
-    if (row.hard_gates && typeof row.hard_gates === 'object' && !Array.isArray(row.hard_gates)) {
+    check(isGateMap(row.hard_gates), `${row.id}: hard_gates must be an object of booleans`)
+    if (isGateMap(row.hard_gates)) {
       const gateValues = Object.values(row.hard_gates)
       check(gateValues.length > 0 && gateValues.every(value => typeof value === 'boolean'), `${row.id}: hard_gates values must be booleans`)
     }
@@ -113,12 +116,15 @@ if (rows) {
       check(row.score !== null, `${row.id}: verified lessons require a score`)
       if (row.score !== null) {
         const grade = row.score >= 85 ? 'A' : row.score >= 70 ? 'B' : 'C'
-        check(row.grade === undefined || row.grade === grade, `${row.id}: grade does not match score (${grade})`)
+        check(row.grade === grade, `${row.id}: grade must be ${grade} for score ${row.score}`)
       }
     }
-    if (row.assessment_status === 'pending') check(row.score === null, `${row.id}: pending lessons must keep score null`)
+    if (row.assessment_status === 'pending') {
+      check(row.score === null, `${row.id}: pending lessons must keep score null`)
+      check(row.grade === undefined, `${row.id}: pending lessons must not carry a grade`)
+    }
 
-    const allHardGates = row.hard_gates && typeof row.hard_gates === 'object' && !Array.isArray(row.hard_gates)
+    const allHardGates = isGateMap(row.hard_gates)
       ? Object.values(row.hard_gates).length > 0 && Object.values(row.hard_gates).every(Boolean)
       : false
     const canPromote = row.assessment_status === 'verified' && row.score !== null && row.score >= 85 && allHardGates

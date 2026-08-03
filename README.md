@@ -41,6 +41,8 @@
 
 ## 本地运行
 
+需要 Node.js 20.19+，并确保 `python3` 可在 `PATH` 中调用；生产构建会实际运行旗舰课展示的 Python 代码，缺少解释器时会明确失败。
+
 ```bash
 npm install
 npm run dev

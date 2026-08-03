@@ -556,7 +556,6 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
 
   useEffect(() => {
     localStorage.setItem(`${lessonKey}-note`, note)
-    localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString())
     onSaveNote?.(lesson[0], note)
   }, [lessonKey, lesson, note, onSaveNote])
   useEffect(() => {
@@ -661,7 +660,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <section className="notes-card">
           <DoodleTape className="note-tape notes-tape" />
           <span className="section-no">FIELD NOTES · {user ? t('localCloud') : t('localAuto')}</span><h2>{t('notesTitle')}</h2>
-          <textarea value={note} onChange={e => { noteTouched.current = true; setNote(e.target.value) }} placeholder={t('notesPlaceholder')} />
+          <textarea value={note} onChange={e => { noteTouched.current = true; localStorage.setItem(`${lessonKey}-note-updated`, new Date().toISOString()); setNote(e.target.value) }} placeholder={t('notesPlaceholder')} />
           <small>{t('charsGoal', { count:note.length })}</small>
         </section>
 
