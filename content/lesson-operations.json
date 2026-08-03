@@ -1194,18 +1194,18 @@
       "has_media": true,
       "priority": "P0",
       "assessment_status": "verified",
-      "score": 58,
-      "grade": "C",
+      "score": 82,
+      "grade": "B",
       "hard_gates": {
         "sources": true,
         "facts": true,
         "practice": false,
-        "mobile": false
+        "mobile": true
       },
       "promotion_eligible": false,
       "last_verified_at": "2026-08-03",
-      "next_review_at": "2026-08-17",
-      "change_reason": "Baseline rubric audit completed; domestic video and primary paper are reachable and facts reviewed, while KV-cache practice evidence and target viewport QA remain open."
+      "next_review_at": "2026-08-10",
+      "change_reason": "Independent re-audit after KV-cache refinement scored 82/B; runnable cached-vs-recomputed attention, capacity math, explicit paper source, and five local viewports passed, while archived learner failure evidence remains the promotion blocker."
     },
     {
       "id": "6.3",

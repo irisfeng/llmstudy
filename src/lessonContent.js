@@ -457,9 +457,17 @@ const lessonMedia = {
 
   '6.1': bili('cs336', { title:'大模型推理：Prefill、Decode 与服务负载', duration:'1h22m', page:10 }),
   '6.2': bili('vllm', {
-    title:'KV Cache 与 PagedAttention', duration:'12m08s',
+    title:'KV Cache 与 PagedAttention', duration:'12m08s', requiredDuration:'12:08',
     before:'先估算一个请求的 KV cache：层数 × 2 × KV heads × head dim × token 数 × 每元素字节数，并预测长度翻倍后的显存变化。',
     after:'对同一批请求分别画出连续分配与分页分配，标出碎片、复用和 block table；再用公式复核总显存。',
+    beforeEn:'Estimate one request’s KV cache from layers × 2 × KV heads × head dim × tokens × bytes, then predict the effect of doubling context.',
+    afterEn:'Draw contiguous and paged allocation for the same requests; label fragmentation, reuse, and the block table, then verify total memory.',
+    global:{
+      platform:'Original', title:'Efficient Memory Management for Large Language Model Serving with PagedAttention',
+      author:'vLLM team', url:'https://arxiv.org/abs/2309.06180', sourceType:'primary', sourceLabel:'Original paper',
+      sourceNote:'International mode opens the primary PagedAttention paper rather than presenting a third-party video as official.',
+      referenceUrl:'https://docs.vllm.ai/en/v0.7.2/design/kernel/paged_attention.html',
+    },
   }),
   '6.3': bili('llamaCpp', { title:'GGUF 文件解析与模型加载', duration:'28m16s', page:5 }),
   '6.4': bili('llamaCpp', { title:'llama.cpp 源码逐行调试带读', duration:'2h34m', page:3, parts:[part(3,'加载后端'), part(5,'解析 GGUF'), part(8,'CPU/GPU Buffer'), part(14,'llama_context'), part(15,'分配 KV Cache')] }),
@@ -886,6 +894,55 @@ y.backward()
 assert y.data == 6.0
 assert x.grad == 5.0        # 2*x + 1; overwrite would fail`
 
+const kvCacheLessonCode = `import math
+
+W_Q = [[1.0, 0.0], [0.0, 1.0]]
+W_K = [[1.0, 0.0], [0.0, 1.0]]
+W_V = [[1.0, 1.0], [1.0, -1.0]]
+
+def matvec(x, weight):
+    return [sum(x[i] * weight[i][j] for i in range(len(x)))
+            for j in range(len(weight[0]))]
+
+def softmax(values):
+    peak = max(values)
+    exp = [math.exp(value - peak) for value in values]
+    total = sum(exp)
+    return [value / total for value in exp]
+
+def attend(query, keys, values):
+    scale = math.sqrt(len(query))
+    scores = [sum(q * k for q, k in zip(query, key)) / scale
+              for key in keys]
+    weights = softmax(scores)
+    return [sum(weight * value[d] for weight, value in zip(weights, values))
+            for d in range(len(values[0]))]
+
+def decode_step(x_t, cache):
+    query = matvec(x_t, W_Q)
+    cache["k"].append(matvec(x_t, W_K))
+    cache["v"].append(matvec(x_t, W_V))
+    return attend(query, cache["k"], cache["v"])
+
+def reference(prefix):
+    keys = [matvec(token, W_K) for token in prefix]
+    values = [matvec(token, W_V) for token in prefix]
+    query = matvec(prefix[-1], W_Q)
+    return attend(query, keys, values)
+
+tokens = [[1.0, 0.0], [0.0, 1.0], [1.0, 1.0]]
+cache = {"k": [], "v": []}
+cached = [decode_step(token, cache) for token in tokens]
+recomputed = [reference(tokens[:i + 1]) for i in range(len(tokens))]
+for actual, expected in zip(cached, recomputed):
+    assert all(abs(a - b) < 1e-12 for a, b in zip(actual, expected))
+assert len(cache["k"]) == len(tokens) == len(cache["v"])
+
+def kv_cache_bytes(layers, batch, tokens, kv_heads, head_dim, bytes_per_element):
+    return layers * 2 * batch * tokens * kv_heads * head_dim * bytes_per_element
+
+assert kv_cache_bytes(32, 1, 4096, 8, 128, 2) == 536_870_912`
+
 const specialLessonCopy = {
   zh: {
     'p.1': {
@@ -926,6 +983,26 @@ const specialLessonCopy = {
       quiz:{question:'为什么不能在发现一个节点后立刻调用它的 _backward？',options:['它可能还有其他下游路径尚未贡献梯度，必须等依赖到齐','Python 递归不能访问父节点','tanh 的导数只能最后计算'],explanation:'逆拓扑顺序保证节点收到所有下游贡献后才继续传播。'},
       mastery:['闭卷实现 add、mul、tanh 与 backward。','画出 y=x*x+x 的边并逐项算出 grad=5。','故意把 += 改成 =，用测试定位共享节点错误。','解释非标量输出为何需要显式上游向量。'],
       references:['Karpathy · micrograd','Karpathy · Neural Networks: Zero to Hero Lecture 1','PyTorch · Autograd mechanics'],
+    },
+    '6.2': {
+      objectives:['能区分 prefill 一次写入整段 K/V 与 decode 每步追加一个位置。','能写出 KV cache 的 shape 与字节公式，并解释 GQA/MQA 如何改变 KV head 数。','能证明缓存版本与每步重算前缀的注意力输出一致。','能区分 KV cache 本身、分页分配和 prefix caching。'],
+      opening:['KV cache 不让注意力“少看历史”，而是避免每生成一个 token 都重新计算历史 token 的 K/V。当前 query 仍需读取全部可见缓存，因此计算、带宽和容量要分开记账。','先修诊断：若还不能解释 Q/K/V 与 causal attention，先回到 3.2；本节只处理自回归 decoder 的推理状态，不讨论训练期完整序列反传。'],
+      concepts:[
+        {name:'Prefill 与 decode',note:'Prefill 并行处理 prompt，产生每层所有 prompt token 的 K/V；decode 每步只为新 token 计算并追加一组 K/V，再让新 query 读取已有前缀。'},
+        {name:'缓存 shape',note:'常见逻辑形状可写成 [layers, 2, batch, tokens, kv_heads, head_dim]。实现可能转置或分页，但元素数量仍由这些维度决定。'},
+        {name:'容量公式',note:'字节数 = layers × 2(K,V) × batch × tokens × kv_heads × head_dim × 每元素字节。上下文翻倍时，其他条件不变，缓存容量线性翻倍。'},
+        {name:'MHA、GQA 与 MQA',note:'MHA 通常让 query heads 与 KV heads 相同；GQA 让多组 query 共享较少 KV heads；MQA 只保留一组 K/V，因此直接降低缓存与读取量。'},
+        {name:'结果等价',note:'正确缓存只复用已经算过的历史 K/V，不改变注意力数学。固定权重和输入时，逐步缓存输出必须与每步重算整个前缀一致。'},
+        {name:'PagedAttention 边界',note:'分页把逻辑 token 位置映射到非连续物理块，减少预留和碎片；它改变存储与调度，不等于减少单个 query 需要读取的有效历史。'},
+      ],
+      workflow:['写出每步 K/V 生命周期','实现追加式 decode_step','与重算前缀逐元素对拍','用公式比较 MHA/GQA/MQA'],
+      practice:{task:'手写带 KV cache 的 attention 并验证等价性',steps:['用三个二维 token 和固定 WQ/WK/WV，先手算第一个位置的 K/V 与输出。','实现 decode_step：新 token 只计算一次 K/V，追加后让当前 query 读取整个 cache。','实现 reference：每一步重算完整前缀，逐元素断言两种输出一致。','填写 layers、tokens、kv_heads、head_dim、dtype 的容量表，再比较上下文翻倍和 GQA。'],evidence:['可直接运行的 kv_cache.py','cached 与 recomputed 三步逐元素一致断言','一张含逻辑 shape、元素数与字节数的 cache ledger','一个错误案例：漏追加、重复追加或 K/V 位置错位及其失败断言']},
+      worked:{title:'32 层、4096 token 的 GQA 缓存是多少',steps:['取 batch=1、kv_heads=8、head_dim=128、BF16=2 bytes。','代入 32×2×1×4096×8×128×2，得到 536,870,912 bytes，即 512 MiB。','上下文变为 8192 时变为 1 GiB；若误用 query head 数，会高估 GQA 缓存。'],question:'为什么 prefix caching 能省掉共享前缀的 prefill，却不保证长回答的每步 decode 更快？'},
+      code:kvCacheLessonCode,codeLabel:'kv_cache.py',
+      misconception:'KV cache 省的是历史 K/V 的重复计算，不会把标准注意力对长前缀的读取成本变成常数，也不自动解决碎片和调度。',
+      quiz:{question:'将上下文从 4k 增加到 8k，其他配置不变，单请求 KV cache 怎样变化？',options:['近似翻倍，因为 token 维线性增长','保持不变，因为历史 K/V 已缓存','变成四倍，因为 attention 是平方复杂度'],explanation:'缓存容量对 token 数线性增长；平方关系描述训练或 prefill 中完整注意力矩阵的部分计算，不是 K/V 元素数。'},
+      mastery:['从配置写出逻辑 cache shape 和字节数。','解释 prefill 写入与 decode 追加的不同。','用测试证明缓存输出等于重算前缀。','区分 GQA、PagedAttention 与 prefix caching 各自改变的量。'],
+      references:['vLLM · PagedAttention paper','vLLM · Paged Attention design','Lesson 3.2 · Scaled Dot-Product Attention'],
     },
     'p.2': {
       objectives:['能创建隔离环境并记录 Python 与依赖版本。','能把脚本拆成可导入模块、命令入口与测试。','能为文件编码、路径与输入错误设计明确失败方式。','能用 pytest 的 arrange–act–assert 结构保护重构。'],
@@ -1064,6 +1141,25 @@ specialLessonCopy.en = {
     quiz:{question:'Why not call a node’s _backward immediately when first discovered?',options:['Another downstream path may not have contributed yet, so dependencies must complete first','Python recursion cannot access parent nodes','The derivative of tanh can only be computed last'],explanation:'Reverse topological order ensures every downstream contribution has reached the node before it propagates.'},
     mastery:['Implement add, multiply, tanh, and backward without a reference.','Draw y=x*x+x and derive grad=5 edge by edge.','Replace += with = and use the test to locate the shared-node bug.','Explain why non-scalar outputs require an upstream vector.'],
     references:['Karpathy · micrograd','Karpathy · Neural Networks: Zero to Hero Lecture 1','PyTorch · Autograd mechanics'],
+  },
+  '6.2': { ...specialLessonCopy.zh['6.2'],
+    objectives:['Separate prefill, which writes prompt K/V in parallel, from decode, which appends one position per step.','Derive the KV-cache shape and byte formula, including the effect of GQA and MQA.','Prove that cached attention matches recomputing every prefix.','Distinguish the KV cache itself from paged allocation and prefix caching.'],
+    opening:['A KV cache does not let attention ignore history. It prevents recomputing historical keys and values at every token; the current query still reads the visible cache, so compute, bandwidth, and capacity remain separate constraints.','Prerequisite check: return to 3.2 if Q/K/V and causal attention are unclear. This lesson covers inference state in an autoregressive decoder, not full-sequence training backpropagation.'],
+    concepts:[
+      {name:'Prefill and decode',note:'Prefill processes the prompt in parallel and writes each layer’s K/V. Decode computes and appends one new K/V pair, then lets the current query read the prefix cache.'},
+      {name:'Cache shape',note:'A useful logical shape is [layers, 2, batch, tokens, kv_heads, head_dim]. Implementations may transpose or page it, but these dimensions still determine the element count.'},
+      {name:'Capacity formula',note:'Bytes = layers × 2(K,V) × batch × tokens × kv_heads × head_dim × bytes per element. Doubling context doubles capacity when all other dimensions stay fixed.'},
+      {name:'MHA, GQA, and MQA',note:'MHA commonly uses one KV head per query head; GQA shares fewer KV heads across query groups; MQA keeps one K/V head. The reduction directly lowers cache size and reads.'},
+      {name:'Output equivalence',note:'A correct cache reuses previously computed K/V without changing the attention equation. Fixed inputs and weights must match a reference that recomputes every prefix.'},
+      {name:'PagedAttention boundary',note:'Paging maps logical token positions to non-contiguous physical blocks to reduce reservation and fragmentation. It changes storage and scheduling, not the valid history a query must attend to.'},
+    ],
+    workflow:['Write the K/V lifetime for each step','Implement append-only decode_step','Compare every output with prefix recomputation','Use the formula across MHA/GQA/MQA'],
+    practice:{task:'Implement cached attention and prove equivalence',steps:['Use three 2-D tokens and fixed WQ/WK/WV; hand-calculate the first K/V and output.','Implement decode_step so each new token computes K/V once and appends them before attention.','Implement a reference that recomputes every prefix, then assert elementwise equality at every step.','Build a capacity table for layers, tokens, kv_heads, head_dim, and dtype; compare doubled context and GQA.'],evidence:['A directly runnable kv_cache.py','Three elementwise cached-versus-recomputed assertions','A cache ledger with logical shape, element count, and bytes','One preserved failure from a missing append, duplicate append, or K/V position mismatch']},
+    worked:{title:'Size a 32-layer, 4096-token GQA cache',steps:['Use batch=1, kv_heads=8, head_dim=128, and BF16=2 bytes.','32×2×1×4096×8×128×2 = 536,870,912 bytes, or 512 MiB.','At 8192 tokens it becomes 1 GiB; substituting query heads would overestimate a GQA cache.'],question:'Why can prefix caching remove shared-prefix prefill work without guaranteeing faster decode for a long answer?'},
+    misconception:'KV caching removes repeated historical K/V computation. It does not make standard long-prefix reads constant-time or automatically solve fragmentation and scheduling.',
+    quiz:{question:'What happens to one request’s KV cache when context grows from 4k to 8k with all other settings fixed?',options:['It approximately doubles because the token dimension grows linearly','It stays fixed because historical K/V is cached','It quadruples because attention has quadratic compute'],explanation:'Cache capacity is linear in token count. Quadratic behavior describes parts of full attention computation, not the number of stored K/V elements.'},
+    mastery:['Derive logical cache shape and bytes from a model config.','Explain prefill writes versus decode appends.','Test cached outputs against prefix recomputation.','Separate the effects of GQA, PagedAttention, and prefix caching.'],
+    references:['vLLM · PagedAttention paper','vLLM · Paged Attention design','Lesson 3.2 · Scaled Dot-Product Attention'],
   },
   'p.2': { ...specialLessonCopy.zh['p.2'],
     objectives:['Create an isolated environment and record interpreter and dependency versions.','Separate importable logic, command entry points, and tests.','Define failures for file encoding, paths, and invalid input.','Protect refactors with arrange–act–assert pytest tests.'],
