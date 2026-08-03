@@ -110,6 +110,9 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   const sansFamily = locale === 'zh'
     ? '"Noto Sans SC Variable", system-ui, sans-serif'
     : '"Manrope Variable", "Noto Sans SC Variable", system-ui, sans-serif'
+  const displayFamily = locale === 'zh'
+    ? '"Noto Serif SC Variable", "Songti SC", STSong, serif'
+    : '"Newsreader Variable", "Noto Serif SC Variable", Georgia, serif'
 
   context.fillStyle = palette.background
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT)
@@ -143,9 +146,9 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   context.fillText(`${isWorld ? 'WORLD MODELS' : 'LLM SYSTEMS'}${lessonId ? `  /  LESSON ${lessonId}` : ''}`, 88, 248)
 
   context.fillStyle = palette.text
-  context.font = `700 ${locale === 'zh' ? 78 : 72}px ${sansFamily}`
+  context.font = `${locale === 'zh' ? 650 : 560} ${locale === 'zh' ? 74 : 72}px ${displayFamily}`
   const titleEnd = drawWrappedText(context, title, {
-    x: 88, y: 346, maxWidth: 884, lineHeight: locale === 'zh' ? 112 : 100, maxLines: 4, locale,
+    x: 88, y: 346, maxWidth: 884, lineHeight: locale === 'zh' ? 106 : 100, maxLines: 4, locale,
   })
 
   context.fillStyle = palette.muted
@@ -163,7 +166,7 @@ async function makeShareCard({ title, description, lessonId, trackId, locale, ur
   context.font = `600 24px ${sansFamily}`
   context.fillText(locale === 'zh' ? '扫码打开本节课' : 'SCAN TO OPEN THIS LESSON', 126, 1150)
   context.fillStyle = palette.text
-  context.font = `700 34px ${sansFamily}`
+  context.font = `600 34px ${displayFamily}`
   context.fillText(locale === 'zh' ? '从原理到系统，亲手学会。' : 'Learn it from first principles.', 126, 1203)
   context.fillStyle = palette.muted
   context.font = '500 19px "IBM Plex Mono", monospace'

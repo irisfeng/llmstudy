@@ -27,6 +27,19 @@ const lessonIds = [...flattenLessons(modules), ...flattenLessons(worldModules)].
 const trackModules = (trackId, locale) => trackId === 'world-models' ? localizeWorldModules(locale) : localizeModules(modules, locale)
 const trackResources = trackId => trackId === 'world-models' ? worldResources : resources
 
+function EditorialTitle({ text, locale }) {
+  if (!locale.startsWith('zh')) return text
+  const segments = typeof Intl.Segmenter === 'function'
+    ? [...new Intl.Segmenter('zh-CN', { granularity:'word' }).segment(text)].map(item => item.segment)
+    : Array.from(text)
+  const words = segments.reduce((items, segment) => {
+    if (/^[：:，,、；;。！？!?]+$/.test(segment) && items.length) items[items.length - 1] += segment
+    else items.push(segment)
+    return items
+  }, [])
+  return words.map((word, index) => <span className="title-word" key={`${word}-${index}`}>{word}</span>)
+}
+
 const LAST_LESSON_KEY = 'uth-last-lesson'
 const readLastLesson = () => {
   try {
@@ -524,7 +537,7 @@ function LessonStudy({ module, lesson, onBack, onNavigate, theme, toggleTheme, c
         <header className="reading-hero">
           <div className="study-breadcrumb">{module.no} {module.title} / {material.id}</div>
           <div className="reading-kicker"><span className="section-no">{t('theoryPracticeEvidence')}</span><span>{material.type}</span><span>{material.duration}</span></div>
-          <h1 id="lesson-title">{material.title}</h1>
+          <h1 id="lesson-title"><EditorialTitle text={material.title} locale={locale} /></h1>
           <DoodleUnderline className="title-swash" />
           <p className="study-lead">{t('lessonLead')}</p>
           <aside className="reading-contract"><DoodleBook /><div><span>{pick('本节不是摘要','NOT A SUMMARY')}</span><b>{pick('先理解，再实现，最后留下可检查证据。','Understand it, build it, then leave inspectable evidence.')}</b><small>{material.practice.task}</small></div></aside>

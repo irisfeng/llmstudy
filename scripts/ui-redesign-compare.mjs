@@ -4,15 +4,19 @@ import puppeteer from 'puppeteer-core'
 import { browserLaunchOptions } from './browser-runtime.mjs'
 
 const outputDir = process.env.UI_CAPTURE_DIR || '/tmp/llmstudy-ui-redesign'
-const pairs = [
-  ['learning-desktop', 'before-learning-desktop.png', 'after-light-learning-desktop.png'],
-  ['learning-mobile', 'before-learning-mobile.png', 'after-light-learning-mobile.png'],
-  ['reading-desktop', 'before-reading-desktop.png', 'after-light-reading-desktop.png'],
-  ['reading-mobile', 'before-reading-mobile.png', 'after-light-reading-mobile.png'],
-  ['share-dialog-desktop', 'before-share-dialog-desktop.png', 'after-light-share-dialog-desktop.png'],
-  ['share-dialog-mobile', 'before-share-dialog-mobile.png', 'after-light-share-dialog-mobile.png'],
-  ['share-card-light', 'before-share-card-light.png', 'after-light-share-card-light.png'],
+const beforeLabel = process.env.UI_COMPARE_BEFORE_LABEL || 'before'
+const afterLabel = process.env.UI_COMPARE_AFTER_LABEL || 'after-light'
+const comparisonLabel = process.env.UI_COMPARE_LABEL || 'comparison'
+const names = [
+  'learning-desktop',
+  'learning-mobile',
+  'reading-desktop',
+  'reading-mobile',
+  'share-dialog-desktop',
+  'share-dialog-mobile',
+  'share-card-light',
 ]
+const pairs = names.map(name => [name, `${beforeLabel}-${name}.png`, `${afterLabel}-${name}.png`])
 
 const asDataUrl = path => `data:image/png;base64,${readFileSync(path).toString('base64')}`
 const browser = await puppeteer.launch(await browserLaunchOptions())
@@ -50,7 +54,7 @@ for (const [name, beforeName, afterName] of pairs) {
     await Promise.all([...document.images].map(image => image.decode()))
     if (document.fonts?.ready) await document.fonts.ready
   })
-  await page.screenshot({ path: join(outputDir, `comparison-${name}.png`), fullPage: true })
+  await page.screenshot({ path: join(outputDir, `${comparisonLabel}-${name}.png`), fullPage: true })
   await page.close()
 }
 

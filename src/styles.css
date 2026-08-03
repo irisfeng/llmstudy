@@ -16,8 +16,11 @@
   --marker: rgba(57,215,164,.2);
   --radius: 12px;
   --side: 172px;
+  --font-body: 'Noto Sans SC Variable', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', Arial, sans-serif;
+  --font-display: 'Noto Serif SC Variable', 'Songti SC', STSong, SimSun, serif;
+  --font-mono: 'IBM Plex Mono', 'Noto Sans SC Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  font-family: 'Noto Sans SC Variable', 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', Arial, sans-serif;
+  font-family: var(--font-body);
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
@@ -27,7 +30,22 @@
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; background: var(--bg); }
 body { margin: 0; min-width: 320px; min-height: 100vh; background: var(--bg); }
-html[lang="en"] { font-family:'Manrope Variable', 'Noto Sans SC Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif; }
+html[lang="en"] {
+  --font-body: 'Manrope Variable', 'Noto Sans SC Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Arial, sans-serif;
+  --font-display: 'Newsreader Variable', 'Noto Serif SC Variable', Georgia, 'Times New Roman', serif;
+  font-family: var(--font-body);
+}
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: 600;
+  text-wrap: balance;
+}
+html[lang^="zh"] h1, html[lang^="zh"] h2, html[lang^="zh"] h3 { line-break:strict; word-break:auto-phrase; }
+html[lang^="zh"] h1 { font-weight:650; letter-spacing:-.018em; }
+html[lang^="zh"] h2, html[lang^="zh"] h3 { letter-spacing:-.012em; }
+html[lang="en"] h1 { font-weight:560; letter-spacing:-.035em; }
+html[lang="en"] h2, html[lang="en"] h3 { font-weight:560; letter-spacing:-.022em; }
 button, input, textarea { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -945,7 +963,8 @@ html[lang="en"] .hero-note .hand { font-size:23px; }
 .reading-kicker { display:flex; align-items:center; gap:8px; }
 .reading-kicker > span:not(.section-no) { padding:4px 8px; border:1px solid var(--line); border-radius:99px; color:var(--muted); font:600 8px 'IBM Plex Mono','Noto Sans SC Variable'; }
 .study-breadcrumb { margin-bottom:26px; }
-.reading-hero > h1 { max-width:730px; margin:16px 0 18px; font-size:clamp(48px,5vw,72px); line-height:1.04; letter-spacing:-.065em; }
+.reading-hero > h1 { max-width:730px; margin:16px 0 18px; font-size:clamp(46px,4.5vw,64px); line-height:1.08; letter-spacing:-.065em; }
+.reading-hero .title-word { display:inline-block; max-width:100%; white-space:nowrap; }
 .reading-hero .study-lead { max-width:680px; font-size:15px; line-height:1.9; }
 .reading-contract { min-height:104px; display:grid; grid-template-columns:72px 1fr; gap:18px; align-items:center; margin:30px -10px -14px; padding:18px 20px; border-top:1px dashed var(--line); background:color-mix(in srgb,var(--accent-dim) 48%,transparent); }
 .reading-contract .doodle { width:66px; color:var(--accent); }
@@ -978,12 +997,12 @@ html[lang="en"] .hero-note .hand { font-size:23px; }
   .curriculum-layout { grid-template-columns:230px 1fr; }
   .module-index button { min-height:86px; }
   .lesson-table-head { display:grid; }
-  .lesson-table-head,.lesson-table > button { grid-template-columns:minmax(220px,1.2fr) minmax(140px,.85fr) minmax(140px,.85fr) 72px; gap:12px; }
+  .lesson-table-head,.lesson-table > button { grid-template-columns:minmax(200px,1.2fr) minmax(125px,.85fr) minmax(125px,.85fr) 64px; gap:10px; }
   .lesson-table > button > span:nth-child(3) { display:block; }
   .study-layout { grid-template-columns:220px minmax(0,760px); gap:38px; padding:0 24px; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 880px) {
   .curriculum-lead { padding:42px 20px 0; }
   .curriculum-lead-grid { grid-template-columns:1fr; gap:28px; }
   .path-lead-copy h1 { font-size:43px; line-height:1.04; }
@@ -1029,7 +1048,7 @@ html[lang="en"] .hero-note .hand { font-size:23px; }
   .study-reading { padding:24px 20px 78px; }
   .reading-hero { margin:0 0 44px; padding:26px 20px 22px; box-shadow:7px 8px 0 color-mix(in srgb,var(--accent) 7%,transparent); }
   .reading-kicker { flex-wrap:wrap; }
-  .reading-hero > h1 { font-size:39px; line-height:1.06; }
+  .reading-hero > h1 { font-size:34px; line-height:1.12; }
   .reading-hero .study-lead { font-size:14px; line-height:1.82; }
   .reading-contract { grid-template-columns:52px 1fr; gap:12px; margin:24px -8px -10px; padding:15px 12px; }
   .reading-contract .doodle { width:48px; }

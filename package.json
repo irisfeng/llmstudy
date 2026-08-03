@@ -21,11 +21,14 @@
     "qa:world": "npm run qa:world-content && node scripts/world-model-check.mjs",
     "qa:ui:capture": "node scripts/ui-redesign-capture.mjs",
     "qa:ui:compare": "node scripts/ui-redesign-compare.mjs",
+    "qa:ui:typography": "node scripts/typography-check.mjs",
     "seo:indexnow:submit": "node scripts/indexnow-submit.mjs --submit"
   },
   "dependencies": {
     "@fontsource-variable/manrope": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
     "@fontsource-variable/noto-sans-sc": "^5.3.0",
+    "@fontsource-variable/noto-serif-sc": "^5.3.0",
     "@fontsource/caveat": "^5.3.0",
     "@fontsource/ibm-plex-mono": "^5.2.7",
     "@fontsource/zhi-mang-xing": "^5.3.0",
