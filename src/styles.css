@@ -964,7 +964,7 @@ html[lang="en"] .hero-note .hand { font-size:23px; }
 .reading-kicker > span:not(.section-no) { padding:4px 8px; border:1px solid var(--line); border-radius:99px; color:var(--muted); font:600 8px 'IBM Plex Mono','Noto Sans SC Variable'; }
 .study-breadcrumb { margin-bottom:26px; }
 .reading-hero > h1 { max-width:730px; margin:16px 0 18px; font-size:clamp(46px,4.5vw,64px); line-height:1.08; letter-spacing:-.065em; }
-.reading-hero .title-phrase { display:inline-block; white-space:nowrap; }
+.reading-hero .title-word { display:inline-block; max-width:100%; white-space:nowrap; }
 .reading-hero .study-lead { max-width:680px; font-size:15px; line-height:1.9; }
 .reading-contract { min-height:104px; display:grid; grid-template-columns:72px 1fr; gap:18px; align-items:center; margin:30px -10px -14px; padding:18px 20px; border-top:1px dashed var(--line); background:color-mix(in srgb,var(--accent-dim) 48%,transparent); }
 .reading-contract .doodle { width:66px; color:var(--accent); }

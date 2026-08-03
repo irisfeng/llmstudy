@@ -29,8 +29,15 @@ const trackResources = trackId => trackId === 'world-models' ? worldResources : 
 
 function EditorialTitle({ text, locale }) {
   if (!locale.startsWith('zh')) return text
-  const phrases = text.match(/[^：:，,、；;。！？!?]+[：:，,、；;。！？!?]?/g) || [text]
-  return phrases.map((phrase, index) => <span className="title-phrase" key={`${phrase}-${index}`}>{phrase}</span>)
+  const segments = typeof Intl.Segmenter === 'function'
+    ? [...new Intl.Segmenter('zh-CN', { granularity:'word' }).segment(text)].map(item => item.segment)
+    : Array.from(text)
+  const words = segments.reduce((items, segment) => {
+    if (/^[：:，,、；;。！？!?]+$/.test(segment) && items.length) items[items.length - 1] += segment
+    else items.push(segment)
+    return items
+  }, [])
+  return words.map((word, index) => <span className="title-word" key={`${word}-${index}`}>{word}</span>)
 }
 
 const LAST_LESSON_KEY = 'uth-last-lesson'
